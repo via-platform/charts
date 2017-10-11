@@ -1,0 +1,89 @@
+@import "ui-variables";
+
+.chart
+{
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    svg
+    {
+        display: block;
+    }
+
+    .chart-graphic
+    {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chart-center
+    {
+        flex: 1;
+        min-width: 0;
+        min-height: 0;
+    }
+
+    .chart-tools
+    {
+        height: 32px;
+        display: flex;
+
+        .chart-tools-left
+        {
+
+        }
+
+        .chart-tools-right
+        {
+
+        }
+
+        .chart-tools-divider
+        {
+            flex: 1;
+        }
+    }
+
+    .zoomable
+    {
+        fill: transparent;
+    }
+
+    clipPath rect
+    {
+        fill: transparent;
+    }
+
+    .grid
+    {
+        pointer-events: none;
+
+        line
+        {
+            stroke: lighten(@tool-panel-background-color, 5%);
+        }
+
+        path
+        {
+            stroke: transparent;
+        }
+    }
+
+
+    .axis
+    {
+        pointer-events: none;
+        
+        line, path
+        {
+            stroke: lighten(@tool-panel-background-color, 12%);
+        }
+
+        text
+        {
+            fill: lighten(@tool-panel-background-color, 25%);
+        }
+    }
+}

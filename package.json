@@ -1,0 +1,35 @@
+{
+  "name": "charts",
+  "version": "1.0.0",
+  "description": "Charting view for a workspace.",
+  "main": "./src/main",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "via",
+    "trading"
+  ],
+  "repository": "https://bitbucket.org/via-trading/charts",
+  "author": "Dakota Gordon",
+  "dependencies": {
+    "d3": "^4.10.2",
+    "etch": "^0.12.5",
+    "underscore-plus": "^1.6.6"
+  },
+  "engines": {
+    "via": "*"
+  },
+  "devDependencies": {
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-env": "^1.6.0"
+  },
+  "providedServices": {
+    "charts": {
+      "description": "Charts package for creating plugins, studies, tools, etc.",
+      "versions": {
+        "1.0.0": "provideCharts"
+      }
+    }
+  }
+}

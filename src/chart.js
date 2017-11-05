@@ -1,16 +1,15 @@
 const {Disposable, CompositeDisposable, Emitter} = require('via');
-// const d3 = require('d3');
-// const techan = require('techan');
-// const Candlestick = require('./candlestick');
+const d3 = require('d3');
 const ChartCenter = require('./chart-center');
-// const ChartData = require('./chart-data');
+const ChartData = require('./chart-data');
 const ChartStudy = require('./chart-study');
+const ChartPanels = require('./chart-panels');
+const ChartTools = require('./chart-tools');
+const ChartAxis = require('./chart-axis');
 const _ = require('underscore-plus');
-const etch = require('etch');
-const $ = etch.dom;
-const PluginTypes = 'plots annotations indicators studies tools'.split(' ');
 const ChartDefaults = {end: 0, start: Date.now() - 864e5};
 const ChartAreas = 'top left bottom right'.split(' ');
+const BaseURI = 'via://chart';
 
 module.exports = class Chart {
     static deserialize(plugins, params){
@@ -19,78 +18,93 @@ module.exports = class Chart {
 
     serialize(){
         return {
-            uri: this.uri,
-            series: this.series,
+            uri: this.getURI(),
             time: this.time,
-            plots: this.plots.map(plot => plot.serialize()),
-            annotations: this.annotations.map(annotation => annotation.serialize()),
-            indicators: this.indicators.map(indicator => indicator.serialize()),
-            studies: this.studies.map(study => study.serialize()),
-            tools: this.tools.map(tool => tool.serialize())
+            panels: this.panels.serialize(),
+            tools: this.tools.serialize()
         };
     }
 
-    constructor(charts, plugins, params = {}){
-        this.charts = charts;
+    constructor(plugins, params = {}){
         this.plugins = plugins;
 
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
         this.warnings = [];
-        this.studies = params.studies || [];
-        this.tools = params.tools || [];
+
+        this.panels = [];
+        this.symbol = null;
+
         this.uri = params.uri;
-        this.type = params.type || 'candlestick';
         this.extent = _.defaults(params.extent || {}, ChartDefaults);
-        this.seriesDisposables = new Map();
-        this.series = [];
+        this.granularity = params.granularity || 6e4;
 
-        this.granularity = params.granularity || 9e5; //5 minutes
+        this.width = 0;
+        this.height = 0;
 
-        etch.initialize(this);
-
-        this.center = new ChartCenter(this);
         // this.data = new ChartData(this);
 
-        this.resizeObserver = new ResizeObserver(this.didResize.bind(this));
+        this.basis = d3.scaleTime().domain([new Date(Date.now() - 36e5), new Date()]);
+        this.scale = this.basis.copy();
+
+        this.element = document.createElement('div');
+        this.element.classList.add('chart');
+
+        this.resizeObserver = new ResizeObserver(this.resize.bind(this));
         this.resizeObserver.observe(this.element);
 
         this.initialize(params);
+        this.draw();
     }
 
-    initialize(params){
-        if(params.series){
-            //Find the symbol object for each symbol id
-            for(let series of params.series){
-                series.symbol = via.symbols.findByURI(series.uri);
+    initialize(state = {}){
+        this.tools = new ChartTools({chart: this, state: state.tools});
+        this.panels = new ChartPanels({chart: this, state: state.panels});
+        this.axis = new ChartAxis({chart: this});
 
-                if(series.symbol){
-                    this.addSeries(series);
-                }
-            }
-        }
+        this.element.appendChild(this.tools.element);
+        this.element.appendChild(this.panels.element);
+        this.element.appendChild(this.axis.element);
     }
 
-    didResize(){
-        this.emitter.emit('did-resize');
+    zoomed({event, target}){
+        this.scale.domain(event.transform.rescaleX(this.basis).domain());
+        this.emitter.emit('did-zoom', {event, target});
+    }
+
+    resize(){
+        this.width = this.element.clientWidth;
+        this.height = this.element.clientHeight;
+
+        this.basis.range([0, this.width]);
+        this.scale.range([0, this.width]);
+
+        this.emitter.emit('did-resize', {width: this.width, height: this.height});
+    }
+
+    draw(){
+        //Redraw all panels and the X axis
+        this.axis.draw();
+    }
+
+    attachAxis(){
+
+    }
+
+    addPanel(state){
+        let chartPanel = new ChartPanel({chart: this, state});
+        this.graphic.appendChild(chartPanel.element);
+        this.panels.push(chartPanel);
+        this.emitter.emit('did-add-panel');
     }
 
     destroy(){
         this.disposables.dispose();
         this.emitter.dispose();
-        this.center.destroy();
+        this.panels.destroy();
+        this.tools.destroy();
+        this.axis.destroy();
         this.resizeObserver.disconnect();
-
-        for(let study of this.studies){
-            study.destroy();
-        }
-
-        for(let disposables of this.seriesDisposables.values()){
-            disposables.dispose();
-        }
-
-        this.seriesDisposables.clear();
-        this.seriesDisposables = null;
         this.emitter.emit('did-destroy');
     }
 
@@ -98,25 +112,13 @@ module.exports = class Chart {
         return this.uri;
     }
 
+    getIdentifier(){
+        return this.getURI().slice(BaseURI.length + 1);
+    }
+
     getTitle(){
         //TODO make the title more helpful
         return 'Chart';
-    }
-
-    addedPlugin(plugin){
-        // let metadata = plugin.getMetadata();
-        //
-        // this.clearWarnings();
-        //
-        // if(!PluginTypes.includes(metadata.type)){
-        //     this.addWarning({type: 'error', message: `Tried to add a plugin with an invalid type: ${plugin.type}.`});
-        //     return;
-        // }
-    }
-
-    removedPlugin(plugin){
-        console.log('Removed a plugin!');
-        //TODO remove any disposables that may be associated with this plugin
     }
 
     addWarning(warning){
@@ -133,37 +135,9 @@ module.exports = class Chart {
         this.warnings = [];
     }
 
-    getSeries(){
-        return this.series.slice();
-    }
-
-    addSeries(series){
-        if(this.series.includes(series)){
-            return;
-        }
-
-        this.series.push(series);
-        this.emitter.emit('did-add-series', series);
-        this.charts.didAddSeries(this, series);
-
-        console.log('series.symbol.subscribe();');
-        series.symbol.ticker.subscribe(function(){});
-
-        let disposables = new CompositeDisposable();
-
-        this.seriesDisposables.set(series, disposables);
-
-        etch.update(this);
-    }
-
-    removeSeries(series){
-        if(this.series.includes(series)){
-            _.remove(this.series, series);
-            this.emitter.emit('did-remove-series', series);
-            this.charts.didRemoveSeries(this, series);
-            this.seriesDisposables.get(series).dispose();
-            this.seriesDisposables.delete(series);
-        }
+    changeSymbol(symbol){
+        this.symbol = symbol;
+        this.emitter.emit('did-change-symbol', symbol);
     }
 
     addTool(tool){
@@ -193,31 +167,21 @@ module.exports = class Chart {
         this.emitter.emit('did-remove-study', study);
     }
 
-    setChartType(type){
-        this.chart.type = type;
-        this.emitter.emit('did-change-chart-type', type);
+    nearestCandle(date){
+        return new Date(Math.floor(date.getTime() / this.granularity) * this.granularity);
     }
 
-    getChartType(){
-        return this.chart.type;
+    addLeftPanel(){
+
     }
 
-    render(){
-        return $.div({class: 'chart'},
-            $.div({class: 'chart-tools', ref: 'tools'},
-                $.div({class: 'chart-tools-left', ref: 'toolsLeft'}),
-                $.div({class: 'chart-tools-divider'}),
-                $.div({class: 'chart-tools-left', ref: 'toolsRight'})
-            ),
-            $.div({class: 'chart-graphic'},
-                $.div({class: 'chart-area top', ref: 'top'}),
-                $.div({class: 'chart-center', ref: 'center'}),
-                $.div({class: 'chart-area bottom', ref: 'bottom'})
-            )
-        );
+    addRightPanel(){
+
     }
 
-    update(){}
+    addRightPanel(){
+
+    }
 
     onDidChangeResolution(callback){
         return this.emitter.on('did-change-resolution', callback);
@@ -239,36 +203,8 @@ module.exports = class Chart {
         return this.emitter.on('did-remove-warning', callback);
     }
 
-    observeSeries(callback){
-        for(let series of this.series){
-            callback(series);
-        }
-
-        return this.emitter.on('did-add-series', callback);
-    }
-
-    onDidAddSeries(callback){
-        return this.emitter.on('did-add-series', callback);
-    }
-
-    onDidRemoveSeries(callback){
-        return this.emitter.on('did-remove-series', callback);
-    }
-
-    onDidModifySeries(callback){
-        return this.emitter.on('did-modify-series', callback);
-    }
-
-    onDidDestroy(callback){
-        return this.emitter.on('did-destroy', callback);
-    }
-
-    onDidAddLayer(callback){
-        return this.center.onDidAddLayer(callback);
-    }
-
-    onDidRemoveLayer(callback){
-        return this.center.onDidRemoveLayer(callback);
+    onDidChangeSymbol(callback){
+        return this.emitter.on('did-change-symbol', callback);
     }
 
     onDidAddStudy(callback){
@@ -279,7 +215,19 @@ module.exports = class Chart {
         return this.emitter.on('did-remove-study', callback);
     }
 
+    onDidDestroy(callback){
+        return this.emitter.on('did-destroy', callback);
+    }
+
     onDidResize(callback){
         return this.emitter.on('did-resize', callback);
+    }
+
+    onDidDraw(callback){
+        return this.emitter.on('did-draw', callback);
+    }
+
+    onDidZoom(callback){
+        return this.emitter.on('did-zoom', callback);
     }
 }

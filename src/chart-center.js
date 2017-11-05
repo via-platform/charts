@@ -12,13 +12,21 @@ module.exports = class ChartCenter {
         this.defaults = null;
         this.margin = {top: 5, right: 40, bottom: 25, left: 0};
         this.layers = [];
+
         this.initialize();
 
         this.disposables.add(this.chart.onDidResize(this.resized.bind(this)));
     }
 
     get element(){
-        return this.chart.refs.center;
+        if(this._element){
+            return this._element;
+        }
+
+        this._element = document.createElement('div');
+        this._element.classList.add('chart-center');
+
+        return this._element;
     }
 
     get width(){
@@ -65,8 +73,8 @@ module.exports = class ChartCenter {
         }
 
         this.basis = {
-            x: d3.scaleTime().domain([new Date(Date.now() - 864e5), new Date()]),
-            y: d3.scaleLinear().domain([3960, 4160]),
+            x: d3.scaleTime().domain([new Date(Date.now() - 36e5), new Date()]),
+            y: d3.scaleLinear().domain([5650, 5750]),
             zoom: d3.zoom().on('zoom', this.zoom())
         };
 
@@ -148,6 +156,8 @@ module.exports = class ChartCenter {
             this.layers[this.layers.indexOf(this.layer) + 1].element.insertBefore(layer.element);
         }
 
+        this.updateDomain();
+
         return new Disposable(() => {
             layer.element.remove();
             this.layers.splice(this.layers.indexOf(layer), 1);
@@ -155,25 +165,44 @@ module.exports = class ChartCenter {
         });
     }
 
-    zoomTranslateExtent(value){
-        if(value){
-            this.basis.zoom.translateExtent(value);
-            this.graphic.call(this.basis.zoom);
+    updateDomain(){
+        let domains = _.flatten(this.layers.map(layer => layer.domain())).filter(value => !_.isUndefined(value));
+
+        if(domains.length){
+            let min = _.min(domains);
+            let max = _.max(domains);
+
+            if(!_.isUndefined(min) && !_.isUndefined(max)){
+                // console.log(`Min ${min} and Max ${max}`);
+                this.basis.y.domain([min, max]);
+                this.scale.y.domain([min, max]);
+                this.emitter.emit('did-change-domain', this.scale);
+                this.draw();
+            }
         }else{
-            return this.basis.zoom.translateExtent();
+            this.basis.y.domain([0, 100]);
+            this.scale.y.domain([0, 100]);
+            this.emitter.emit('did-change-domain', this.scale);
+            this.draw();
         }
     }
+
+    // zoomTranslateExtent(value){
+    //     if(value){
+    //         this.basis.zoom.translateExtent(value);
+    //         this.graphic.call(this.basis.zoom);
+    //     }else{
+    //         return this.basis.zoom.translateExtent();
+    //     }
+    // }
 
     zoom(){
         let that = this;
 
         return function(d, i){
+            console.log(d3.event);
             that.scale.x.domain(d3.event.transform.rescaleX(that.basis.x).domain());
-
-            // if(!d3.event.sourceEvent.shiftKey){
-                that.scale.y.domain(d3.event.transform.rescaleY(that.basis.y).domain());
-            // }
-
+            that.updateDomain();
             that.emitter.emit('did-zoom', {event: d3.event, mouse: d3.mouse(this), d, i});
             that.emitter.emit('did-change-domain', that.scale);
             that.draw();

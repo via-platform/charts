@@ -3,12 +3,13 @@ const d3 = require('d3');
 const _ = require('underscore-plus');
 
 class Candlestick {
-    constructor({chart, state, layer}){
+    constructor({chart, state, element, panel}){
         this.disposables = new CompositeDisposable();
         this.chart = chart;
+        this.panel = panel;
+        this.element = element;
 
-        this.element = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        this.element.classList.add('layer', 'candlestick', 'full-width', 'full-height');
+        this.element.classed('candlestick', true);
 
         this.body = this.body.bind(this);
         this.wick = this.wick.bind(this);
@@ -19,7 +20,7 @@ class Candlestick {
     serialize(){
         return {
             version: 1,
-            plugin: 'candlestick'
+            name: 'candlestick'
         };
     }
 
@@ -28,8 +29,8 @@ class Candlestick {
     }
 
     domain(){
-        let [start, end] = this.chart.center.scale.x.domain();
-        let data = this.data.fetch({start, end});
+        let [start, end] = this.chart.scale.domain();
+        let data = this.chart.data.fetch({start, end});
 
         if(data.length){
             return [ _.min(data.map(d => d.low)), _.max(data.map(d => d.high)) ];
@@ -37,8 +38,9 @@ class Candlestick {
     }
 
     draw(){
-        let [start, end] = this.chart.center.scale.x.domain();
-        let data = this.data.fetch({start, end});
+        return console.log("Drew candles");
+        let [start, end] = this.chart.scale.domain();
+        let data = this.chart.data.fetch({start, end});
         let element = d3.select(this.element);
         // this.chart.center.zoomTranslateExtent();
 

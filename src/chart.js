@@ -9,7 +9,7 @@ const ChartAxis = require('./chart-axis');
 const _ = require('underscore-plus');
 const ChartDefaults = {end: 0, start: Date.now() - 864e5};
 const ChartAreas = 'top left bottom right'.split(' ');
-const BaseURI = 'via://chart';
+const BaseURI = 'via://charts';
 
 module.exports = class Chart {
     static deserialize(plugins, params){
@@ -21,7 +21,8 @@ module.exports = class Chart {
             uri: this.getURI(),
             time: this.time,
             panels: this.panels.serialize(),
-            tools: this.tools.serialize()
+            tools: this.tools.serialize(),
+            data: this.data.serialize()
         };
     }
 
@@ -33,16 +34,13 @@ module.exports = class Chart {
         this.warnings = [];
 
         this.panels = [];
-        this.symbol = null;
 
         this.uri = params.uri;
-        this.extent = _.defaults(params.extent || {}, ChartDefaults);
-        this.granularity = params.granularity || 6e4;
 
         this.width = 0;
         this.height = 0;
 
-        // this.data = new ChartData(this);
+        this.data = new ChartData({chart: this});
 
         this.basis = d3.scaleTime().domain([new Date(Date.now() - 36e5), new Date()]);
         this.scale = this.basis.copy();
@@ -65,6 +63,12 @@ module.exports = class Chart {
         this.element.appendChild(this.tools.element);
         this.element.appendChild(this.panels.element);
         this.element.appendChild(this.axis.element);
+
+        this.symbol = this.getURI().slice(BaseURI.length + 1);
+
+        if(this.symbol){
+            this.emitter.emit('did-change-symbol', this.symbol);
+        }
     }
 
     zoomed({event, target}){
@@ -168,7 +172,7 @@ module.exports = class Chart {
     }
 
     nearestCandle(date){
-        return new Date(Math.floor(date.getTime() / this.granularity) * this.granularity);
+        return new Date(Math.floor(date.getTime() / this.data.granularity) * this.data.granularity);
     }
 
     addLeftPanel(){

@@ -19,7 +19,7 @@ class ChartPackage {
 
         this.disposables.add(via.workspace.addOpener((uri, options) => {
             if(uri.startsWith(BaseURI)){
-                let chart = new Chart(this.plugins, options.state);
+                let chart = new Chart(this.plugins, {uri});
 
                 this.charts.push(chart);
                 this.emitter.emit('did-create-chart', chart);
@@ -51,18 +51,15 @@ class ChartPackage {
     }
 
     registerPlugin(plugin){
-        let metadata = plugin.metadata();
-        this.plugins.set(metadata.name, plugin);
+        this.plugins.set(plugin.name, plugin);
         this.emitter.emit('did-register-plugin', plugin);
         this.updatePluginActivationState(plugin);
         return new Disposable(() => this.unregisterPlugin(plugin));
     }
 
     unregisterPlugin(plugin){
-        let metadata = plugin.metadata();
-
-        if(this.plugins.has(metadata.name)){
-            this.plugins.delete(metadata.name);
+        if(this.plugins.has(plugin.name)){
+            this.plugins.delete(plugin.name);
             this.emitter.emit('did-unregister-plugin', plugin);
         }
     }

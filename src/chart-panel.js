@@ -1,11 +1,12 @@
 const {Disposable, CompositeDisposable, Emitter} = require('via');
 const d3 = require('d3');
+const _ = require('underscore-plus');
 const ChartLayer = require('./chart-layer');
 const ChartPanelAxis = require('./chart-panel-axis');
 const ChartPanelGrid = require('./chart-panel-grid');
 
 //TODO allow the user to set a preference on this
-const DEFAULT_PLOT = 'candlestick';
+const DEFAULT_PLUGIN = {name: 'candlestick'};
 const AXIS_WIDTH = 60;
 
 module.exports = class ChartPanel {
@@ -13,73 +14,59 @@ module.exports = class ChartPanel {
     serialize(){
         return {
             isCenter: this.isCenter,
-            plot: this.plot.serialize(),
-            objects: this.objects.map(object => object.serialize())
+            layers: this.layers.map(object => object.serialize())
         };
     }
 
-    constructor({chart, isCenter, plot, state}){
+    constructor({chart, isCenter, state}){
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
 
         this.chart = chart;
         this.isCenter = isCenter;
-        this.objects = [];
+        this.layers = [];
 
         this.width = 0;
         this.height = 0;
 
-        this.basis = d3.scaleLinear().domain([0, 100]);
+        this.basis = d3.scaleLinear().domain([100, 0]);
         this.scale = this.basis.copy();
 
         this.element = document.createElement('div');
         this.element.classList.add('panel', this.isCenter ? 'center' : 'indicator');
 
-        this.layers = document.createElement('div');
-        this.layers.classList.add('panel-layers');
+        this.center = document.createElement('div');
+        this.center.classList.add('panel-center');
 
-        this.grid = new ChartPanelGrid({chart: this.chart, panel: this});
         this.axis = new ChartPanelAxis({chart: this.chart, panel: this});
-
-        this.element.appendChild(this.layers);
+        this.element.appendChild(this.center);
         this.element.appendChild(this.axis.element);
 
-        this.svg = d3.select(this.layers)
+        this.svg = d3.select(this.center)
             .append('svg')
             .attr('width', this.width);
 
         this.zoomable = this.svg.append('rect').attr('class', 'zoomable');
         this.zoomable.call(d3.zoom().on('zoom', this.zoom()));
-        // this.zoomable.call(d3.drag().on('drag', this.drag()));
+
+        this.grid = new ChartPanelGrid({chart: this.chart, panel: this});
 
         this.disposables.add(this.chart.onDidDraw(this.draw.bind(this)));
         this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
         this.disposables.add(this.chart.onDidDestroy(this.destroy.bind(this)));
 
+        if(state && state.layers){
+            this.layers = state.layers.map(layer => ChartLayer.deserialize({chart: this.chart, panel: this, state: layer}));
+        }else{
+            this.layers.push(new ChartLayer({chart: this.chart, panel: this, isRoot: true, plugin: DEFAULT_PLUGIN}));
+        }
+
         this.resize();
     }
 
-    initialize(state = {}){
-        // this.layers = this.svg.append('rect').attr('class', 'layers');
-
-        // this.grid.x = this.svg.append('g').attr('class', 'grid x');
-        // this.grid.y = this.svg.append('g').attr('class', 'grid y');
-
-
-        // let plugin = state.plot.plugin || DEFAULT_PLOT;
-        // let layer = svg.append('g').attr('class', 'plot layer');
-        // this.plot = this.chart.plugins.get(plugin).instance({chart, panel: this, state: state.plot, layer});
-
-        if(state.objects){
-            for(let object of state.objects){
-
-            }
-        }
-    }
-
     resize(){
-        this.width = this.layers.clientWidth;
-        this.height = this.layers.clientHeight;
+        this.width = this.center.clientWidth;
+        this.height = this.center.clientHeight;
         this.basis.range([0, this.height]);
         this.scale.range([0, this.height]);
 
@@ -92,24 +79,7 @@ module.exports = class ChartPanel {
     }
 
     draw(){
-        //Calculate the range of this graph
-
-        //Scale the x and y axes appropriately
-        // this.element.select('g.y.axis').call(this.axis.y);
-        // this.element.select('g.x.grid').call(d3.axisBottom(this.scale.x).ticks(10).tickSize(this.height).tickFormat(''));
-        // this.element.select('g.y.grid').call(d3.axisLeft(this.scale.y).ticks(10).tickSize(-this.width).tickFormat(''));
-
-        // this.emitter.emit('did-draw');
-    }
-
-    drag(){
-        const _this = this;
-
-        return function(d, i){
-            // console.log('dragged');
-            // console.log(d3.event.transform);
-            // _this.chart.zoomed({event: d3.event, target: _this});
-        };
+        this.layers.forEach(layer => layer.draw());
     }
 
     zoomed({event, target}){
@@ -117,6 +87,7 @@ module.exports = class ChartPanel {
             d3.zoom().transform(this.zoomable, event.transform);
         }
 
+        this.rescale();
         this.draw();
     }
 
@@ -128,8 +99,8 @@ module.exports = class ChartPanel {
         };
     }
 
-    updateDomain(){
-        let domains = _.flatten(this.layers.map(layer => layer.domain())).filter(value => !_.isUndefined(value));
+    rescale(){
+        let domains = _.flatten(this.layers.map(layer => layer.domain()));
 
         if(domains.length){
             let min = _.min(domains);
@@ -137,15 +108,15 @@ module.exports = class ChartPanel {
 
             if(!_.isUndefined(min) && !_.isUndefined(max)){
                 // console.log(`Min ${min} and Max ${max}`);
-                this.basis.y.domain([min, max]);
-                this.scale.y.domain([min, max]);
-                this.emitter.emit('did-change-domain', this.scale);
+                this.basis.domain([min, max]);
+                this.scale.domain([min, max]);
+                this.emitter.emit('did-rescale', this.scale);
                 this.draw();
             }
         }else{
-            this.basis.y.domain([0, 100]);
-            this.scale.y.domain([0, 100]);
-            this.emitter.emit('did-change-domain', this.scale);
+            this.basis.domain([0, 100]);
+            this.scale.domain([0, 100]);
+            this.emitter.emit('did-rescale', this.scale);
             this.draw();
         }
     }
@@ -156,6 +127,11 @@ module.exports = class ChartPanel {
         }
     }
 
+    destroy(){
+        this.disposables.dispose();
+        this.emitter.emit('did-destroy');
+    }
+
     onDidDraw(callback){
         return this.emitter.on('did-draw', callback);
     }
@@ -164,7 +140,11 @@ module.exports = class ChartPanel {
         return this.emitter.on('did-resize', callback);
     }
 
-    destroy(){
-        this.disposables.dispose();
+    onDidRescale(callback){
+        return this.emitter.on('did-rescale', callback);
+    }
+
+    onDidDestroy(callback){
+        return this.emitter.on('did-destroy', callback);
     }
 }

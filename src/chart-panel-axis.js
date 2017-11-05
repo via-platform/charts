@@ -23,10 +23,12 @@ module.exports = class ChartPanelAxis {
         this.axis = this.svg.append('g').attr('class', 'y axis');
 
         this.zoomable.call(d3.zoom().on('zoom', this.zoom()));
+
         this.disposables.add(this.panel.onDidResize(this.resize.bind(this)));
         this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
+        this.disposables.add(this.chart.onDidDestroy(this.destroy.bind(this)));
 
-        this.resize({height: 0});
+        this.resize();
     }
 
     zoom(){
@@ -45,14 +47,18 @@ module.exports = class ChartPanelAxis {
         // this.draw();
     }
 
-    resize({height}){
-        this.svg.attr('height', height);
-        this.zoomable.attr('height', height);
+    resize(){
+        this.svg.attr('height', this.panel.height);
+        this.zoomable.attr('height', this.panel.height);
 
         this.draw();
     }
 
     draw(){
         this.axis.call(this.basis);
+    }
+
+    destroy(){
+        this.disposables.dispose();
     }
 }

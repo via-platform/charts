@@ -1,4 +1,5 @@
 const {Disposable, CompositeDisposable, Emitter} = require('via');
+const _ = require('underscore-plus');
 
 module.exports = class ChartData {
     static deserialize({chart, state}){
@@ -15,30 +16,43 @@ module.exports = class ChartData {
         this.chart = chart;
         this.disposables = new CompositeDisposable();
         this.seriesDisposables = new Map();
-        this.granularity = granularity || 6e4;
+        this.granularity = granularity;
+        this.changedDomain = _.throttle(this.changedDomain.bind(this), 2000);
+        this.source = null;
 
         this.disposables.add(this.chart.onDidChangeSymbol(this.changedSymbol.bind(this)));
-
-        // this.disposables.add(this.chart.center.onDidChangeDomain(this.changedDomain.bind(this)));
-        // this.disposables.add(this.chart.observeSeries(this.addedSeries.bind(this)));
-        // this.disposables.add(this.chart.onDidRemoveSeries(this.removedSeries.bind(this)));
+        this.disposables.add(this.chart.onDidZoom(this.changedDomain.bind(this)));
     }
 
-    changedSymbol(identifier){
-        console.log("Changed the symbol to " + identifier);
+    changedSymbol(symbol){
+        if(this.source){
+            this.source.destroy();
+        }
+
+        this.source = symbol.data(this.granularity);
+        this.changedDomain();
     }
 
-    changedDomain(scale){
-        // console.log('Changed domain');
-        // console.log(scale.x.domain());
+    changedDomain(){
+        const [start, end] = this.chart.scale.domain();
+        this.source.request({start, end});
     }
 
     changedResolution(resolution){
+        if(this.source){
+            this.source.destroy();
+        }
 
+        this.source = symbol.data(this.granularity);
+        this.changedDomain();
     }
 
     fetch(range){
-        return [];
+        if(!this.source){
+            return [];
+        }
+
+        return this.source.fetch(range);
     }
 
     onDidModifyData(callback){

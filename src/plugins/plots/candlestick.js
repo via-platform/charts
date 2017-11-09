@@ -8,13 +8,12 @@ class Candlestick {
         this.chart = chart;
         this.panel = panel;
         this.element = element;
+        this.padding = 0.2;
 
         this.element.classed('candlestick', true);
 
         this.body = this.body.bind(this);
         this.wick = this.wick.bind(this);
-        this.padding = 0.2; //TODO observe user preferences
-        this.bandwidth = 10;
     }
 
     serialize(){
@@ -22,10 +21,6 @@ class Candlestick {
             version: 1,
             name: 'candlestick'
         };
-    }
-
-    extent(){
-
     }
 
     domain(){
@@ -38,13 +33,10 @@ class Candlestick {
     }
 
     draw(){
-        return console.log("Drew candles");
         let [start, end] = this.chart.scale.domain();
         let data = this.chart.data.fetch({start, end});
-        let element = d3.select(this.element);
-        // this.chart.center.zoomTranslateExtent();
 
-        let body = element.selectAll('path.candle.body')
+        let body = this.element.selectAll('path.candle.body')
             .data(data, d => d.date.getTime())
             .attr('class', d => (d.open > d.close) ? 'candle body down' : 'candle body up')
             .attr('d', this.body);
@@ -56,7 +48,7 @@ class Candlestick {
 
         body.exit().remove();
 
-        let wick = element.selectAll('path.candle.wick')
+        let wick = this.element.selectAll('path.candle.wick')
             .data(data, d => d.date.getTime())
             .attr('class', d => (d.open > d.close) ? 'candle wick down' : 'candle wick up')
             .attr('d', this.wick);
@@ -74,10 +66,10 @@ class Candlestick {
     }
 
     body(d){
-        let width = this.bandwidth,
-            open = this.chart.center.scale.y(d.open),
-            close = this.chart.center.scale.y(d.close),
-            xValue = this.chart.center.scale.x(d.date) - width / 2;
+        let width = Math.min(this.chart.bandwidth - 2, Math.floor(this.chart.bandwidth * (1 - this.padding) - 1)),
+            open = this.panel.scale(d.open),
+            close = this.panel.scale(d.close),
+            xValue = this.chart.scale(d.date) - width / 2;
 
         if(Math.abs(open - close) < 1){
             if(close < open){
@@ -87,17 +79,17 @@ class Candlestick {
             }
         }
 
-        return `M ${xValue} ${open} l ${width} 0 L ${xValue + width} ${close} l ${-1 * this.bandwidth} 0 L ${xValue} ${open}`;
+        return `M ${xValue} ${open} l ${width} 0 L ${xValue + width} ${close} l ${-1 * width} 0 L ${xValue} ${open}`;
     }
 
     wick(d){
-        let width = this.bandwidth,
-            open = this.chart.center.scale.y(d.open),
-            close = this.chart.center.scale.y(d.close),
-            xPoint = this.chart.center.scale.x(d.date),
+        let width = this.chart.bandwidth,
+            open = this.panel.scale(d.open),
+            close = this.panel.scale(d.close),
+            xPoint = this.chart.scale(d.date),
             xValue = xPoint - width / 2,
-            high = this.chart.center.scale.y(d.high),
-            low = this.chart.center.scale.y(d.low),
+            high = this.panel.scale(d.high),
+            low = this.panel.scale(d.low),
             path = `M ${xPoint} ${high} L ${xPoint} ${Math.min(open, close)}`;
 
         return path + ` M ${xPoint} ${Math.max(open, close)} L ${xPoint} ${low}`;

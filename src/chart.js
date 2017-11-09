@@ -11,6 +11,9 @@ const ChartDefaults = {end: 0, start: Date.now() - 864e5};
 const ChartAreas = 'top left bottom right'.split(' ');
 const BaseURI = 'via://charts';
 
+const AXIS_HEIGHT = 30;
+const AXIS_WIDTH = 60;
+
 module.exports = class Chart {
     static deserialize(plugins, params){
         return new Chart(plugins, params);
@@ -40,7 +43,12 @@ module.exports = class Chart {
         this.width = 0;
         this.height = 0;
 
-        this.data = new ChartData({chart: this});
+        //TODO allow the padding to be customized
+        this.padding = 0.2;
+        this.bandwidth = 10;
+        this.granularity = params.granularity || 3e5
+
+        this.data = new ChartData({chart: this, granularity: this.granularity});
 
         this.basis = d3.scaleTime().domain([new Date(Date.now() - 36e5), new Date()]);
         this.scale = this.basis.copy();
@@ -64,7 +72,7 @@ module.exports = class Chart {
         this.element.appendChild(this.panels.element);
         this.element.appendChild(this.axis.element);
 
-        this.symbol = this.getURI().slice(BaseURI.length + 1);
+        this.symbol = via.symbols.findByIdentifier(this.getURI().slice(BaseURI.length + 1));
 
         if(this.symbol){
             this.emitter.emit('did-change-symbol', this.symbol);
@@ -73,6 +81,7 @@ module.exports = class Chart {
 
     zoomed({event, target}){
         this.scale.domain(event.transform.rescaleX(this.basis).domain());
+        this.updateBandwidth();
         this.emitter.emit('did-zoom', {event, target});
     }
 
@@ -80,10 +89,18 @@ module.exports = class Chart {
         this.width = this.element.clientWidth;
         this.height = this.element.clientHeight;
 
-        this.basis.range([0, this.width]);
-        this.scale.range([0, this.width]);
+        this.basis.range([0, this.width - AXIS_WIDTH]);
+        this.scale.range([0, this.width - AXIS_WIDTH]);
+
+        this.updateBandwidth();
 
         this.emitter.emit('did-resize', {width: this.width, height: this.height});
+    }
+
+    updateBandwidth(){
+        const [start, end] = this.scale.domain();
+        const total = Math.ceil((end - start) / this.granularity);
+        this.bandwidth = (this.width - AXIS_WIDTH) / total;
     }
 
     draw(){
@@ -172,7 +189,7 @@ module.exports = class Chart {
     }
 
     nearestCandle(date){
-        return new Date(Math.floor(date.getTime() / this.data.granularity) * this.data.granularity);
+        return new Date(Math.floor(date.getTime() / this.granularity) * this.granularity);
     }
 
     addLeftPanel(){

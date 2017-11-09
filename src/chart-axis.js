@@ -1,7 +1,7 @@
 const {Disposable, CompositeDisposable, Emitter} = require('via');
 const d3 = require('d3');
 const AXIS_HEIGHT = 30;
-
+const AXIS_WIDTH = 60;
 
 module.exports = class ChartAxis {
     constructor({chart}){
@@ -50,8 +50,8 @@ module.exports = class ChartAxis {
     }
 
     resize({width}){
-        this.svg.attr('width', width);
-        this.zoomable.attr('width', width);
+        this.svg.attr('width', width - AXIS_WIDTH);
+        this.zoomable.attr('width', width - AXIS_WIDTH);
 
         this.draw();
     }

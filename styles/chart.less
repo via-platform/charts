@@ -40,7 +40,7 @@
     {
         height: 32px;
         display: flex;
-        background: #333;
+        // background: #333;
 
         .chart-tools-left
         {
@@ -129,13 +129,41 @@
         stroke-width: 1px;
     }
 
+    path.bar
+    {
+        fill: #FFFFFF;
+
+        &.up
+        {
+            fill: #01db62;
+        }
+
+        &.down
+        {
+            fill: #F22613;
+        }
+    }
+
+    path.stroke
+    {
+        stroke: @primary-color;
+        fill: transparent;
+        stroke-width: 1.5;
+    }
+
+    path.fill
+    {
+        opacity: 0.15;
+        fill: @primary-color;
+    }
+
     .chart-axis
     {
-        background: #333;
 
         &.x
         {
             height: 30px;
+            padding-right: 60px;
         }
 
         &.y

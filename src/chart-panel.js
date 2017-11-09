@@ -51,7 +51,6 @@ module.exports = class ChartPanel {
 
         this.grid = new ChartPanelGrid({chart: this.chart, panel: this});
 
-        this.disposables.add(this.chart.onDidDraw(this.draw.bind(this)));
         this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
         this.disposables.add(this.chart.onDidDestroy(this.destroy.bind(this)));
 
@@ -88,7 +87,6 @@ module.exports = class ChartPanel {
         }
 
         this.rescale();
-        this.draw();
     }
 
     zoom(){
@@ -107,18 +105,17 @@ module.exports = class ChartPanel {
             let max = _.max(domains);
 
             if(!_.isUndefined(min) && !_.isUndefined(max)){
-                // console.log(`Min ${min} and Max ${max}`);
-                this.basis.domain([min, max]);
-                this.scale.domain([min, max]);
+                this.basis.domain([max, min]).nice();
+                this.scale.domain([max, min]).nice();
                 this.emitter.emit('did-rescale', this.scale);
-                this.draw();
             }
         }else{
-            this.basis.domain([0, 100]);
-            this.scale.domain([0, 100]);
+            this.basis.domain([100, 0]);
+            this.scale.domain([100, 0]);
             this.emitter.emit('did-rescale', this.scale);
-            this.draw();
         }
+
+        this.draw();
     }
 
     changePlotType(type){

@@ -24,6 +24,7 @@ module.exports = class ChartPanelAxis {
 
         this.zoomable.call(d3.zoom().on('zoom', this.zoom()));
 
+        this.disposables.add(this.panel.onDidRescale(this.draw.bind(this)));
         this.disposables.add(this.panel.onDidResize(this.resize.bind(this)));
         this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
         this.disposables.add(this.chart.onDidDestroy(this.destroy.bind(this)));

@@ -1,4 +1,4 @@
-const {CompositeDisposable, Disposable, Symbols} = require('via');
+const {CompositeDisposable, Disposable} = require('via');
 const d3 = require('d3');
 const _ = require('underscore-plus');
 

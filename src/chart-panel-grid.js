@@ -1,6 +1,9 @@
 const {Disposable, CompositeDisposable, Emitter} = require('via');
 const d3 = require('d3');
-const TICKS = 10;
+const DEFAULT_TICKS = 10;
+
+//TODO Allow this to be customizable
+const TICK_SPACING = 50;
 
 module.exports = class ChartPanelGrid {
     constructor({chart, panel}){
@@ -14,8 +17,8 @@ module.exports = class ChartPanelGrid {
         };
 
         this.basis = {
-            x: d3.axisBottom(this.chart.scale).ticks(TICKS).tickSize(this.panel.height).tickFormat(''),
-            y: d3.axisLeft(this.panel.scale).ticks(TICKS).tickSize(-this.panel.width).tickFormat('')
+            x: d3.axisBottom(this.chart.scale).ticks(DEFAULT_TICKS).tickSize(this.panel.height).tickFormat('').tickSizeOuter(0),
+            y: d3.axisLeft(this.panel.scale).ticks(DEFAULT_TICKS).tickSize(-this.panel.width).tickFormat('').tickSizeOuter(0)
         };
 
         this.disposables.add(this.panel.onDidDestroy(this.destroy.bind(this)));
@@ -24,8 +27,8 @@ module.exports = class ChartPanelGrid {
     }
 
     resize(){
-        this.basis.x.tickSize(this.panel.height);
-        this.basis.y.tickSize(-this.panel.width);
+        this.basis.x.tickSize(this.panel.height).ticks(Math.floor(this.panel.width / TICK_SPACING)).tickSizeOuter(0);
+        this.basis.y.tickSize(-this.panel.width).ticks(Math.floor(this.panel.height / TICK_SPACING)).tickSizeOuter(0);
 
         this.draw();
     }
@@ -33,6 +36,8 @@ module.exports = class ChartPanelGrid {
     draw(){
         this.grid.x.call(this.basis.x);
         this.grid.y.call(this.basis.y);
+
+        this.grid.y.selectAll('.tick').filter(d => this.panel.scale(d) < 5).remove();
     }
 
     destroy(){

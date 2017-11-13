@@ -1,4 +1,4 @@
-const {CompositeDisposable, Disposable, Symbols} = require('via');
+const {CompositeDisposable, Disposable} = require('via');
 const d3 = require('d3');
 const _ = require('underscore-plus');
 
@@ -25,7 +25,7 @@ class Line {
     serialize(){
         return {
             version: 1,
-            name: 'ohlc'
+            name: 'line'
         };
     }
 
@@ -40,6 +40,10 @@ class Line {
 
     draw(){
         let [start, end] = this.chart.scale.domain();
+
+        start.setTime(start.getTime() - this.chart.granularity);
+        end.setTime(end.getTime() + this.chart.granularity);
+
         let data = this.chart.data.fetch({start, end});
 
         this.element.selectAll('path').remove();

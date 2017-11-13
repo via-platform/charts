@@ -6,7 +6,6 @@ const ChartPanelAxis = require('./chart-panel-axis');
 const ChartPanelGrid = require('./chart-panel-grid');
 
 //TODO allow the user to set a preference on this
-const DEFAULT_PLUGIN = {name: 'candlestick'};
 const AXIS_WIDTH = 60;
 
 module.exports = class ChartPanel {
@@ -18,7 +17,7 @@ module.exports = class ChartPanel {
         };
     }
 
-    constructor({chart, isCenter, state}){
+    constructor({chart, isCenter, state, plugin}){
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
 
@@ -53,14 +52,27 @@ module.exports = class ChartPanel {
 
         this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
         this.disposables.add(this.chart.onDidDestroy(this.destroy.bind(this)));
+        this.disposables.add(this.chart.data.onDidUpdateData(this.rescale.bind(this)));
 
         if(state && state.layers){
             this.layers = state.layers.map(layer => ChartLayer.deserialize({chart: this.chart, panel: this, state: layer}));
         }else{
-            this.layers.push(new ChartLayer({chart: this.chart, panel: this, isRoot: true, plugin: DEFAULT_PLUGIN}));
+            this.layers.push(new ChartLayer({chart: this.chart, panel: this, isRoot: true, plugin}));
         }
 
         this.resize();
+        this.rescale();
+    }
+
+    addLayer(plugin){
+        let layer = new ChartLayer({chart: this.chart, panel: this, plugin});
+        this.layers.push(layer);
+        this.emitter.emit('did-add-layer', layer);
+        this.draw();
+    }
+
+    getRoot(){
+        return this.layers.find(layer => layer.isRoot);
     }
 
     resize(){
@@ -116,12 +128,6 @@ module.exports = class ChartPanel {
         }
 
         this.draw();
-    }
-
-    changePlotType(type){
-        if(this.plot !== type){
-            this.emitter.emit('did-change-plot-type');
-        }
     }
 
     destroy(){

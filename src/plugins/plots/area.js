@@ -1,4 +1,4 @@
-const {CompositeDisposable, Disposable, Symbols} = require('via');
+const {CompositeDisposable, Disposable} = require('via');
 const d3 = require('d3');
 const _ = require('underscore-plus');
 
@@ -12,7 +12,7 @@ class Area {
         //TODO customize these properties
         this.property = 'close';
 
-        this.element.classed('line', true);
+        this.element.classed('area', true);
 
         this.stroke = this.stroke.bind(this);
         this.fill = this.fill.bind(this);
@@ -46,7 +46,6 @@ class Area {
 
         this.element.append('path').classed('stroke', true).datum(data).attr('d', this.stroke);
         this.element.append('path').classed('fill', true).datum(data).attr('d', this.fill);
-
     }
 
     stroke(data){

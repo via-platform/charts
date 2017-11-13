@@ -15,10 +15,12 @@ module.exports = class ChartData {
     constructor({chart, granularity}){
         this.chart = chart;
         this.disposables = new CompositeDisposable();
+        this.emitter = new Emitter();
         this.seriesDisposables = new Map();
         this.granularity = granularity;
         this.changedDomain = _.throttle(this.changedDomain.bind(this), 2000);
         this.source = null;
+        this.sourceDisposables = null;
 
         this.disposables.add(this.chart.onDidChangeSymbol(this.changedSymbol.bind(this)));
         this.disposables.add(this.chart.onDidZoom(this.changedDomain.bind(this)));
@@ -29,22 +31,20 @@ module.exports = class ChartData {
             this.source.destroy();
         }
 
+        if(this.sourceDisposables){
+            this.sourceDisposables.dispose();
+        }
+
+        this.sourceDisposables = new CompositeDisposable();
         this.source = symbol.data(this.granularity);
+        this.sourceDisposables.add(this.source.onDidUpdateData(this.didUpdateData.bind(this)));
+
         this.changedDomain();
     }
 
     changedDomain(){
         const [start, end] = this.chart.scale.domain();
         this.source.request({start, end});
-    }
-
-    changedResolution(resolution){
-        if(this.source){
-            this.source.destroy();
-        }
-
-        this.source = symbol.data(this.granularity);
-        this.changedDomain();
     }
 
     fetch(range){
@@ -55,8 +55,12 @@ module.exports = class ChartData {
         return this.source.fetch(range);
     }
 
-    onDidModifyData(callback){
-        return this.emitter.on('did-modify-data', callback);
+    didUpdateData(){
+        this.emitter.emit('did-update-data');
+    }
+
+    onDidUpdateData(callback){
+        return this.emitter.on('did-update-data', callback);
     }
 
     destroy(){

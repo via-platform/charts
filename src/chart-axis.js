@@ -50,10 +50,12 @@ module.exports = class ChartAxis {
     }
 
     resize({width}){
-        this.svg.attr('width', width - AXIS_WIDTH);
-        this.zoomable.attr('width', width - AXIS_WIDTH);
+        if(width && width > 60){
+            this.svg.attr('width', width - AXIS_WIDTH);
+            this.zoomable.attr('width', width - AXIS_WIDTH);
 
-        this.draw();
+            this.draw();
+        }
     }
 
     destroy(){

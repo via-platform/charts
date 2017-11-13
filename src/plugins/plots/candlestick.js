@@ -1,4 +1,4 @@
-const {CompositeDisposable, Disposable, Symbols} = require('via');
+const {CompositeDisposable, Disposable} = require('via');
 const d3 = require('d3');
 const _ = require('underscore-plus');
 
@@ -70,6 +70,8 @@ class Candlestick {
             open = this.panel.scale(d.open),
             close = this.panel.scale(d.close),
             xValue = this.chart.scale(d.date) - width / 2;
+
+        // if(isNaN(width) || isNaN(open) || isNaN(close) || isNaN(xValue)) debugger;
 
         if(Math.abs(open - close) < 1){
             if(close < open){

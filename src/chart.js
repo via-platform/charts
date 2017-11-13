@@ -23,6 +23,7 @@ module.exports = class Chart {
         return {
             uri: this.getURI(),
             time: this.time,
+            type: this.type,
             panels: this.panels.serialize(),
             tools: this.tools.serialize(),
             data: this.data.serialize()
@@ -36,12 +37,15 @@ module.exports = class Chart {
         this.emitter = new Emitter();
         this.warnings = [];
 
-        this.panels = [];
+        this.panels = null;
 
         this.uri = params.uri;
 
         this.width = 0;
         this.height = 0;
+
+        //TODO allow the user to set a preference on this
+        this.type = 'candlestick';
 
         //TODO allow the padding to be customized
         this.padding = 0.2;
@@ -50,7 +54,7 @@ module.exports = class Chart {
 
         this.data = new ChartData({chart: this, granularity: this.granularity});
 
-        this.basis = d3.scaleTime().domain([new Date(Date.now() - 36e5), new Date()]);
+        this.basis = d3.scaleTime().domain([new Date(Date.now() - 864e5), new Date()]);
         this.scale = this.basis.copy();
 
         this.element = document.createElement('div');
@@ -112,13 +116,6 @@ module.exports = class Chart {
 
     }
 
-    addPanel(state){
-        let chartPanel = new ChartPanel({chart: this, state});
-        this.graphic.appendChild(chartPanel.element);
-        this.panels.push(chartPanel);
-        this.emitter.emit('did-add-panel');
-    }
-
     destroy(){
         this.disposables.dispose();
         this.emitter.dispose();
@@ -142,6 +139,14 @@ module.exports = class Chart {
         return 'Chart';
     }
 
+    getType(){
+        return this.type;
+    }
+
+    getTypePlugin(){
+        return this.plugins.get(this.getType());
+    }
+
     addWarning(warning){
         this.warnings.push(warning);
         this.emitter.emit('did-add-warning', warning);
@@ -159,6 +164,13 @@ module.exports = class Chart {
     changeSymbol(symbol){
         this.symbol = symbol;
         this.emitter.emit('did-change-symbol', symbol);
+    }
+
+    changeType(type){
+        if(this.type !== type){
+            this.type = type;
+            this.emitter.emit('did-change-type', this.plugins.get(type));
+        }
     }
 
     addTool(tool){
@@ -212,8 +224,8 @@ module.exports = class Chart {
         return this.emitter.on('did-change-data', callback);
     }
 
-    onDidChangeChartType(callback){
-        return this.emitter.on('did-change-chart-type', callback);
+    onDidChangeType(callback){
+        return this.emitter.on('did-change-type', callback);
     }
 
     onDidAddWarning(callback){

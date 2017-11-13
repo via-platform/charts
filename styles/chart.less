@@ -1,12 +1,32 @@
+@import "variables";
+@import "plugins/plots/area";
+@import "plugins/plots/line";
+@import "plugins/plots/candlestick";
+@import "plugins/plots/ohlc";
+
+@import "plugins/tools/symbol";
+@import "plugins/tools/type";
+@import "plugins/tools/indicators";
+
+@import "plugins/indicators/volume";
+
+@import "plugins/overlays/sma";
+
 .chart
 {
     display: flex;
     flex-direction: column;
     position: relative;
+    -webkit-font-smoothing: antialiased;
 
     svg
     {
         display: block;
+    }
+
+    .layer
+    {
+        pointer-events: none;
     }
 
     .chart-panels
@@ -20,6 +40,12 @@
             display: flex;
             flex: 1;
             overflow: hidden;
+            border-top: 3px solid lighten(@dock-border-color, 5%);
+
+            &.center
+            {
+                flex: 3;
+            }
 
             .panel-center
             {
@@ -38,21 +64,18 @@
 
     .chart-tools
     {
-        height: 32px;
+        height: 40px;
         display: flex;
         // background: #333;
 
-        .chart-tools-left
+        .chart-tools-left, .chart-tools-right
         {
-
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
         }
 
-        .chart-tools-right
-        {
-
-        }
-
-        .chart-tools-divider
+        .chart-tools-spacer
         {
             flex: 1;
         }
@@ -79,7 +102,7 @@
 
         path
         {
-            stroke: transparent;
+            display: none;
         }
     }
 
@@ -99,62 +122,6 @@
             font-weight: 700;
             font-size: 11px;
         }
-    }
-
-    path.candle
-    {
-        // stroke: #000000;
-    }
-
-    path.candle.up
-    {
-        fill: transparent;
-        stroke: #01db62;
-    }
-
-    path.candle.down
-    {
-        fill: #F22613;
-        stroke: #F22613;
-    }
-
-    path.candle.body
-    {
-        stroke-width: 1px;
-    }
-
-    path.candle.wick
-    {
-        // stroke: #FFF;
-        stroke-width: 1px;
-    }
-
-    path.bar
-    {
-        fill: #FFFFFF;
-
-        &.up
-        {
-            fill: #01db62;
-        }
-
-        &.down
-        {
-            fill: #F22613;
-        }
-    }
-
-    path.stroke
-    {
-        stroke: @primary-color;
-        fill: transparent;
-        stroke-width: 1.5;
-    }
-
-    path.fill
-    {
-        opacity: 0.15;
-        fill: @primary-color;
     }
 
     .chart-axis

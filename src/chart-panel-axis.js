@@ -2,6 +2,9 @@ const {Disposable, CompositeDisposable, Emitter} = require('via');
 const d3 = require('d3');
 const AXIS_WIDTH = 60;
 
+//TODO Allow this to be customizable
+const TICK_SPACING = 40;
+
 module.exports = class ChartPanelAxis {
     constructor({chart, panel}){
         this.disposables = new CompositeDisposable();
@@ -51,6 +54,7 @@ module.exports = class ChartPanelAxis {
     resize(){
         this.svg.attr('height', this.panel.height);
         this.zoomable.attr('height', this.panel.height);
+        this.basis.ticks(Math.floor(this.panel.height / TICK_SPACING));
 
         this.draw();
     }

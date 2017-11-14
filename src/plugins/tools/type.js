@@ -9,7 +9,7 @@ class Type {
         this.tools = tools;
         this.types = new Map();
         this.element = document.createElement('select');
-        this.element.classList.add('type', 'input-select');
+        this.element.classList.add('type', 'input-select', 'mini');
         this.element.addEventListener('change', this.selected.bind(this));
 
         this.disposables.add(this.tools.onDidDestroy(this.destroy.bind(this)));

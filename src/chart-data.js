@@ -21,8 +21,10 @@ module.exports = class ChartData {
         this.changedDomain = _.throttle(this.changedDomain.bind(this), 2000);
         this.source = null;
         this.sourceDisposables = null;
+        this.symbol = null;
 
         this.disposables.add(this.chart.onDidChangeSymbol(this.changedSymbol.bind(this)));
+        this.disposables.add(this.chart.onDidChangeGranularity(this.changedGranularity.bind(this)));
         this.disposables.add(this.chart.onDidZoom(this.changedDomain.bind(this)));
     }
 
@@ -35,11 +37,19 @@ module.exports = class ChartData {
             this.sourceDisposables.dispose();
         }
 
+        this.symbol = symbol;
         this.sourceDisposables = new CompositeDisposable();
         this.source = symbol.data(this.granularity);
         this.sourceDisposables.add(this.source.onDidUpdateData(this.didUpdateData.bind(this)));
 
         this.changedDomain();
+    }
+
+    changedGranularity(granularity){
+        if(granularity !== this.granularity){
+            this.granularity = granularity;
+            this.changedSymbol(this.symbol);
+        }
     }
 
     changedDomain(){

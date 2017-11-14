@@ -3,14 +3,17 @@
 @import "plugins/plots/line";
 @import "plugins/plots/candlestick";
 @import "plugins/plots/ohlc";
+@import "plugins/plots/heikin-ashi";
 
 @import "plugins/tools/symbol";
 @import "plugins/tools/type";
 @import "plugins/tools/indicators";
+@import "plugins/tools/granularity";
 
 @import "plugins/indicators/volume";
 
 @import "plugins/overlays/sma";
+@import "plugins/overlays/bollinger-bands";
 
 .chart
 {
@@ -97,7 +100,7 @@
 
         line
         {
-            stroke: lighten(@pane-background-color, 8%);
+            stroke: lighten(@pane-background-color, 5%);
         }
 
         path
@@ -113,7 +116,7 @@
 
         line, path
         {
-            stroke: lighten(@pane-background-color, 12%);
+            stroke: lighten(@pane-background-color, 10%);
         }
 
         text

@@ -50,7 +50,7 @@ module.exports = class Chart {
         //TODO allow the padding to be customized
         this.padding = 0.2;
         this.bandwidth = 10;
-        this.granularity = params.granularity || 3e5
+        this.granularity = params.granularity || 3e5;
 
         this.data = new ChartData({chart: this, granularity: this.granularity});
 
@@ -166,6 +166,12 @@ module.exports = class Chart {
         this.emitter.emit('did-change-symbol', symbol);
     }
 
+    changeGranularity(granularity){
+        this.granularity = granularity;
+        this.updateBandwidth();
+        this.emitter.emit('did-change-granularity', granularity);
+    }
+
     changeType(type){
         if(this.type !== type){
             this.type = type;
@@ -216,8 +222,8 @@ module.exports = class Chart {
 
     }
 
-    onDidChangeResolution(callback){
-        return this.emitter.on('did-change-resolution', callback);
+    onDidChangeGranularity(callback){
+        return this.emitter.on('did-change-granularity', callback);
     }
 
     onDidChangeData(callback){

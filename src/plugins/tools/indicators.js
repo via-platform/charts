@@ -15,7 +15,6 @@ class Indicators {
     }
 
     add(){
-        console.log('Adding sma panel');
         let plugin = this.chart.plugins.get('sma');
 
         if(plugin.type === 'indicator'){
@@ -33,7 +32,7 @@ class Indicators {
 module.exports = {
     name: 'indicators',
     type: 'tool',
-    position: 'left',
+    position: 'right',
     priority: 0,
     instance: params => new Indicators(params)
 };

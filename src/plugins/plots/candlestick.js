@@ -1,6 +1,8 @@
 const {CompositeDisposable, Disposable} = require('via');
 const d3 = require('d3');
 const _ = require('underscore-plus');
+const FLAG_HEIGHT = 20;
+const AXIS_WIDTH = 60;
 
 class Candlestick {
     constructor({chart, state, element, panel}){
@@ -9,6 +11,23 @@ class Candlestick {
         this.panel = panel;
         this.element = element;
         this.padding = 0.2;
+
+        this.flag = this.panel.axis.flag().classed('last-price-flag', true);
+
+        this.flag.append('rect')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', AXIS_WIDTH - 1)
+        .attr('height', FLAG_HEIGHT);
+
+        this.flag.append('text')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('dy', '0.35em')
+        .attr('width', AXIS_WIDTH - 1)
+        .attr('height', FLAG_HEIGHT)
+        // .attr('alignment-baseline', 'middle')
+        .attr('text-anchor', 'middle');
 
         this.element.classed('candlestick', true);
 
@@ -34,7 +53,19 @@ class Candlestick {
 
     draw(){
         let [start, end] = this.chart.scale.domain();
-        let data = this.chart.data.fetch({start, end});
+        let data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
+
+        let last = _.last(data);
+
+        if(last){
+            this.flag.select('rect').classed('up', last.open < last.close);
+            this.flag.select('text').text(last.close);
+            this.flag
+                .style('display', 'block')
+                .attr('transform', `translate(1, ${this.panel.scale(last.close) - FLAG_HEIGHT / 2})`);
+        }else{
+            this.flag.style('display', 'none');
+        }
 
         let body = this.element.selectAll('path.candle.body')
             .data(data, d => d.date.getTime())
@@ -42,9 +73,9 @@ class Candlestick {
             .attr('d', this.body);
 
         body.enter()
-                .append('path')
-                .attr('d', this.body)
-                .attr('class', d => (d.open > d.close) ? 'candle body down' : 'candle body up');
+            .append('path')
+            .attr('d', this.body)
+            .attr('class', d => (d.open > d.close) ? 'candle body down' : 'candle body up');
 
         body.exit().remove();
 
@@ -54,9 +85,9 @@ class Candlestick {
             .attr('d', this.wick);
 
         wick.enter()
-                .append('path')
-                .attr('class', d => (d.open > d.close) ? 'candle wick down' : 'candle wick up')
-                .attr('d', this.wick);
+            .append('path')
+            .attr('class', d => (d.open > d.close) ? 'candle wick down' : 'candle wick up')
+            .attr('d', this.wick);
 
         wick.exit().remove();
     }

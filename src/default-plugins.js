@@ -12,6 +12,7 @@ const Granularity = require('./plugins/tools/granularity');
 const Volume = require('./plugins/indicators/volume');
 
 const SMA = require('./plugins/overlays/sma');
+const BollingerBands = require('./plugins/overlays/bollinger-bands');
 
 module.exports = [
     Candlestick,
@@ -24,5 +25,9 @@ module.exports = [
     Type,
     Volume,
     SMA,
-    Granularity
+    Granularity,
+    BollingerBands
 ];
+
+//TODO
+//Parabolic SAR

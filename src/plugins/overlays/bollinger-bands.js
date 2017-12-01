@@ -14,24 +14,43 @@ class BollingerBands {
         this.property = 'close';
         this.length = 20;
 
-        this.element.classed('sma', true);
+        this.element.classed('bollinger-bands', true);
 
-        this.line = d3.line()
+        this.upper = d3.line()
             .x(d => this.chart.scale(d.date))
-            .y(d => this.panel.scale(d.average));
+            .y(d => this.panel.scale(d.upper));
 
-        this.line = this.line.bind(this);
+        this.middle = d3.line()
+            .x(d => this.chart.scale(d.date))
+            .y(d => this.panel.scale(d.middle));
+
+        this.lower = d3.line()
+            .x(d => this.chart.scale(d.date))
+            .y(d => this.panel.scale(d.lower));
+
+        this.upper = this.upper.bind(this);
+        this.middle = this.middle.bind(this);
+        this.lower = this.lower.bind(this);
     }
 
     serialize(){
         return {
             version: 1,
-            name: 'sma'
+            name: 'bollinger-bands'
         };
     }
 
     bollinger(data){
-        
+        const elements = data.map(d => d[this.property]);
+        const mean = d3.mean(elements);
+        const deviation = d3.deviation(elements) || 0;
+
+        return {
+            date: _.last(data).date,
+            upper: mean + 2 * deviation,
+            middle: mean,
+            lower: mean - 2 * deviation
+        };
     }
 
     draw(){
@@ -45,47 +64,67 @@ class BollingerBands {
         end.setTime(end.getTime() + this.chart.granularity);
 
         let data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
-        // let incomplete = data.slice(0, this.length - 1);
-        // let complete = data.slice(this.length - 1);
+        let bands = [];
 
-        for(let i = 0; i < this.length - 1 && i < data.length; i++){
-            let total = 0;
-
-            for(let j = 0; j <= i; j++){
-                total += data[j][this.property];
-            }
-
-            data[i].average = total / (i + 1);
-        }
-
-        for(let i = this.length - 1; i < data.length; i++){
-            let total = 0;
-
-            for(let j = i - this.length + 1; j <= i; j++){
-                total += data[j][this.property];
-            }
-
-            data[i].average = total / this.length;
+        for(let i = 0; i < data.length; i++){
+            bands.push(this.bollinger(data.slice(Math.max(0, i - this.length), i + 1)));
         }
 
         this.element.selectAll('path').remove();
 
         this.element.append('path')
-            .datum(data.slice(0, this.length - 1))
-            .classed('incomplete', true)
+            .datum(bands.slice(0, this.length - 1))
+            .attr('class', 'bollinger-band upper incomplete')
             .attr('fill', 'none')
             .attr('stroke-linejoin', 'round')
             .attr('stroke-linecap', 'round')
             .attr('stroke-width', this.stroke)
-            .attr('d', this.line);
+            .attr('d', this.upper);
 
         this.element.append('path')
-            .datum(data.slice(this.length - 2))
+            .datum(bands.slice(this.length - 2))
+            .attr('class', 'bollinger-band upper')
             .attr('fill', 'none')
             .attr('stroke-linejoin', 'round')
             .attr('stroke-linecap', 'round')
             .attr('stroke-width', this.stroke)
-            .attr('d', this.line);
+            .attr('d', this.upper);
+
+        this.element.append('path')
+            .datum(bands.slice(0, this.length - 1))
+            .attr('class', 'bollinger-band middle incomplete')
+            .attr('fill', 'none')
+            .attr('stroke-linejoin', 'round')
+            .attr('stroke-linecap', 'round')
+            .attr('stroke-width', this.stroke)
+            .attr('d', this.middle);
+
+        this.element.append('path')
+            .datum(bands.slice(this.length - 2))
+            .attr('class', 'bollinger-band middle')
+            .attr('fill', 'none')
+            .attr('stroke-linejoin', 'round')
+            .attr('stroke-linecap', 'round')
+            .attr('stroke-width', this.stroke)
+            .attr('d', this.middle);
+
+        this.element.append('path')
+            .datum(bands.slice(0, this.length - 1))
+            .attr('class', 'bollinger-band lower incomplete')
+            .attr('fill', 'none')
+            .attr('stroke-linejoin', 'round')
+            .attr('stroke-linecap', 'round')
+            .attr('stroke-width', this.stroke)
+            .attr('d', this.lower);
+
+        this.element.append('path')
+            .datum(bands.slice(this.length - 2))
+            .attr('class', 'bollinger-band lower')
+            .attr('fill', 'none')
+            .attr('stroke-linejoin', 'round')
+            .attr('stroke-linecap', 'round')
+            .attr('stroke-width', this.stroke)
+            .attr('d', this.lower);
     }
 
     destroy(){

@@ -15,7 +15,7 @@ class Indicators {
     }
 
     add(){
-        let plugin = this.chart.plugins.get('sma');
+        let plugin = this.chart.plugins.get('bollinger-bands');
 
         if(plugin.type === 'indicator'){
             this.chart.panels.addPanel(plugin);

@@ -35,6 +35,10 @@ module.exports = class ChartPanelAxis {
         this.resize();
     }
 
+    flag(){
+        return this.svg.append('g').attr('class', 'flag');
+    }
+
     zoom(){
         const _this = this;
 

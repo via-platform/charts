@@ -10,8 +10,26 @@ class Symbol {
         this.element.classList.add('symbol');
         this.element.textContent = 'No Symbol';
 
+        this.change = this.change.bind(this);
+
         this.disposables.add(this.tools.onDidDestroy(this.destroy.bind(this)));
         this.disposables.add(this.chart.onDidChangeSymbol(this.changed.bind(this)));
+
+        this.element.addEventListener('click', this.change);
+        this.disposables.add(new Disposable(() => this.element.removeEventListener('click', this.change)));
+    }
+
+    change(){
+        if(this.chart.omnibar){
+            this.chart.omnibar.search({
+                name: 'Change Chart Symbol',
+                placeholder: 'Enter a Symbol to Display on the Chart...',
+                didConfirmSelection: selection => this.chart.changeSymbol(selection.symbol),
+                maxResultsPerCategory: 10
+            });
+        }else{
+            console.error('Could not find omnibar.');
+        }
     }
 
     changed(symbol){

@@ -31,5 +31,12 @@
         "1.0.0": "provideCharts"
       }
     }
+  },
+  "consumedServices": {
+      "action-bar": {
+          "versions": {
+              "^0.0.0": "consumeActionBar"
+          }
+      }
   }
 }

@@ -1,12 +1,12 @@
 const {CompositeDisposable, Disposable} = require('via');
 const _ = require('underscore-plus');
-const keys = [6e4, 3e5, 9e5, 36e5, 72e5, 216e5, 864e5];
+const keys = [6e4, 3e5, 9e5, 36e5, 108e5, 216e5, 864e5];
 const options = {
     6e4: '1m',
     3e5: '5m',
     9e5: '15m',
     36e5: '1h',
-    72e5: '2h',
+    108e5: '3h',
     216e5: '6h',
     864e5: '1d'
 };

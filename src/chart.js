@@ -15,8 +15,8 @@ const AXIS_HEIGHT = 30;
 const AXIS_WIDTH = 60;
 
 module.exports = class Chart {
-    static deserialize(plugins, params){
-        return new Chart(plugins, params);
+    static deserialize({plugins, omnibar}, params){
+        return new Chart({plugins, omnibar}, params);
     }
 
     serialize(){
@@ -30,8 +30,9 @@ module.exports = class Chart {
         };
     }
 
-    constructor(plugins, params = {}){
+    constructor({plugins, omnibar}, params = {}){
         this.plugins = plugins;
+        this.omnibar = omnibar;
 
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
@@ -114,6 +115,11 @@ module.exports = class Chart {
 
     attachAxis(){
 
+    }
+
+    consumeActionBar(actionBar){
+        console.log('CONSUMING AB');
+        this.omnibar = actionBar.omnibar;
     }
 
     destroy(){

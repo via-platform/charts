@@ -4,6 +4,12 @@ const BaseURI = 'via://chart';
 
 const DefaultPlugins = require('./default-plugins');
 
+const InterfaceConfiguration = {
+    name: 'Interactive Chart',
+    description: 'A real-time chart for a given symbol with various built-in indicators and overlays.',
+    uri: BaseURI
+};
+
 class ChartPackage {
     activate(){
         this.disposables = new CompositeDisposable();
@@ -12,6 +18,7 @@ class ChartPackage {
         this.plugins = new Map();
         this.pluginsSubscriptions = {};
         this.pluginsOrderMap = {};
+        this.omnibar = null;
 
         via.commands.add('via-workspace', {
             'chart:default': () => via.workspace.open(BaseURI)
@@ -19,14 +26,14 @@ class ChartPackage {
 
         this.disposables.add(via.workspace.addOpener((uri, options) => {
             if(uri.startsWith(BaseURI)){
-                let chart = new Chart(this.plugins, {uri});
+                let chart = new Chart({plugins: this.plugins, omnibar: this.omnibar}, {uri});
 
                 this.charts.push(chart);
                 this.emitter.emit('did-create-chart', chart);
 
                 return chart;
             }
-        }));
+        }, InterfaceConfiguration));
 
         this.registerDefaultPlugins();
     }
@@ -36,6 +43,14 @@ class ChartPackage {
         this.disposables.dispose();
         this.disposables = null;
         this.active = false;
+    }
+
+    consumeActionBar(actionBar){
+        this.omnibar = actionBar.omnibar;
+
+        for(let chart of this.charts){
+            chart.consumeActionBar(actionBar);
+        }
     }
 
     getCharts(){

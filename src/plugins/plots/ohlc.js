@@ -82,5 +82,7 @@ module.exports = {
     name: 'ohlc',
     type: 'plot',
     settings: {},
+    title: 'OHLC Bars',
+    description: 'Plot open-high-low-close bars.',
     instance: params => new OHLC(params)
 };

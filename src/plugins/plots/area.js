@@ -21,7 +21,7 @@ class Area {
     serialize(){
         return {
             version: 1,
-            name: 'ohlc'
+            name: 'area'
         };
     }
 
@@ -40,7 +40,7 @@ class Area {
         start.setTime(start.getTime() - this.chart.granularity);
         end.setTime(end.getTime() + this.chart.granularity);
 
-        let data = this.chart.data.fetch({start, end});
+        let data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
 
         this.element.selectAll('path').remove();
 
@@ -77,5 +77,7 @@ module.exports = {
     name: 'area',
     type: 'plot',
     settings: {},
+    title: 'Area Chart',
+    description: 'Plot a solid shape.',
     instance: params => new Area(params)
 };

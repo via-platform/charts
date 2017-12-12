@@ -3,7 +3,7 @@ const d3 = require('d3');
 const DEFAULT_TICKS = 10;
 
 //TODO Allow this to be customizable
-const TICK_SPACING = 50;
+const TICK_SPACING = 100;
 
 module.exports = class ChartPanelGrid {
     constructor({chart, panel}){

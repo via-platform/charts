@@ -41,15 +41,15 @@ class Volume {
             .attr('d', this.body);
 
         body.enter()
-                .append('path')
-                .attr('d', this.body)
-                .attr('class', d => (d.open > d.close) ? 'down' : 'up');
+            .append('path')
+            .attr('d', this.body)
+            .attr('class', d => (d.open > d.close) ? 'down' : 'up');
 
         body.exit().remove();
     }
 
     body(d){
-        let w = Math.min(this.chart.bandwidth - 2, Math.floor(this.chart.bandwidth * (1 - this.padding) - 1)),
+        let w = Math.max(1, Math.min(this.chart.bandwidth - 2, Math.floor(this.chart.bandwidth * (1 - this.padding) - 1))),
             vol = this.panel.scale(d.volume),
             x = this.chart.scale(d.date) - w / 2,
             y = this.panel.scale(0);
@@ -66,5 +66,7 @@ module.exports = {
     name: 'volume',
     type: 'indicator',
     settings: {},
+    title: 'Trading Volume',
+    description: 'A volume bar for each time period corresponding to the relative number of units traded.',
     instance: params => new Volume(params)
 };

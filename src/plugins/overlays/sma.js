@@ -93,5 +93,7 @@ module.exports = {
     name: 'sma',
     type: 'overlay',
     settings: {},
+    title: 'Simple Moving Average',
+    description: 'An n-period moving average.',
     instance: params => new SMA(params)
 };

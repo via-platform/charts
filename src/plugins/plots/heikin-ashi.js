@@ -138,5 +138,7 @@ module.exports = {
     name: 'heikin-ashi',
     type: 'plot',
     settings: {},
+    title: 'Heikin-Ashi Candlesticks',
+    description: 'Plot Heikin-Ashi candlesticks.',
     instance: params => new HeikinAshi(params)
 };

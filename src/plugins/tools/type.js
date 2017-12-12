@@ -1,47 +1,53 @@
 const {CompositeDisposable, Disposable} = require('via');
 const _ = require('underscore-plus');
+const etch = require('etch');
+const $ = etch.dom;
 
 class Type {
     constructor({chart, tools}){
-        console.log('initialize type tool');
         this.disposables = new CompositeDisposable();
         this.chart = chart;
         this.tools = tools;
-        this.types = new Map();
-        this.element = document.createElement('select');
-        this.element.classList.add('type', 'input-select', 'mini');
-        this.element.addEventListener('change', this.selected.bind(this));
+        this.types = Array.from(this.chart.plugins.values()).filter(plugin => plugin.type === 'plot');
+
+        etch.initialize(this);
 
         this.disposables.add(this.tools.onDidDestroy(this.destroy.bind(this)));
         this.disposables.add(this.chart.onDidChangeType(this.changed.bind(this)));
-
-        this.initialize();
     }
 
-    initialize(){
-        const plugins = Array.from(this.chart.plugins.values()).filter(plugin => plugin.type === 'plot');
+    update(){}
 
-        for(let plugin of plugins){
-            let name = plugin.name;
-            let option = document.createElement('option');
-            option.textContent = name;
+    render(){
+        const plugin = this.chart.getTypePlugin();
 
-            this.types.set(name, option);
-            this.element.appendChild(option);
-        }
+        return $.div({classList: 'type btn btn-subtle mini caret', onClick: this.change.bind(this)}, plugin ? plugin.title : 'Unknown Type');
     }
 
     selected(){
         this.chart.changeType(this.element.value);
     }
 
+    change(){
+        if(this.chart.omnibar){
+            this.chart.omnibar.search({
+                name: 'Change Chart Type',
+                placeholder: 'Select a Chart Type...',
+                items: this.types.map(plugin => ({name: plugin.title, description: plugin.description, value: plugin.name})),
+                didConfirmSelection: selection => this.chart.changeType(selection.value)
+            });
+        }else{
+            console.error('Could not find omnibar.');
+        }
+    }
+
     changed(type){
-        console.log('DID CHANGE');
-        // this.element.textContent = symbol ? symbol.identifier : 'No Symbol';
+        etch.update(this);
     }
 
     destroy(){
         this.disposables.dispose();
+        return etch.destroy(this);
     }
 }
 
@@ -50,5 +56,7 @@ module.exports = {
     type: 'tool',
     position: 'left',
     priority: 1,
+    title: 'Chart Type',
+    description: 'Change the type of the corresponding chart.',
     instance: params => new Type(params)
 };

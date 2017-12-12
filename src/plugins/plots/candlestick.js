@@ -21,12 +21,11 @@ class Candlestick {
         .attr('height', FLAG_HEIGHT);
 
         this.flag.append('text')
-        .attr('x', 0)
-        .attr('y', 0)
-        .attr('dy', '0.35em')
+        .attr('x', AXIS_WIDTH / 2)
+        .attr('y', FLAG_HEIGHT / 2)
         .attr('width', AXIS_WIDTH - 1)
         .attr('height', FLAG_HEIGHT)
-        // .attr('alignment-baseline', 'middle')
+        .attr('alignment-baseline', 'middle')
         .attr('text-anchor', 'middle');
 
         this.element.classed('candlestick', true);
@@ -59,7 +58,7 @@ class Candlestick {
 
         if(last){
             this.flag.select('rect').classed('up', last.open < last.close);
-            this.flag.select('text').text(last.close);
+            this.flag.select('text').text(Math.floor(last.close));
             this.flag
                 .style('display', 'block')
                 .attr('transform', `translate(1, ${this.panel.scale(last.close) - FLAG_HEIGHT / 2})`);
@@ -133,5 +132,7 @@ module.exports = {
     name: 'candlestick',
     type: 'plot',
     settings: {},
+    title: 'Candlestick',
+    description: 'Plot candlesticks.',
     instance: params => new Candlestick(params)
 };

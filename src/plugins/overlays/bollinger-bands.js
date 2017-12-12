@@ -136,5 +136,7 @@ module.exports = {
     name: 'bollinger-bands',
     type: 'overlay',
     settings: {},
+    title: 'Bollinger Bands',
+    description: 'The n-period moving average and two bands, one standard deviation above and below the moving average.',
     instance: params => new BollingerBands(params)
 };

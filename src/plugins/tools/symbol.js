@@ -1,22 +1,25 @@
 const {CompositeDisposable, Disposable} = require('via');
 const _ = require('underscore-plus');
+const etch = require('etch');
+const $ = etch.dom;
 
 class Symbol {
     constructor({chart, tools}){
         this.disposables = new CompositeDisposable();
         this.chart = chart;
         this.tools = tools;
-        this.element = document.createElement('div');
-        this.element.classList.add('symbol');
-        this.element.textContent = 'No Symbol';
 
-        this.change = this.change.bind(this);
+        etch.initialize(this);
 
         this.disposables.add(this.tools.onDidDestroy(this.destroy.bind(this)));
         this.disposables.add(this.chart.onDidChangeSymbol(this.changed.bind(this)));
+    }
 
-        this.element.addEventListener('click', this.change);
-        this.disposables.add(new Disposable(() => this.element.removeEventListener('click', this.change)));
+    update(){}
+
+    render(){
+        const symbol = this.chart.getSymbol();
+        return $.div({classList: 'symbol', onClick: this.change.bind(this)}, symbol ? symbol.identifier : 'No Symbol');
     }
 
     change(){
@@ -32,12 +35,13 @@ class Symbol {
         }
     }
 
-    changed(symbol){
-        this.element.textContent = symbol ? symbol.identifier : 'No Symbol';
+    changed(){
+        etch.update(this);
     }
 
     destroy(){
         this.disposables.dispose();
+        etch.destroy(this);
     }
 }
 

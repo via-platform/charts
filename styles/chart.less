@@ -15,6 +15,10 @@
 @import "plugins/overlays/sma";
 @import "plugins/overlays/bollinger-bands";
 
+@chart-tools-height: 32px;
+@chart-panel-border-width: 1px;
+@chart-panel-border-color: #181818;
+
 .chart
 {
     display: flex;
@@ -43,7 +47,7 @@
             display: flex;
             flex: 1;
             overflow: hidden;
-            border-top: 3px solid lighten(@dock-border-color, 5%);
+            border-top: @chart-panel-border-width solid @chart-panel-border-color;
 
             &.center
             {
@@ -67,9 +71,8 @@
 
     .chart-tools
     {
-        height: 40px;
+        height: @chart-tools-height;
         display: flex;
-        // background: #333;
 
         .chart-tools-left, .chart-tools-right
         {
@@ -100,7 +103,8 @@
 
         line
         {
-            stroke: lighten(@pane-background-color, 5%);
+            stroke: #444;
+            stroke-dasharray: 8;
         }
 
         path
@@ -116,12 +120,12 @@
 
         line, path
         {
-            stroke: lighten(@pane-background-color, 10%);
+            stroke: #444;
         }
 
         text
         {
-            fill: lighten(@pane-background-color, 40%);
+            fill: @text-color-subtle;
             font-weight: 700;
             font-size: 11px;
         }

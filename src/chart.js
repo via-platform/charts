@@ -149,6 +149,10 @@ module.exports = class Chart {
         return this.type;
     }
 
+    getSymbol(){
+        return this.symbol;
+    }
+
     getTypePlugin(){
         return this.plugins.get(this.getType());
     }

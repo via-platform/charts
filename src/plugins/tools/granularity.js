@@ -1,5 +1,8 @@
 const {CompositeDisposable, Disposable} = require('via');
 const _ = require('underscore-plus');
+const etch = require('etch');
+const $ = etch.dom;
+
 const keys = [6e4, 3e5, 9e5, 36e5, 108e5, 216e5, 864e5];
 const options = {
     6e4: '1m',
@@ -16,26 +19,26 @@ class Granularity {
         this.disposables = new CompositeDisposable();
         this.chart = chart;
         this.tools = tools;
-        this.granularity = this.chart.granularity;
-        this.element = document.createElement('div');
-        this.element.classList.add('granularity', 'btn-group', 'mini');
-        this.buttons = new Map();
+        etch.initialize(this);
 
-        this.disposables.add(this.chart.onDidChangeSymbol(this.changedSymbol.bind(this)));
-        this.disposables.add(this.chart.onDidChangeGranularity(this.changedGranularity.bind(this)));
+        // this.disposables.add(this.chart.onDidChangeSymbol(this.changedSymbol.bind(this)));
+        this.disposables.add(this.chart.onDidChangeGranularity(this.didChangeGranularity.bind(this)));
         this.disposables.add(this.tools.onDidDestroy(this.destroy.bind(this)));
-        this.attachButtons();
     }
 
-    changedGranularity(granularity){
-        if(granularity !== this.granularity){
-            this.granularity = granularity;
+    update(){}
 
-            for(let key of keys){
-                let button = this.buttons.get(key);
-                this.granularity === key ? button.classList.add('selected') : button.classList.remove('selected');
-            }
-        }
+    render(){
+        const buttons = keys.map(key => {
+            const classes = this.chart.granularity === key ? 'btn btn-subtle mini selected' : 'btn btn-subtle mini';
+            return $.div({classList: classes, onClick: () => this.change(key)}, options[key]);
+        });
+
+        return $.div({classList: 'granularity btn-group mini'}, ...buttons);
+    }
+
+    didChangeGranularity(granularity){
+        etch.update(this);
     }
 
     changedSymbol(symbol){
@@ -45,49 +48,26 @@ class Granularity {
         }else{
             this.element.classList.remove('hide');
 
-            for(let key of keys){
-                let button = this.buttons.get(key);
-                symbol.granularity > key ? button.classList.add('hide') : button.classList.remove('hide');
-            }
-
             if(this.chart.granularity < symbol.granularity){
                 this.chart.changeGranularity(symbol.granularity);
             }
         }
     }
 
-    attachButtons(){
-        for(let key of keys){
-            let button = document.createElement('button');
-
-            button.classList.add('btn', 'mini');
-            button.addEventListener('click', () => this.clicked(key));
-            button.textContent = options[key];
-            button.title = options[key];
-
-            if(this.chart.granularity === key){
-                button.classList.add('selected');
-            }
-
-            this.buttons.set(key, button);
-            this.element.appendChild(button);
-        }
-    }
-
-    clicked(granularity){
+    change(granularity){
         this.chart.changeGranularity(granularity);
     }
 
     destroy(){
-        this.buttons.clear();
         this.disposables.dispose();
+        etch.destroy(this);
     }
 }
 
 module.exports = {
     name: 'granularity',
     type: 'tool',
-    position: 'left',
+    position: 'right',
     priority: 0,
     instance: params => new Granularity(params)
 };

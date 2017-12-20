@@ -48,6 +48,8 @@
             flex: 1;
             overflow: hidden;
             border-top: @chart-panel-border-width solid @chart-panel-border-color;
+            border-bottom: @chart-panel-border-width solid @chart-panel-border-color;
+            margin-bottom: 3px;
 
             &.center
             {
@@ -58,6 +60,12 @@
             {
                 flex: 1;
                 overflow: hidden;
+            }
+
+            &:last-child
+            {
+                border-bottom: 0;
+                margin-bottom: 0;
             }
         }
     }

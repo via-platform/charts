@@ -29,10 +29,6 @@ module.exports = class ChartData {
     }
 
     changedSymbol(symbol){
-        if(this.source){
-            this.source.destroy();
-        }
-
         if(this.sourceDisposables){
             this.sourceDisposables.dispose();
         }

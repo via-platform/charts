@@ -1,6 +1,6 @@
 {
   "name": "charts",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Charting view for a workspace.",
   "main": "./src/main",
   "scripts": {
@@ -33,10 +33,10 @@
     }
   },
   "consumedServices": {
-      "action-bar": {
-          "versions": {
-              "^0.0.0": "consumeActionBar"
-          }
+    "action-bar": {
+      "versions": {
+        "^0.0.0": "consumeActionBar"
       }
+    }
   }
 }

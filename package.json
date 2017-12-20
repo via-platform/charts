@@ -1,6 +1,6 @@
 {
   "name": "charts",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Charting view for a workspace.",
   "main": "./src/main",
   "scripts": {
@@ -10,7 +10,7 @@
     "via",
     "trading"
   ],
-  "repository": "https://bitbucket.org/via-trading/charts",
+  "repository": "https://github.com/via-platform/charts",
   "author": "Dakota Gordon",
   "dependencies": {
     "d3": "^4.10.2",

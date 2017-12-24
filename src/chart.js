@@ -118,7 +118,6 @@ module.exports = class Chart {
     }
 
     consumeActionBar(actionBar){
-        console.log('CONSUMING AB');
         this.omnibar = actionBar.omnibar;
     }
 

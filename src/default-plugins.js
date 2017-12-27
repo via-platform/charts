@@ -10,9 +10,11 @@ const Indicators = require('./plugins/tools/indicators');
 const Granularity = require('./plugins/tools/granularity');
 
 const Volume = require('./plugins/indicators/volume');
+// const MACD = require('./plugins/indicators/macd');
 
 const SMA = require('./plugins/overlays/sma');
 const BollingerBands = require('./plugins/overlays/bollinger-bands');
+// const IchimokuCloud = require('./plugins/overlays/ichimoku-cloud');
 
 module.exports = [
     Candlestick,
@@ -26,8 +28,7 @@ module.exports = [
     Volume,
     SMA,
     Granularity,
-    BollingerBands
+    BollingerBands,
+    IchimokuCloud,
+    MACD
 ];
-
-//TODO
-//Parabolic SAR

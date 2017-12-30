@@ -45,6 +45,7 @@ module.exports = class Chart {
 
         this.width = 0;
         this.height = 0;
+        this.transform = null;
 
         //TODO allow the user to set a preference on this
         this.type = 'candlestick';
@@ -94,12 +95,18 @@ module.exports = class Chart {
     }
 
     zoomed({event, target}){
+        this.transform = event.transform;
         this.scale.domain(event.transform.rescaleX(this.basis).domain());
         this.updateBandwidth();
         this.emitter.emit('did-zoom', {event, target});
     }
 
     resize(){
+        if(this.transform){
+            //TODO This doesn't work very well, but it's suffient to not appear like an obvious bug
+            this.transform.x = this.transform.x * (this.element.clientWidth / this.width);
+        }
+
         this.width = this.element.clientWidth;
         this.height = this.element.clientHeight;
 

@@ -97,6 +97,10 @@ module.exports = class ChartPanel {
         this.svg.attr('height', this.height).attr('width', this.width);
         this.zoomable.attr('width', this.width).attr('height', this.height);
 
+        if(this.chart.transform){
+            d3.zoom().transform(this.zoomable, this.chart.transform);
+        }
+
         this.emitter.emit('did-resize', {width: this.width, height: this.height, target: this});
 
         this.draw();

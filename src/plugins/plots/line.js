@@ -10,16 +10,11 @@ class Line {
         this.element = element;
 
         //TODO customize these properties
-        this.stroke = 1.5;
         this.property = 'close';
 
         this.element.classed('line', true);
 
-        this.line = d3.line()
-            .x(d => this.chart.scale(d.date))
-            .y(d => this.panel.scale(d.close));
-
-        this.line = this.line.bind(this);
+        this.stroke = this.stroke.bind(this);
     }
 
     serialize(){
@@ -44,18 +39,18 @@ class Line {
         start.setTime(start.getTime() - this.chart.granularity);
         end.setTime(end.getTime() + this.chart.granularity);
 
-        let data = this.chart.data.fetch({start, end});
+        let data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
 
         this.element.selectAll('path').remove();
+        this.element.append('path').classed('stroke', true).datum(data).attr('d', this.stroke);
+    }
 
-        this.element.append('path')
-            .datum(data)
-            .attr('fill', 'none')
-            .attr('stroke-linejoin', 'round')
-            .attr('stroke-linecap', 'round')
-            .attr('stroke-width', this.stroke)
-            .attr('d', this.line);
+    stroke(data){
+        if(data.length < 2){
+            return '';
+        }
 
+        return 'M ' + data.map(d => this.chart.scale(d.date) + ' ' + this.panel.scale(d.close)).join(' L ');
     }
 
     destroy(){

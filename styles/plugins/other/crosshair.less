@@ -1,0 +1,65 @@
+@import "variables";
+
+.chart
+{
+    .crosshair, .crosshair-flag
+    {
+        display: none;
+    }
+
+    .chart-axis
+    {
+        .crosshair-flag
+        {
+            rect
+            {
+                fill: #FFF;
+            }
+
+            text
+            {
+                fill: #282828;
+                font-size: 12px;
+                font-weight: 700;
+                font-family: 'Inconsolata';
+            }
+        }
+    }
+
+    .panel
+    {
+        .crosshair
+        {
+            stroke: #CCC;
+            stroke-width: 1px;
+            pointer-events: none;
+            stroke-dasharray: 6;
+
+            &.y
+            {
+                display: none;
+            }
+        }
+
+        .chart-axis .crosshair-flag
+        {
+            display: none;
+        }
+
+        &:hover
+        {
+            .crosshair.y, .chart-axis .crosshair-flag
+            {
+                display: block;
+            }
+        }
+    }
+
+    &:hover
+    {
+        .crosshair, .crosshair-flag
+        {
+            display: block;
+        }
+    }
+}

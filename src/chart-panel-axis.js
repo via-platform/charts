@@ -1,6 +1,9 @@
 const {Disposable, CompositeDisposable, Emitter} = require('via');
 const d3 = require('d3');
+const AXIS_HEIGHT = 22;
 const AXIS_WIDTH = 60;
+const FLAG_WIDTH = AXIS_WIDTH - 6;
+const FLAG_HEIGHT = AXIS_HEIGHT - 3;
 
 //TODO Allow this to be customizable
 const TICK_SPACING = 40;
@@ -36,7 +39,23 @@ module.exports = class ChartPanelAxis {
     }
 
     flag(){
-        return this.svg.append('g').attr('class', 'flag');
+        const flag = this.svg.append('g').attr('class', 'flag');
+
+        flag.append('rect')
+        .attr('x', 1)
+        .attr('y', 0)
+        .attr('width', AXIS_WIDTH - 1)
+        .attr('height', FLAG_HEIGHT);
+
+        flag.append('text')
+        .attr('x', AXIS_WIDTH / 2)
+        .attr('y', FLAG_HEIGHT / 2 + 1)
+        .attr('width', AXIS_WIDTH)
+        .attr('height', FLAG_HEIGHT)
+        .attr('alignment-baseline', 'middle')
+        .attr('text-anchor', 'middle');
+
+        return flag;
     }
 
     zoom(){

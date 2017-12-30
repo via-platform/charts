@@ -41,12 +41,33 @@ module.exports = class ChartPanels {
         this.resize();
     }
 
+    removePanel(panel){
+        this.panels.splice(this.panels.indexOf(panel));
+        this.emitter.emit('did-remove-panel', panel);
+    }
+
+    observePanels(callback){
+        for(const panel of this.panels){
+            callback(panel);
+        }
+
+        return this.onDidAddPanel(callback);
+    }
+
     resize(){
         this.panels.forEach(panel => panel.resize());
     }
 
     getCenter(){
         return this.panels.find(panel => panel.isCenter);
+    }
+
+    onDidAddPanel(callback){
+        return this.emitter.on('did-add-panel', callback);
+    }
+
+    onDidRemovePanel(callback){
+        return this.emitter.on('did-remove-panel', callback);
     }
 
     destroy(){

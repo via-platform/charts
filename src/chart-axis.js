@@ -1,7 +1,10 @@
 const {Disposable, CompositeDisposable, Emitter} = require('via');
 const d3 = require('d3');
-const AXIS_HEIGHT = 30;
+const AXIS_HEIGHT = 22;
 const AXIS_WIDTH = 60;
+const FLAG_WIDTH = AXIS_WIDTH - 6;
+const FLAG_HEIGHT = AXIS_HEIGHT - 2;
+const X_FLAG_WIDTH = 124; //TODO resize based on chart granularity
 
 module.exports = class ChartAxis {
     constructor({chart}){
@@ -27,6 +30,26 @@ module.exports = class ChartAxis {
         this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
 
         this.resize({width: 0});
+    }
+
+    flag(){
+        const flag = this.svg.append('g').attr('class', 'flag');
+
+        flag.append('rect')
+        .attr('x', 0)
+        .attr('y', 2)
+        .attr('width', X_FLAG_WIDTH)
+        .attr('height', FLAG_HEIGHT);
+
+        flag.append('text')
+        .attr('x', X_FLAG_WIDTH / 2)
+        .attr('y', FLAG_HEIGHT / 2 + 3)
+        .attr('width', X_FLAG_WIDTH)
+        .attr('height', FLAG_HEIGHT)
+        .attr('alignment-baseline', 'middle')
+        .attr('text-anchor', 'middle');
+
+        return flag;
     }
 
     zoom(){

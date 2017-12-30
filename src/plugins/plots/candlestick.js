@@ -14,20 +14,6 @@ class Candlestick {
 
         this.flag = this.panel.axis.flag().classed('last-price-flag', true);
 
-        this.flag.append('rect')
-        .attr('x', 0)
-        .attr('y', 0)
-        .attr('width', AXIS_WIDTH - 1)
-        .attr('height', FLAG_HEIGHT);
-
-        this.flag.append('text')
-        .attr('x', AXIS_WIDTH / 2)
-        .attr('y', FLAG_HEIGHT / 2)
-        .attr('width', AXIS_WIDTH - 1)
-        .attr('height', FLAG_HEIGHT)
-        .attr('alignment-baseline', 'middle')
-        .attr('text-anchor', 'middle');
-
         this.element.classed('candlestick', true);
 
         this.body = this.body.bind(this);

@@ -48,6 +48,11 @@ module.exports = class ChartPanel {
         this.zoomable = this.svg.append('rect').attr('class', 'zoomable');
         this.zoomable.call(d3.zoom().on('zoom', this.zoom()));
 
+        this.zoomable
+        .on('mouseover', this.mouseover())
+        .on('mouseout', this.mouseout())
+        .on('mousemove', this.mousemove());
+
         this.grid = new ChartPanelGrid({chart: this.chart, panel: this});
 
         this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
@@ -69,6 +74,14 @@ module.exports = class ChartPanel {
         this.layers.push(layer);
         this.emitter.emit('did-add-layer', layer);
         this.draw();
+
+        return layer;
+    }
+
+    removeLayer(layer){
+        this.layers.splice(this.layers.indexOf(layer), 1);
+        this.emitter.emit('did-remove-layer', layer);
+        layer.destroy();
     }
 
     getRoot(){
@@ -84,7 +97,7 @@ module.exports = class ChartPanel {
         this.svg.attr('height', this.height).attr('width', this.width);
         this.zoomable.attr('width', this.width).attr('height', this.height);
 
-        this.emitter.emit('did-resize', {width: this.width, height: this.height});
+        this.emitter.emit('did-resize', {width: this.width, height: this.height, target: this});
 
         this.draw();
     }
@@ -106,6 +119,30 @@ module.exports = class ChartPanel {
 
         return function(d, i){
             _this.chart.zoomed({event: d3.event, target: _this});
+        };
+    }
+
+    mouseover(){
+        const _this = this;
+
+        return function(d, i){
+            _this.emitter.emit('did-mouse-over', {event: d3.event, target: _this});
+        };
+    }
+
+    mouseout(){
+        const _this = this;
+
+        return function(d, i){
+            _this.emitter.emit('did-mouse-out', {event: d3.event, target: _this});
+        };
+    }
+
+    mousemove(){
+        const _this = this;
+
+        return function(d, i){
+            _this.emitter.emit('did-mouse-move', {event: d3.event, target: _this});
         };
     }
 
@@ -149,5 +186,17 @@ module.exports = class ChartPanel {
 
     onDidDestroy(callback){
         return this.emitter.on('did-destroy', callback);
+    }
+
+    onDidMouseOver(callback){
+        return this.emitter.on('did-mouse-over', callback);
+    }
+
+    onDidMouseMove(callback){
+        return this.emitter.on('did-mouse-move', callback);
+    }
+
+    onDidMouseOut(callback){
+        return this.emitter.on('did-mouse-out', callback);
     }
 }

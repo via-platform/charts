@@ -18,8 +18,17 @@ class Symbol {
     update(){}
 
     render(){
-        const symbol = this.chart.getSymbol();
-        return $.div({classList: 'symbol', onClick: this.change.bind(this)}, symbol ? symbol.identifier : 'No Symbol');
+        return $.div({classList: 'symbol', onClick: this.change.bind(this)}, this.format(this.chart.getSymbol()));
+    }
+
+    format(symbol){
+        if(!symbol){
+            return 'No Symbol';
+        }
+
+        let exchange = symbol.adapter && _.isFunction(symbol.adapter.title) ? symbol.adapter.title() : symbol.identifier.split(':').shift();
+
+        return exchange + ' ' + symbol.name;
     }
 
     change(){

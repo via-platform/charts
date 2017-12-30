@@ -15,14 +15,11 @@
   "dependencies": {
     "d3": "^4.10.2",
     "etch": "^0.12.5",
+    "moment": "^2.20.1",
     "underscore-plus": "^1.6.6"
   },
   "engines": {
     "via": "*"
-  },
-  "devDependencies": {
-    "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-env": "^1.6.0"
   },
   "providedServices": {
     "charts": {

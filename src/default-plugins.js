@@ -16,6 +16,8 @@ const SMA = require('./plugins/overlays/sma');
 const BollingerBands = require('./plugins/overlays/bollinger-bands');
 // const IchimokuCloud = require('./plugins/overlays/ichimoku-cloud');
 
+const Crosshair = require('./plugins/other/crosshair');
+
 module.exports = [
     Candlestick,
     OHLC,
@@ -29,6 +31,7 @@ module.exports = [
     SMA,
     Granularity,
     BollingerBands,
-    IchimokuCloud,
-    MACD
+    // IchimokuCloud,
+    // MACD
+    Crosshair
 ];

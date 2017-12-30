@@ -15,6 +15,8 @@
 @import "plugins/overlays/sma";
 @import "plugins/overlays/bollinger-bands";
 
+@import "plugins/other/crosshair";
+
 @chart-tools-height: 32px;
 @chart-panel-border-width: 1px;
 @chart-panel-border-color: #181818;
@@ -48,8 +50,6 @@
             flex: 1;
             overflow: hidden;
             border-top: @chart-panel-border-width solid @chart-panel-border-color;
-            border-bottom: @chart-panel-border-width solid @chart-panel-border-color;
-            margin-bottom: 3px;
 
             &.center
             {
@@ -98,6 +98,7 @@
     .zoomable
     {
         fill: transparent;
+        cursor: none;
     }
 
     clipPath rect
@@ -111,8 +112,8 @@
 
         line
         {
-            stroke: #444;
-            stroke-dasharray: 8;
+            stroke: #333;
+            // stroke-dasharray: 8;
         }
 
         path
@@ -141,10 +142,9 @@
 
     .chart-axis
     {
-
         &.x
         {
-            height: 30px;
+            height: 22px;
             padding-right: 60px;
         }
 

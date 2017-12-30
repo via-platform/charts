@@ -15,8 +15,8 @@ const AXIS_HEIGHT = 30;
 const AXIS_WIDTH = 60;
 
 module.exports = class Chart {
-    static deserialize({plugins, omnibar}, params){
-        return new Chart({plugins, omnibar}, params);
+    static deserialize({manager, plugins, omnibar}, params){
+        return new Chart({manager, plugins, omnibar}, params);
     }
 
     serialize(){
@@ -30,7 +30,8 @@ module.exports = class Chart {
         };
     }
 
-    constructor({plugins, omnibar}, params = {}){
+    constructor({manager, plugins, omnibar}, params = {}){
+        this.manager = manager;
         this.plugins = plugins;
         this.omnibar = omnibar;
 
@@ -82,6 +83,14 @@ module.exports = class Chart {
         if(this.symbol){
             this.emitter.emit('did-change-symbol', this.symbol);
         }
+
+        //There isn't a great place to initialize uber-general plugins like the crosshairs
+        //Might as well do it here...
+        this.manager.observePlugins(plugin => {
+            if(plugin.type === 'other'){
+                plugin.instance({chart: this, tools: this});
+            }
+        });
     }
 
     zoomed({event, target}){

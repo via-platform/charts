@@ -104,6 +104,7 @@ module.exports = class ChartPanel {
 
     draw(){
         this.layers.forEach(layer => layer.draw());
+        this.emitter.emit('did-draw');
     }
 
     zoomed({event, target}){

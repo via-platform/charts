@@ -23,14 +23,12 @@ module.exports = class ChartPanelGrid {
 
         this.disposables.add(this.panel.onDidDestroy(this.destroy.bind(this)));
         this.disposables.add(this.panel.onDidResize(this.resize.bind(this)));
-        this.disposables.add(this.chart.onDidZoom(this.draw.bind(this)));
+        this.disposables.add(this.panel.onDidDraw(this.draw.bind(this)));
     }
 
     resize(){
         this.basis.x.tickSize(this.panel.height).ticks(Math.floor(this.panel.width / TICK_SPACING)).tickSizeOuter(0);
         this.basis.y.tickSize(-this.panel.width).ticks(Math.floor(this.panel.height / TICK_SPACING)).tickSizeOuter(0);
-
-        this.draw();
     }
 
     draw(){

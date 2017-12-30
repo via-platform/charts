@@ -82,12 +82,10 @@ class Candlestick {
     }
 
     body(d){
-        let width = Math.min(this.chart.bandwidth - 2, Math.floor(this.chart.bandwidth * (1 - this.padding) - 1)),
-            open = this.panel.scale(d.open),
-            close = this.panel.scale(d.close),
-            xValue = this.chart.scale(d.date) - width / 2;
-
-        // if(isNaN(width) || isNaN(open) || isNaN(close) || isNaN(xValue)) debugger;
+        let width = Math.min(this.chart.bandwidth - 2, Math.floor(this.chart.bandwidth * (1 - this.padding) - 1));
+        let x = this.chart.scale(d.date) - width / 2;
+        let open = this.panel.scale(d.open);
+        let close = this.panel.scale(d.close);
 
         if(Math.abs(open - close) < 1){
             if(close < open){
@@ -97,20 +95,17 @@ class Candlestick {
             }
         }
 
-        return `M ${xValue} ${open} l ${width} 0 L ${xValue + width} ${close} l ${-1 * width} 0 L ${xValue} ${open}`;
+        return `M ${x - 0.5} ${open} h ${width} V ${close} h ${-1 * width} Z`;
     }
 
     wick(d){
-        let width = this.chart.bandwidth,
+        let x = Math.round(this.chart.scale(d.date)),
             open = this.panel.scale(d.open),
             close = this.panel.scale(d.close),
-            xPoint = this.chart.scale(d.date),
-            xValue = xPoint - width / 2,
             high = this.panel.scale(d.high),
-            low = this.panel.scale(d.low),
-            path = `M ${xPoint} ${high} L ${xPoint} ${Math.min(open, close)}`;
+            low = this.panel.scale(d.low);
 
-        return path + ` M ${xPoint} ${Math.max(open, close)} L ${xPoint} ${low}`;
+        return `M ${x - 0.5} ${high} V ${Math.min(open, close)} M ${x - 0.5} ${Math.max(open, close)} V ${low}`;
     }
 }
 

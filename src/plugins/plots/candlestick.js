@@ -1,7 +1,7 @@
 const {CompositeDisposable, Disposable} = require('via');
 const d3 = require('d3');
 const _ = require('underscore-plus');
-const FLAG_HEIGHT = 20;
+// const FLAG_HEIGHT = 20;
 const AXIS_WIDTH = 60;
 
 class Candlestick {
@@ -12,7 +12,7 @@ class Candlestick {
         this.element = element;
         this.padding = 0.2;
 
-        this.flag = this.panel.axis.flag().classed('last-price-flag', true);
+        // this.flag = this.panel.axis.flag().classed('last-price-flag', true);
 
         this.element.classed('candlestick', true);
 
@@ -40,17 +40,17 @@ class Candlestick {
         let [start, end] = this.chart.scale.domain();
         let data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
 
-        let last = _.last(data);
+        // let last = _.last(data);
 
-        if(last){
-            this.flag.select('rect').classed('up', last.open < last.close);
-            this.flag.select('text').text(Math.floor(last.close));
-            this.flag
-                .style('display', 'block')
-                .attr('transform', `translate(1, ${this.panel.scale(last.close) - FLAG_HEIGHT / 2})`);
-        }else{
-            this.flag.style('display', 'none');
-        }
+        // if(last){
+        //     this.flag.select('rect').classed('up', last.open < last.close);
+        //     this.flag.select('text').text(Math.floor(last.close));
+        //     this.flag
+        //         .style('display', 'block')
+        //         .attr('transform', `translate(1, ${this.panel.scale(last.close) - FLAG_HEIGHT / 2})`);
+        // }else{
+        //     this.flag.style('display', 'none');
+        // }
 
         let body = this.element.selectAll('path.candle.body')
             .data(data, d => d.date.getTime())

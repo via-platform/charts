@@ -12,6 +12,7 @@ const Granularity = require('./plugins/tools/granularity');
 const Volume = require('./plugins/indicators/volume');
 // const MACD = require('./plugins/indicators/macd');
 
+const CurrentValue = require('./plugins/overlays/current-value');
 const SMA = require('./plugins/overlays/sma');
 const BollingerBands = require('./plugins/overlays/bollinger-bands');
 // const IchimokuCloud = require('./plugins/overlays/ichimoku-cloud');
@@ -28,6 +29,7 @@ module.exports = [
     Indicators,
     Type,
     Volume,
+    CurrentValue,
     SMA,
     Granularity,
     BollingerBands,

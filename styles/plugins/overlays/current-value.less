@@ -1,0 +1,60 @@
+@import "variables";
+
+.chart
+{
+    .chart-axis
+    {
+        .current-value-flag
+        {
+            rect
+            {
+                fill: #FFF;
+            }
+
+            text
+            {
+                fill: #FFF;
+                font-size: 12px;
+                font-weight: 700;
+                font-family: 'Inconsolata';
+            }
+
+            &.up
+            {
+                rect
+                {
+                    fill: @primary-color-up;
+                }
+            }
+
+            &.down
+            {
+                rect
+                {
+                    fill: @primary-color-down;
+                }
+            }
+        }
+    }
+
+    .panel .layer.current-value
+    {
+        path
+        {
+            stroke: #FFF;
+            fill: transparent;
+            stroke-width: 1px;
+            stroke-dasharray: 2;
+
+            &.up
+            {
+                stroke: fade(@primary-color-up, 50%);
+            }
+
+            &.down
+            {
+                stroke: fade(@primary-color-down, 50%);
+            }
+        }
+    }
+}

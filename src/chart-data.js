@@ -61,6 +61,14 @@ module.exports = class ChartData {
         return this.source.fetch(range);
     }
 
+    candle(date = new Date()){
+        return this.source.candle(date);
+    }
+
+    last(){
+        return this.source.last();
+    }
+
     didUpdateData(){
         this.emitter.emit('did-update-data');
     }

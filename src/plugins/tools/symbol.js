@@ -37,7 +37,16 @@ class Symbol {
                 name: 'Change Chart Symbol',
                 placeholder: 'Enter a Symbol to Display on the Chart...',
                 didConfirmSelection: selection => this.chart.changeSymbol(selection.symbol),
-                maxResultsPerCategory: 10
+                maxResultsPerCategory: 30,
+                items: via.symbols.getSymbols()
+                    .filter(symbol => symbol.adapter && _.isFunction(symbol.adapter.data))
+                    .map(symbol => {
+                        return {
+                            symbol: symbol,
+                            name: symbol.identifier,
+                            description: symbol.description
+                        };
+                    })
             });
         }else{
             console.error('Could not find omnibar.');

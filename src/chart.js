@@ -45,7 +45,7 @@ module.exports = class Chart {
 
         this.width = 0;
         this.height = 0;
-        this.transform = null;
+        this.transform = d3.zoomIdentity;
 
         //TODO allow the user to set a preference on this
         this.type = 'candlestick';
@@ -53,15 +53,18 @@ module.exports = class Chart {
         //TODO allow the padding to be customized
         this.padding = 0.2;
         this.bandwidth = 10;
-        this.granularity = params.granularity || 3e5;
-
-        this.data = new ChartData({chart: this, granularity: this.granularity});
+        this.bandInterval = null;
+        this.granularity = 0;
 
         this.basis = d3.scaleTime().domain([new Date(Date.now() - 864e5), new Date()]);
         this.scale = this.basis.copy();
 
         this.element = document.createElement('div');
         this.element.classList.add('chart');
+
+        this.changeGranularity(params.granularity || 3e5);
+
+        this.data = new ChartData({chart: this, granularity: this.granularity});
 
         this.resizeObserver = new ResizeObserver(this.resize.bind(this));
         this.resizeObserver.observe(this.element);
@@ -102,7 +105,7 @@ module.exports = class Chart {
     }
 
     resize(){
-        if(this.transform){
+        if(this.transform && this.element.clientWidth && this.width){
             //TODO This doesn't work very well, but it's suffient to not appear like an obvious bug
             this.transform.x = this.transform.x * (this.element.clientWidth / this.width);
         }
@@ -182,6 +185,21 @@ module.exports = class Chart {
         this.emitter.emit('did-remove-warning', warning);
     }
 
+    setNextBandTimeout(shift = true){
+        if(this.bandTimeout){
+            clearTimeout(this.bandTimeout);
+        }
+
+        if(shift){
+            //Shift the graph to the left by one bandwidth
+            this.transform.x -= this.bandwidth;
+            this.zoomed({event: {transform: this.transform}});
+        }
+
+        const nextCandle = this.nearestCandle(new Date(Date.now() + this.granularity));
+        this.bandTimeout = setTimeout(() => this.setNextBandTimeout(), nextCandle.getTime() - Date.now());
+    }
+
     clearWarnings(){
         this.warnings = [];
     }
@@ -192,9 +210,13 @@ module.exports = class Chart {
     }
 
     changeGranularity(granularity){
-        this.granularity = granularity;
-        this.updateBandwidth();
-        this.emitter.emit('did-change-granularity', granularity);
+        //TODO check to make this is a valid granularity for the symbol
+        if(this.granularity !== granularity){
+            this.granularity = granularity;
+            this.updateBandwidth();
+            this.setNextBandTimeout(false);
+            this.emitter.emit('did-change-granularity', granularity);
+        }
     }
 
     changeType(type){

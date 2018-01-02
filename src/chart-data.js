@@ -16,7 +16,6 @@ module.exports = class ChartData {
         this.chart = chart;
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
-        this.seriesDisposables = new Map();
         this.granularity = granularity;
         this.changedDomain = _.throttle(this.changedDomain.bind(this), 2000);
         this.source = null;
@@ -79,6 +78,9 @@ module.exports = class ChartData {
 
     destroy(){
         this.disposables.dispose();
-        this.seriesDisposables.clear();
+        
+        if(this.sourceDisposables){
+            this.sourceDisposables.dispose();
+        }
     }
 }

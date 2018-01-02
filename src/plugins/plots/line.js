@@ -1,6 +1,8 @@
 const {CompositeDisposable, Disposable} = require('via');
 const d3 = require('d3');
 const _ = require('underscore-plus');
+const etch = require('etch');
+const $ = etch.dom;
 
 class Line {
     constructor({chart, state, element, panel}){
@@ -15,6 +17,27 @@ class Line {
         this.element.classed('line', true);
 
         this.stroke = this.stroke.bind(this);
+    }
+
+    title(){
+        return `Line Chart`;
+    }
+
+    value(band){
+        const data = _.first(this.chart.data.fetch({start: band, end: band})) || {};
+        const direction = data ? ((data.close >= data.open) ? 'up' : 'down') : 'unavailable';
+
+        //TODO we should fix these values to some sort of user preference or per-symbol basis
+        return $.div({classList: 'value'},
+            'O',
+            $.span({classList: direction}, data.open && data.open.toFixed(2) || '-'),
+            'H',
+            $.span({classList: direction}, data.high && data.high.toFixed(2) || '-'),
+            'L',
+            $.span({classList: direction}, data.low && data.low.toFixed(2) || '-'),
+            'C',
+            $.span({classList: direction}, data.close && data.close.toFixed(2) || '-')
+        );
     }
 
     serialize(){

@@ -84,6 +84,14 @@ class SMA {
             .attr('d', this.line);
     }
 
+    title(){
+
+    }
+
+    value(band){
+
+    }
+
     destroy(){
         this.disposables.dispose();
     }

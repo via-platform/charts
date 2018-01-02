@@ -1,6 +1,8 @@
 const {CompositeDisposable, Disposable} = require('via');
 const d3 = require('d3');
 const _ = require('underscore-plus');
+const etch = require('etch');
+const $ = etch.dom;
 
 class HeikinAshi {
     constructor({chart, state, element, panel}){
@@ -9,11 +11,33 @@ class HeikinAshi {
         this.panel = panel;
         this.element = element;
         this.padding = 0.2;
+        this.candles = [];
 
         this.element.classed('heikin-ashi', true);
 
         this.body = this.body.bind(this);
         this.wick = this.wick.bind(this);
+    }
+
+    title(){
+        return `Heikin-Ashi`;
+    }
+
+    value(band){
+        const data = this.candles.find(candle => candle.date.getTime() === band.getTime()) || {};
+        const direction = data ? ((data.close >= data.open) ? 'up' : 'down') : 'unavailable';
+
+        //TODO we should fix these values to some sort of user preference or per-symbol basis
+        return $.div({classList: 'value'},
+            'O',
+            $.span({classList: direction}, data.open && data.open.toFixed(2) || '-'),
+            'H',
+            $.span({classList: direction}, data.high && data.high.toFixed(2) || '-'),
+            'L',
+            $.span({classList: direction}, data.low && data.low.toFixed(2) || '-'),
+            'C',
+            $.span({classList: direction}, data.close && data.close.toFixed(2) || '-')
+        );
     }
 
     serialize(){
@@ -38,7 +62,7 @@ class HeikinAshi {
         start.setTime(start.getTime() - this.chart.granularity);
 
         let data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
-        let candles = [];
+        this.candles = [];
 
         if(!data.length){
             return;
@@ -47,7 +71,7 @@ class HeikinAshi {
         //Calculate the first candle
         let first = _.first(data);
 
-        candles.push({
+        this.candles.push({
             date: first.date,
             open: (first.open + first.close) / 2,
             close: (first.open + first.close + first.high + first.low) / 4,
@@ -61,7 +85,7 @@ class HeikinAshi {
             let open = (previous.open + previous.close) / 2;
             let close = (candle.open + candle.close + candle.high + candle.low) / 4;
 
-            candles.push({
+            this.candles.push({
                 date: candle.date,
                 open,
                 close,
@@ -71,7 +95,7 @@ class HeikinAshi {
         }
 
         let body = this.element.selectAll('path.candle.body')
-            .data(candles, d => d.date.getTime())
+            .data(this.candles, d => d.date.getTime())
             .attr('class', d => (d.open > d.close) ? 'candle body down' : 'candle body up')
             .classed('incomplete', d => d.incomplete)
             .attr('d', this.body);
@@ -85,7 +109,7 @@ class HeikinAshi {
         body.exit().remove();
 
         let wick = this.element.selectAll('path.candle.wick')
-            .data(candles, d => d.date.getTime())
+            .data(this.candles, d => d.date.getTime())
             .attr('class', d => (d.open > d.close) ? 'candle wick down' : 'candle wick up')
             .attr('d', this.wick);
 

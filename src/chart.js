@@ -104,6 +104,18 @@ module.exports = class Chart {
         this.emitter.emit('did-zoom', {event, target});
     }
 
+    mouseover({event, target}){
+        this.emitter.emit('did-mouse-over', {event, target});
+    }
+
+    mouseout({event, target}){
+        this.emitter.emit('did-mouse-out', {event, target});
+    }
+
+    mousemove({event, target}){
+        this.emitter.emit('did-mouse-move', {event, target});
+    }
+
     resize(){
         if(this.transform && this.element.clientWidth && this.width){
             //TODO This doesn't work very well, but it's suffient to not appear like an obvious bug
@@ -141,13 +153,15 @@ module.exports = class Chart {
     }
 
     destroy(){
-        this.disposables.dispose();
-        this.emitter.dispose();
+        this.data.destroy();
         this.panels.destroy();
         this.tools.destroy();
         this.axis.destroy();
         this.resizeObserver.disconnect();
         this.emitter.emit('did-destroy');
+        
+        this.disposables.dispose();
+        this.emitter.dispose();
     }
 
     getURI(){
@@ -315,5 +329,17 @@ module.exports = class Chart {
 
     onDidZoom(callback){
         return this.emitter.on('did-zoom', callback);
+    }
+
+    onDidMouseOver(callback){
+        return this.emitter.on('did-mouse-over', callback);
+    }
+
+    onDidMouseMove(callback){
+        return this.emitter.on('did-mouse-move', callback);
+    }
+
+    onDidMouseOut(callback){
+        return this.emitter.on('did-mouse-out', callback);
     }
 }

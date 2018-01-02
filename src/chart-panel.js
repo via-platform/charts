@@ -4,6 +4,7 @@ const _ = require('underscore-plus');
 const ChartLayer = require('./chart-layer');
 const ChartPanelAxis = require('./chart-panel-axis');
 const ChartPanelGrid = require('./chart-panel-grid');
+const ChartPanelValues = require('./chart-panel-values');
 
 //TODO allow the user to set a preference on this
 const AXIS_WIDTH = 60;
@@ -38,7 +39,10 @@ module.exports = class ChartPanel {
         this.center.classList.add('panel-center');
 
         this.axis = new ChartPanelAxis({chart: this.chart, panel: this});
+        this.values = new ChartPanelValues({chart: this.chart, panel: this});
+
         this.element.appendChild(this.center);
+        this.element.appendChild(this.values.element);
         this.element.appendChild(this.axis.element);
 
         this.svg = d3.select(this.center)
@@ -49,9 +53,9 @@ module.exports = class ChartPanel {
         this.zoomable.call(d3.zoom().on('zoom', this.zoom()));
 
         this.zoomable
-        .on('mouseover', this.mouseover())
-        .on('mouseout', this.mouseout())
-        .on('mousemove', this.mousemove());
+            .on('mouseover', this.mouseover())
+            .on('mouseout', this.mouseout())
+            .on('mousemove', this.mousemove());
 
         this.grid = new ChartPanelGrid({chart: this.chart, panel: this});
 
@@ -132,6 +136,7 @@ module.exports = class ChartPanel {
 
         return function(d, i){
             _this.emitter.emit('did-mouse-over', {event: d3.event, target: _this});
+            _this.chart.mouseover({event: d3.event, target: _this});
         };
     }
 
@@ -140,6 +145,7 @@ module.exports = class ChartPanel {
 
         return function(d, i){
             _this.emitter.emit('did-mouse-out', {event: d3.event, target: _this});
+            _this.chart.mouseout({event: d3.event, target: _this});
         };
     }
 
@@ -148,6 +154,7 @@ module.exports = class ChartPanel {
 
         return function(d, i){
             _this.emitter.emit('did-mouse-move', {event: d3.event, target: _this});
+            _this.chart.mousemove({event: d3.event, target: _this});
         };
     }
 

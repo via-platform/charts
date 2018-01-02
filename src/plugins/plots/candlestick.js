@@ -1,6 +1,9 @@
 const {CompositeDisposable, Disposable} = require('via');
 const d3 = require('d3');
 const _ = require('underscore-plus');
+const etch = require('etch');
+const $ = etch.dom;
+
 // const FLAG_HEIGHT = 20;
 const AXIS_WIDTH = 60;
 
@@ -12,12 +15,30 @@ class Candlestick {
         this.element = element;
         this.padding = 0.2;
 
-        // this.flag = this.panel.axis.flag().classed('last-price-flag', true);
-
         this.element.classed('candlestick', true);
-
         this.body = this.body.bind(this);
         this.wick = this.wick.bind(this);
+    }
+
+    title(){
+        return `Candlesticks`;
+    }
+
+    value(band){
+        const data = _.first(this.chart.data.fetch({start: band, end: band})) || {};
+        const direction = data ? ((data.close >= data.open) ? 'up' : 'down') : 'unavailable';
+
+        //TODO we should fix these values to some sort of user preference or per-symbol basis
+        return $.div({classList: 'value'},
+            'O',
+            $.span({classList: direction}, data.open && data.open.toFixed(2) || '-'),
+            'H',
+            $.span({classList: direction}, data.high && data.high.toFixed(2) || '-'),
+            'L',
+            $.span({classList: direction}, data.low && data.low.toFixed(2) || '-'),
+            'C',
+            $.span({classList: direction}, data.close && data.close.toFixed(2) || '-')
+        );
     }
 
     serialize(){
@@ -39,18 +60,6 @@ class Candlestick {
     draw(){
         let [start, end] = this.chart.scale.domain();
         let data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
-
-        // let last = _.last(data);
-
-        // if(last){
-        //     this.flag.select('rect').classed('up', last.open < last.close);
-        //     this.flag.select('text').text(Math.floor(last.close));
-        //     this.flag
-        //         .style('display', 'block')
-        //         .attr('transform', `translate(1, ${this.panel.scale(last.close) - FLAG_HEIGHT / 2})`);
-        // }else{
-        //     this.flag.style('display', 'none');
-        // }
 
         let body = this.element.selectAll('path.candle.body')
             .data(data, d => d.date.getTime())

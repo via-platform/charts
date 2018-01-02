@@ -1,6 +1,8 @@
 const {CompositeDisposable, Disposable} = require('via');
 const d3 = require('d3');
 const _ = require('underscore-plus');
+const etch = require('etch');
+const $ = etch.dom;
 
 class BollingerBands {
     constructor({chart, state, element, panel}){
@@ -8,11 +10,13 @@ class BollingerBands {
         this.chart = chart;
         this.panel = panel;
         this.element = element;
+        this.bands = [];
 
         //TODO customize these properties
         this.stroke = 1.5;
         this.property = 'close';
         this.length = 20;
+        this.multiple = 2;
 
         this.element.classed('bollinger-bands', true);
 
@@ -33,6 +37,25 @@ class BollingerBands {
         this.lower = this.lower.bind(this);
     }
 
+    title(){
+        return `Bollinger Bands (${this.length}, ${this.multiple})`;
+    }
+
+    value(band){
+        const data = this.bands.find(period => period.date.getTime() === band.getTime()) || {};
+        const availability = data.incomplete ? 'available' : 'unavailable';
+
+        //TODO we should fix these values to some sort of user preference or per-symbol basis
+        return $.div({classList: 'value'},
+            'L',
+            $.span({classList: availability}, data.lower && data.lower.toFixed(2) || '-'),
+            'M',
+            $.span({classList: availability}, data.middle && data.middle.toFixed(2) || '-'),
+            'U',
+            $.span({classList: availability}, data.upper && data.upper.toFixed(2) || '-')
+        );
+    }
+
     serialize(){
         return {
             version: 1,
@@ -47,9 +70,10 @@ class BollingerBands {
 
         return {
             date: _.last(data).date,
-            upper: mean + 2 * deviation,
+            upper: mean + this.multiple * deviation,
             middle: mean,
-            lower: mean - 2 * deviation
+            lower: mean - this.multiple * deviation,
+            incomplete: data.length === this.length
         };
     }
 
@@ -64,16 +88,16 @@ class BollingerBands {
         end.setTime(end.getTime() + this.chart.granularity);
 
         let data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
-        let bands = [];
+        this.bands = [];
 
         for(let i = 0; i < data.length; i++){
-            bands.push(this.bollinger(data.slice(Math.max(0, i - this.length), i + 1)));
+            this.bands.push(this.bollinger(data.slice(Math.max(0, i - (this.length - 1)), i + 1)));
         }
 
         this.element.selectAll('path').remove();
 
         this.element.append('path')
-            .datum(bands.slice(0, this.length - 1))
+            .datum(this.bands.slice(0, this.length - 1))
             .attr('class', 'bollinger-band upper incomplete')
             .attr('fill', 'none')
             .attr('stroke-linejoin', 'round')
@@ -82,7 +106,7 @@ class BollingerBands {
             .attr('d', this.upper);
 
         this.element.append('path')
-            .datum(bands.slice(this.length - 2))
+            .datum(this.bands.slice(this.length - 2))
             .attr('class', 'bollinger-band upper')
             .attr('fill', 'none')
             .attr('stroke-linejoin', 'round')
@@ -91,7 +115,7 @@ class BollingerBands {
             .attr('d', this.upper);
 
         this.element.append('path')
-            .datum(bands.slice(0, this.length - 1))
+            .datum(this.bands.slice(0, this.length - 1))
             .attr('class', 'bollinger-band middle incomplete')
             .attr('fill', 'none')
             .attr('stroke-linejoin', 'round')
@@ -100,7 +124,7 @@ class BollingerBands {
             .attr('d', this.middle);
 
         this.element.append('path')
-            .datum(bands.slice(this.length - 2))
+            .datum(this.bands.slice(this.length - 2))
             .attr('class', 'bollinger-band middle')
             .attr('fill', 'none')
             .attr('stroke-linejoin', 'round')
@@ -109,7 +133,7 @@ class BollingerBands {
             .attr('d', this.middle);
 
         this.element.append('path')
-            .datum(bands.slice(0, this.length - 1))
+            .datum(this.bands.slice(0, this.length - 1))
             .attr('class', 'bollinger-band lower incomplete')
             .attr('fill', 'none')
             .attr('stroke-linejoin', 'round')
@@ -118,7 +142,7 @@ class BollingerBands {
             .attr('d', this.lower);
 
         this.element.append('path')
-            .datum(bands.slice(this.length - 2))
+            .datum(this.bands.slice(this.length - 2))
             .attr('class', 'bollinger-band lower')
             .attr('fill', 'none')
             .attr('stroke-linejoin', 'round')

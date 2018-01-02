@@ -51,6 +51,7 @@
             flex: 1;
             overflow: hidden;
             border-top: @chart-panel-border-width solid @chart-panel-border-color;
+            position: relative;
 
             &.center
             {
@@ -61,6 +62,57 @@
             {
                 flex: 1;
                 overflow: hidden;
+            }
+
+            .panel-values
+            {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                z-index: 2;
+
+                .panel-value
+                {
+                    display: flex;
+                    font-size: 12px;
+                    font-weight: 500;
+                    -webkit-font-smoothing: antialiased;
+                    color: @text-color-subtle;
+                    line-height: 20px;
+                    height: 20px;
+                    cursor: default;
+                    user-select: none;
+
+                    .title
+                    {
+                        margin-right: 12px;
+                        color: #FFF;
+                    }
+
+                    span
+                    {
+                        font-family: 'Inconsolata';
+                        font-size: 14px;
+                        margin: 0 6px;
+                        font-weight: 700;
+                        color: #FFF;
+
+                        &.up
+                        {
+                            color: @primary-color-up;
+                        }
+
+                        &.down
+                        {
+                            color: @primary-color-down;
+                        }
+
+                        &.unavailable
+                        {
+                            color: @text-color-subtle;
+                        }
+                    }
+                }
             }
 
             &:last-child

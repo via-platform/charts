@@ -48,9 +48,22 @@ module.exports = class ChartLayer {
         return (this.plugin && _.isFunction(this.plugin.domain)) ? this.plugin.domain() : [];
     }
 
+    title(){
+        return _.isFunction(this.plugin.title) ? this.plugin.title() : '';
+    }
+
+    value(candle){
+        return _.isFunction(this.plugin.value) ? this.plugin.value(candle) : '';
+    }
+
     draw(){
         if(this.plugin){
             this.plugin.draw();
         }
+    }
+
+    destroy(){
+        this.disposables.dispose();
+        this.plugin.destroy();
     }
 }

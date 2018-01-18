@@ -27,7 +27,7 @@ class Area {
     value(band){
         const data = _.first(this.chart.data.fetch({start: band, end: band})) || {};
         const direction = data ? ((data.close >= data.open) ? 'up' : 'down') : 'unavailable';
-        const aggregation = this.chart.symbol.aggregation;
+        const aggregation = this.chart.symbol ? this.chart.symbol.aggregation : 2;
 
         //TODO we should fix these values to some sort of user preference or per-symbol basis
         return $.div({classList: 'value'},

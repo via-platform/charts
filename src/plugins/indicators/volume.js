@@ -30,7 +30,8 @@ class Volume {
 
     value(band){
         const data = _.first(this.chart.data.fetch({start: band, end: band})) || {};
-        const value = (_.isUndefined(data) || _.isUndefined(data.volume)) ? '-' : data.volume.toFixed(this.chart.symbol.aggregation);
+        const aggregation = this.chart.symbol ? this.chart.symbol.aggregation : 2;
+        const value = (_.isUndefined(data) || _.isUndefined(data.volume)) ? '-' : data.volume.toFixed(aggregation);
         const base = this.chart.symbol ? this.chart.symbol.base : '';
 
         return $.div({classList: 'value'},

@@ -74,6 +74,7 @@ module.exports = class Chart {
     }
 
     initialize(state = {}){
+        this.symbol = via.symbols.findByIdentifier(this.getURI().slice(BaseURI.length + 1));
         this.tools = new ChartTools({chart: this, state: state.tools});
         this.panels = new ChartPanels({chart: this, state: state.panels});
         this.axis = new ChartAxis({chart: this});
@@ -82,7 +83,6 @@ module.exports = class Chart {
         this.element.appendChild(this.panels.element);
         this.element.appendChild(this.axis.element);
 
-        this.symbol = via.symbols.findByIdentifier(this.getURI().slice(BaseURI.length + 1));
 
         if(this.symbol){
             this.emitter.emit('did-change-symbol', this.symbol);
@@ -159,7 +159,7 @@ module.exports = class Chart {
         this.axis.destroy();
         this.resizeObserver.disconnect();
         this.emitter.emit('did-destroy');
-        
+
         this.disposables.dispose();
         this.emitter.dispose();
     }

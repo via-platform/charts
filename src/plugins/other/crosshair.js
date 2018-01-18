@@ -54,7 +54,8 @@ class Crosshair {
 
         if(panel){
             const value = target.scale.invert(event.offsetY); //TODO properly format this number
-            panel.flag.attr('transform', `translate(0, ${event.offsetY - Math.ceil(FLAG_HEIGHT / 2)})`).select('text').text(value.toFixed(this.chart.symbol.aggregation)); //TODO properly format this number
+            const aggregation = this.chart.symbol ? this.chart.symbol.aggregation : 2;
+            panel.flag.attr('transform', `translate(0, ${event.offsetY - Math.ceil(FLAG_HEIGHT / 2)})`).select('text').text(value.toFixed(aggregation)); //TODO properly format this number
             panel.crosshairs.y.attr('transform', `translate(0, ${event.offsetY - 0.5})`);
         }
 

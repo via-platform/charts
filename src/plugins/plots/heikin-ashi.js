@@ -26,7 +26,7 @@ class HeikinAshi {
     value(band){
         const data = this.candles.find(candle => candle.date.getTime() === band.getTime()) || {};
         const direction = data ? ((data.close >= data.open) ? 'up' : 'down') : 'unavailable';
-        const aggregation = this.chart.symbol.aggregation;
+        const aggregation = this.chart.symbol ? this.chart.symbol.aggregation : 2;
 
         //TODO we should fix these values to some sort of user preference or per-symbol basis
         return $.div({classList: 'value'},

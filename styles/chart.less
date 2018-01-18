@@ -18,9 +18,10 @@
 
 @import "plugins/other/crosshair";
 
-@chart-tools-height: 32px;
+@chart-tools-height: 24px;
 @chart-panel-border-width: 1px;
-@chart-panel-border-color: #181818;
+@chart-panel-border-color: @pane-border-color;
+@chart-panel-background-color: @pane-content-background-color;
 
 .chart
 {
@@ -51,7 +52,10 @@
             flex: 1;
             overflow: hidden;
             border-top: @chart-panel-border-width solid @chart-panel-border-color;
+            border-bottom: @chart-panel-border-width solid @chart-panel-border-color;
             position: relative;
+            margin-bottom: 4px;
+            background: @chart-panel-background-color;
 
             &.center
             {
@@ -74,7 +78,7 @@
                 .panel-value
                 {
                     display: flex;
-                    font-size: 12px;
+                    font-size: 11px;
                     font-weight: 500;
                     -webkit-font-smoothing: antialiased;
                     color: @text-color-subtle;
@@ -92,7 +96,7 @@
                     span
                     {
                         font-family: 'Inconsolata';
-                        font-size: 14px;
+                        font-size: 12px;
                         margin: 0 6px;
                         font-weight: 700;
                         color: #FFF;
@@ -111,13 +115,17 @@
                         {
                             color: @text-color-subtle;
                         }
+
+                        &.first
+                        {
+                            margin-left: 0;
+                        }
                     }
                 }
             }
 
             &:last-child
             {
-                border-bottom: 0;
                 margin-bottom: 0;
             }
         }
@@ -133,18 +141,41 @@
     .chart-tools
     {
         height: @chart-tools-height;
+        // border-bottom: 1px solid @chart-panel-border-color;
+        // border-bottom: 0;
         display: flex;
 
         .chart-tools-left, .chart-tools-right
         {
             display: flex;
             align-items: center;
-            padding: 0 10px;
+        }
+
+        .chart-tools-left
+        {
+            .btn
+            {
+                border-right: 1px solid @chart-panel-border-color;
+            }
+        }
+
+        .chart-tools-right
+        {
+            .btn
+            {
+                border-left: 1px solid @chart-panel-border-color;
+            }
         }
 
         .chart-tools-spacer
         {
             flex: 1;
+        }
+
+        .btn
+        {
+            height: @chart-tools-height;
+            line-height: @chart-tools-height;
         }
     }
 
@@ -180,16 +211,21 @@
     {
         pointer-events: none;
 
-        line, path
+        path
         {
-            stroke: #444;
+            display: none;
+        }
+
+        line
+        {
+            stroke: #000;
         }
 
         text
         {
             fill: @text-color-subtle;
             font-weight: 700;
-            font-size: 11px;
+            font-size: 10px;
         }
     }
 

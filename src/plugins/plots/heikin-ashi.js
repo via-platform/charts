@@ -26,17 +26,18 @@ class HeikinAshi {
     value(band){
         const data = this.candles.find(candle => candle.date.getTime() === band.getTime()) || {};
         const direction = data ? ((data.close >= data.open) ? 'up' : 'down') : 'unavailable';
+        const aggregation = this.chart.symbol.aggregation;
 
         //TODO we should fix these values to some sort of user preference or per-symbol basis
         return $.div({classList: 'value'},
             'O',
-            $.span({classList: direction}, data.open && data.open.toFixed(2) || '-'),
+            $.span({classList: direction}, data.open && data.open.toFixed(aggregation) || '-'),
             'H',
-            $.span({classList: direction}, data.high && data.high.toFixed(2) || '-'),
+            $.span({classList: direction}, data.high && data.high.toFixed(aggregation) || '-'),
             'L',
-            $.span({classList: direction}, data.low && data.low.toFixed(2) || '-'),
+            $.span({classList: direction}, data.low && data.low.toFixed(aggregation) || '-'),
             'C',
-            $.span({classList: direction}, data.close && data.close.toFixed(2) || '-')
+            $.span({classList: direction}, data.close && data.close.toFixed(aggregation) || '-')
         );
     }
 

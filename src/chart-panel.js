@@ -63,6 +63,10 @@ module.exports = class ChartPanel {
         this.disposables.add(this.chart.onDidDestroy(this.destroy.bind(this)));
         this.disposables.add(this.chart.data.onDidUpdateData(this.rescale.bind(this)));
 
+        this.disposables.add(via.commands.add(this.element, {
+            'charts:remove-panel': () => this.remove()
+        }));
+
         if(state && state.layers){
             this.layers = state.layers.map(layer => ChartLayer.deserialize({chart: this.chart, panel: this, state: layer}));
         }else{
@@ -86,6 +90,10 @@ module.exports = class ChartPanel {
         this.layers.splice(this.layers.indexOf(layer), 1);
         this.emitter.emit('did-remove-layer', layer);
         layer.destroy();
+    }
+
+    didModifyLayer(layer){
+        this.emitter.emit('did-modify-layer', layer);
     }
 
     getRoot(){
@@ -179,7 +187,18 @@ module.exports = class ChartPanel {
         this.draw();
     }
 
+    remove(){
+        if(this.isCenter){
+            return;
+        }
+
+        this.chart.panels.removePanel(this);
+    }
+
     destroy(){
+        this.axis.destroy();
+        this.values.destroy();
+        this.element.parentElement.removeChild(this.element);
         this.disposables.dispose();
         this.emitter.emit('did-destroy');
     }
@@ -210,5 +229,17 @@ module.exports = class ChartPanel {
 
     onDidMouseOut(callback){
         return this.emitter.on('did-mouse-out', callback);
+    }
+
+    onDidAddLayer(callback){
+        return this.emitter.on('did-add-layer', callback);
+    }
+
+    onDidRemoveLayer(callback){
+        return this.emitter.on('did-remove-layer', callback);
+    }
+
+    onDidModifyLayer(callback){
+        return this.emitter.on('did-modify-layer', callback);
     }
 }

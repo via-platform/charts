@@ -1,0 +1,7 @@
+'context-menu':
+  '.chart .panel-values .panel-value': [
+    {label: 'Remove Layer', command: 'charts:remove-layer'}
+  ]
+  '.chart .panel:not(.center)': [
+    {label: 'Remove Panel', command: 'charts:remove-panel'}
+  ]

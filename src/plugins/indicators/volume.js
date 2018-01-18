@@ -1,6 +1,8 @@
 const {CompositeDisposable, Disposable} = require('via');
 const d3 = require('d3');
 const _ = require('underscore-plus');
+const etch = require('etch');
+const $ = etch.dom;
 
 class Volume {
     constructor({chart, state, element, panel}){
@@ -8,7 +10,7 @@ class Volume {
         this.chart = chart;
         this.panel = panel;
         this.element = element;
-        this.padding = 0.4;
+        this.padding = 0.6;
 
         this.element.classed('volume', true);
 
@@ -20,6 +22,21 @@ class Volume {
             version: 1,
             name: 'volume'
         };
+    }
+
+    title(){
+        return `Trading Volume`;
+    }
+
+    value(band){
+        const data = _.first(this.chart.data.fetch({start: band, end: band})) || {};
+        const value = (_.isUndefined(data) || _.isUndefined(data.volume)) ? '-' : data.volume.toFixed(this.chart.symbol.aggregation);
+        const base = this.chart.symbol ? this.chart.symbol.base : '';
+
+        return $.div({classList: 'value'},
+            $.span({classList: 'available first'}, value),
+            base
+        );
     }
 
     domain(){
@@ -52,7 +69,7 @@ class Volume {
         let w = Math.max(1, Math.min(this.chart.bandwidth - 2, Math.floor(this.chart.bandwidth * (1 - this.padding) - 1))),
             vol = this.panel.scale(d.volume),
             x = this.chart.scale(d.date) - w / 2,
-            y = this.panel.scale(0);
+            y = this.panel.scale.range()[1] + 10;
 
         return `M ${x} ${vol} h ${w} V ${y} h ${-w} Z`;
     }

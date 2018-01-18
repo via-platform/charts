@@ -30,11 +30,11 @@ class Granularity {
 
     render(){
         const buttons = keys.map(key => {
-            const classes = this.chart.granularity === key ? 'btn btn-subtle mini selected' : 'btn btn-subtle mini';
+            const classes = this.chart.granularity === key ? 'btn btn-subtle selected' : 'btn btn-subtle';
             return $.div({classList: classes, onClick: () => this.change(key)}, options[key]);
         });
 
-        return $.div({classList: 'granularity btn-group mini'}, ...buttons);
+        return $.div({classList: 'granularity btn-group'}, ...buttons);
     }
 
     didChangeGranularity(granularity){

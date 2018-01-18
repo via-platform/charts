@@ -37,13 +37,13 @@ module.exports = class ChartAxis {
 
         flag.append('rect')
         .attr('x', 0)
-        .attr('y', 2)
+        .attr('y', 1)
         .attr('width', X_FLAG_WIDTH)
         .attr('height', FLAG_HEIGHT);
 
         flag.append('text')
         .attr('x', X_FLAG_WIDTH / 2)
-        .attr('y', FLAG_HEIGHT / 2 + 3)
+        .attr('y', FLAG_HEIGHT / 2 + 2)
         .attr('width', X_FLAG_WIDTH)
         .attr('height', FLAG_HEIGHT)
         .attr('alignment-baseline', 'middle')

@@ -15,19 +15,16 @@ module.exports = class ChartPanelValues {
 
         this.disposables.add(this.panel.onDidDestroy(this.destroy.bind(this)));
         this.disposables.add(this.panel.onDidDraw(() => this.update()));
+        this.disposables.add(this.panel.onDidAddLayer(() => this.update()));
+        this.disposables.add(this.panel.onDidRemoveLayer(() => this.update()));
+        this.disposables.add(this.panel.onDidModifyLayer(() => this.update()));
 
         this.disposables.add(this.chart.onDidMouseMove(this.update.bind(this)));
         this.disposables.add(this.chart.onDidMouseOut(this.update.bind(this)));
     }
 
     render(){
-        return $.div({classList: 'panel-values'}, this.panel.layers.map(layer => {
-            //Just don't list layers that do not provide a title (for now at least).
-            //For they moment, they just can't be removed the normal way
-            const title = layer.title();
-            const value = layer.value(this.candle);
-            return layer.title ? $.div({classList: 'panel-value'}, $.div({classList: 'title'}, title), value) : '';
-        }));
+        return $.div({classList: 'panel-values'}, this.panel.layers.map(layer => $(ChartPanelValue, {layer, candle: this.candle})));
     }
 
     update({event} = {}){
@@ -48,5 +45,39 @@ module.exports = class ChartPanelValues {
         etch.destroy(this);
         this.disposables.dispose();
         this.emitter.dispose();
+    }
+}
+
+class ChartPanelValue {
+    constructor({layer, candle}){
+        this.layer = layer;
+        this.candle = candle;
+        this.disposables = new CompositeDisposable();
+
+        etch.initialize(this);
+
+        this.disposables.add(via.commands.add(this.element, {
+            'charts:remove-layer': () => this.layer.remove()
+        }));
+    }
+
+    render(){
+        //Just don't list layers that do not provide a title (for now at least).
+        //For they moment, they just can't be removed the normal way
+        const title = this.layer.title();
+        const value = this.layer.value(this.candle);
+
+        return title ? $.div({classList: 'panel-value'}, $.div({classList: 'title'}, title), value) : $.div({});
+    }
+
+    update({candle, layer}){
+        this.layer = layer;
+        this.candle = candle;
+        etch.update(this);
+    }
+
+    destroy(){
+        this.disposables.dispose();
+        etch.destroy(this);
     }
 }

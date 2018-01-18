@@ -1,4 +1,4 @@
-const {Disposable, CompositeDisposable, Emitter} = require('via');
+const {Disposable, CompositeDisposable, Emitter, Data} = require('via');
 const _ = require('underscore-plus');
 
 module.exports = class ChartData {
@@ -34,7 +34,7 @@ module.exports = class ChartData {
 
         this.symbol = symbol;
         this.sourceDisposables = new CompositeDisposable();
-        this.source = symbol.data(this.granularity);
+        this.source = new Data(this.symbol, this.granularity);
         this.sourceDisposables.add(this.source.onDidUpdateData(this.didUpdateData.bind(this)));
 
         this.changedDomain();
@@ -78,7 +78,11 @@ module.exports = class ChartData {
 
     destroy(){
         this.disposables.dispose();
-        
+
+        if(this.source){
+            this.source.destroy();
+        }
+
         if(this.sourceDisposables){
             this.sourceDisposables.dispose();
         }

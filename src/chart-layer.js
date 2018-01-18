@@ -41,6 +41,7 @@ module.exports = class ChartLayer {
 
         this.element = this.panel.svg.append('g').classed('layer', true).classed('root', this.isRoot);
         this.plugin = plugin.instance({chart: this.chart, panel: this.panel, element: this.element});
+        this.panel.didModifyLayer(this);
         this.draw();
     }
 
@@ -62,7 +63,16 @@ module.exports = class ChartLayer {
         }
     }
 
+    remove(){
+        if(this.panel.isCenter && this.isRoot){
+            return;
+        }
+
+        this.panel.removeLayer(this);
+    }
+
     destroy(){
+        this.element.remove();
         this.disposables.dispose();
         this.plugin.destroy();
     }

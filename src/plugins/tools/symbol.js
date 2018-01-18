@@ -18,7 +18,7 @@ class Symbol {
     update(){}
 
     render(){
-        return $.div({classList: 'symbol', onClick: this.change.bind(this)}, this.format(this.chart.getSymbol()));
+        return $.div({classList: 'symbol btn btn-subtle', onClick: this.change.bind(this)}, this.format(this.chart.getSymbol()));
     }
 
     format(symbol){
@@ -26,9 +26,7 @@ class Symbol {
             return 'No Symbol';
         }
 
-        let exchange = symbol.adapter && _.isFunction(symbol.adapter.title) ? symbol.adapter.title() : symbol.identifier.split(':').shift();
-
-        return exchange + ' ' + symbol.name;
+        return symbol.identifier;
     }
 
     change(){
@@ -39,7 +37,6 @@ class Symbol {
                 didConfirmSelection: selection => this.chart.changeSymbol(selection.symbol),
                 maxResultsPerCategory: 30,
                 items: via.symbols.getSymbols()
-                    .filter(symbol => symbol.adapter && _.isFunction(symbol.adapter.data))
                     .map(symbol => {
                         return {
                             symbol: symbol,

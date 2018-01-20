@@ -28,6 +28,7 @@ module.exports = class ChartPanel {
 
         this.width = 0;
         this.height = 0;
+        this.padding = 0.05;
 
         this.basis = d3.scaleLinear().domain([100, 0]);
         this.scale = this.basis.copy();
@@ -172,10 +173,12 @@ module.exports = class ChartPanel {
         if(domains.length){
             let min = _.min(domains);
             let max = _.max(domains);
+            let range = max - min;
+            let extra = range * this.padding;
 
             if(!_.isUndefined(min) && !_.isUndefined(max)){
-                this.basis.domain([max, min]).nice();
-                this.scale.domain([max, min]).nice();
+                this.basis.domain([max + extra, min - extra]);
+                this.scale.domain([max + extra, min - extra]);
                 this.emitter.emit('did-rescale', this.scale);
             }
         }else{

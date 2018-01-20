@@ -10,6 +10,7 @@ const Indicators = require('./plugins/tools/indicators');
 const Granularity = require('./plugins/tools/granularity');
 
 const Volume = require('./plugins/indicators/volume');
+const RSI = require('./plugins/indicators/rsi');
 // const MACD = require('./plugins/indicators/macd');
 
 const CurrentValue = require('./plugins/overlays/current-value');
@@ -29,6 +30,7 @@ module.exports = [
     Indicators,
     Type,
     Volume,
+    RSI,
     CurrentValue,
     SMA,
     Granularity,

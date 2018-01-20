@@ -1,0 +1,21 @@
+@import "variables";
+
+.chart .panel .layer.rsi
+{
+    path
+    {
+        stroke: rgb(90, 200, 250);
+
+        &.range
+        {
+            stroke: rgba(255, 255, 255, 0.3);
+            stroke-dasharray: 6;
+            stroke-width: 1;
+        }
+    }
+
+    rect
+    {
+        fill: rgba(255, 255, 255, 0.05);
+    }
+}

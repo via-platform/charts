@@ -44,15 +44,16 @@ class BollingerBands {
     value(band){
         const data = this.bands.find(period => period.date.getTime() === band.getTime()) || {};
         const availability = data.incomplete ? 'available' : 'unavailable';
+        const aggregation = this.chart.symbol ? this.chart.symbol.aggregation : 2;
 
         //TODO we should fix these values to some sort of user preference or per-symbol basis
         return $.div({classList: 'value'},
             'L',
-            $.span({classList: availability}, data.lower && data.lower.toFixed(2) || '-'),
+            $.span({classList: availability}, data.lower && data.lower.toFixed(aggregation) || '-'),
             'M',
-            $.span({classList: availability}, data.middle && data.middle.toFixed(2) || '-'),
+            $.span({classList: availability}, data.middle && data.middle.toFixed(aggregation) || '-'),
             'U',
-            $.span({classList: availability}, data.upper && data.upper.toFixed(2) || '-')
+            $.span({classList: availability}, data.upper && data.upper.toFixed(aggregation) || '-')
         );
     }
 

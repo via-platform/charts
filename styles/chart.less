@@ -59,6 +59,11 @@
             margin-bottom: 4px;
             background: @chart-panel-background-color;
 
+            &:first-child
+            {
+                border-top: 0;
+            }
+
             &.center
             {
                 flex: 3;
@@ -142,11 +147,6 @@
 
     .chart-tools
     {
-        height: @chart-tools-height;
-        // border-bottom: 1px solid @chart-panel-border-color;
-        // border-bottom: 0;
-        display: flex;
-
         .chart-tools-left, .chart-tools-right
         {
             display: flex;

@@ -21,6 +21,7 @@ module.exports = class ChartData {
         this.source = null;
         this.sourceDisposables = null;
         this.symbol = null;
+        this.destroyed = false;
 
         this.disposables.add(this.chart.onDidChangeSymbol(this.changedSymbol.bind(this)));
         this.disposables.add(this.chart.onDidChangeGranularity(this.changedGranularity.bind(this)));
@@ -48,12 +49,14 @@ module.exports = class ChartData {
     }
 
     changedDomain(){
-        const [start, end] = this.chart.scale.domain();
-        this.source.request({start, end});
+        if(!this.destroyed){
+            const [start, end] = this.chart.scale.domain();
+            this.source.request({start, end});
+        }
     }
 
     fetch(range){
-        if(!this.source){
+        if(!this.source || this.destroyed){
             return [];
         }
 
@@ -77,14 +80,17 @@ module.exports = class ChartData {
     }
 
     destroy(){
-        this.disposables.dispose();
+        if(!this.destroyed){
+            this.disposables.dispose();
+            this.destroyed = true;
 
-        if(this.source){
-            this.source.destroy();
-        }
+            if(this.source){
+                this.source.destroy();
+            }
 
-        if(this.sourceDisposables){
-            this.sourceDisposables.dispose();
+            if(this.sourceDisposables){
+                this.sourceDisposables.dispose();
+            }
         }
     }
 }

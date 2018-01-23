@@ -13,7 +13,7 @@ module.exports = class ChartTools {
         this.tools = [];
 
         this.element = document.createElement('div');
-        this.element.classList.add('chart-tools');
+        this.element.classList.add('chart-tools', 'toolbar');
 
         this.left = document.createElement('div');
         this.spacer = document.createElement('div');

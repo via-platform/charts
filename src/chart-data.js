@@ -1,74 +1,50 @@
-const {Disposable, CompositeDisposable, Emitter, Data} = require('via');
+const {Disposable, CompositeDisposable, Emitter} = require('via');
 const _ = require('underscore-plus');
 
 module.exports = class ChartData {
-    static deserialize({chart, state}){
-        return new ChartData({chart, granularity: state.granularity});
-    }
-
-    serialize(){
-        return {
-            granularity: this.granularity
-        };
-    }
-
-    constructor({chart, granularity}){
+    constructor(chart){
         this.chart = chart;
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
-        this.granularity = granularity;
         this.changedDomain = _.throttle(this.changedDomain.bind(this), 2000);
-        this.source = null;
-        this.sourceDisposables = null;
-        this.symbol = null;
-        this.destroyed = false;
+        this.data = null;
 
-        this.disposables.add(this.chart.onDidChangeSymbol(this.changedSymbol.bind(this)));
-        this.disposables.add(this.chart.onDidChangeGranularity(this.changedGranularity.bind(this)));
+        this.disposables.add(this.chart.onDidChangeMarket(this.reset.bind(this)));
+        this.disposables.add(this.chart.onDidChangeGranularity(this.reset.bind(this)));
         this.disposables.add(this.chart.onDidZoom(this.changedDomain.bind(this)));
     }
 
-    changedSymbol(symbol){
-        if(this.sourceDisposables){
-            this.sourceDisposables.dispose();
+    reset(){
+        if(this.data){
+            this.data.destroy();
+            this.data = null;
         }
 
-        this.symbol = symbol;
-        this.sourceDisposables = new CompositeDisposable();
-        this.source = new Data(this.symbol, this.granularity);
-        this.sourceDisposables.add(this.source.onDidUpdateData(this.didUpdateData.bind(this)));
-
-        this.changedDomain();
-    }
-
-    changedGranularity(granularity){
-        if(granularity !== this.granularity){
-            this.granularity = granularity;
-            this.changedSymbol(this.symbol);
+        if(this.chart.market.exchange.hasFetchOHLCV){
+            this.data = this.chart.market.data(this.chart.granularity);
+            this.data.onDidUpdateData(this.didUpdateData.bind(this));
+            this.changedDomain();
         }
     }
 
     changedDomain(){
-        if(!this.destroyed){
-            const [start, end] = this.chart.scale.domain();
-            this.source.request({start, end});
+        const [start, end] = this.chart.scale.domain();
+
+        if(this.data){
+            this.data.request({start, end});
         }
     }
 
     fetch(range){
-        if(!this.source || this.destroyed){
-            return [];
-        }
-
-        return this.source.fetch(range);
+        return this.data ? this.data.fetch(range) : [];
     }
 
     candle(date = new Date()){
-        return this.source.candle(date);
+        return this.data ? this.data.candle(date) : {};
     }
 
     last(){
-        return this.source.last();
+        return this.data ? this.data.last() : {};
     }
 
     didUpdateData(){
@@ -79,18 +55,18 @@ module.exports = class ChartData {
         return this.emitter.on('did-update-data', callback);
     }
 
+    onDidDestroy(callback){
+        return this.emitter.on('did-destroy', callback);
+    }
+
     destroy(){
-        if(!this.destroyed){
-            this.disposables.dispose();
-            this.destroyed = true;
-
-            if(this.source){
-                this.source.destroy();
-            }
-
-            if(this.sourceDisposables){
-                this.sourceDisposables.dispose();
-            }
+        if(this.data){
+            this.data.destroy();
+            this.data = null;
         }
+
+        this.disposables.dispose();
+        this.emitter.emit('did-destroy');
+        this.emitter.dispose();
     }
 }

@@ -123,7 +123,7 @@ module.exports = {
     name: 'candlestick',
     type: 'plot',
     settings: {},
-    title: 'Candlestick',
+    title: 'Candlesticks',
     description: 'Plot candlesticks.',
     instance: params => new Candlestick(params)
 };

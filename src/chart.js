@@ -25,8 +25,7 @@ module.exports = class Chart {
             time: this.time,
             type: this.type,
             panels: this.panels.serialize(),
-            tools: this.tools.serialize(),
-            data: this.data.serialize()
+            tools: this.tools.serialize()
         };
     }
 
@@ -64,7 +63,7 @@ module.exports = class Chart {
 
         this.changeGranularity(params.granularity || 3e5);
 
-        this.data = new ChartData({chart: this, granularity: this.granularity});
+        this.data = new ChartData(this);
 
         this.resizeObserver = new ResizeObserver(this.resize.bind(this));
         this.resizeObserver.observe(this.element);
@@ -74,7 +73,9 @@ module.exports = class Chart {
     }
 
     initialize(state = {}){
-        this.symbol = via.symbols.findByIdentifier(this.getURI().slice(BaseURI.length + 1));
+        // debugger;
+        this.changeMarket(via.markets.findByIdentifier(this.getURI().slice(BaseURI.length + 1)));
+
         this.tools = new ChartTools({chart: this, state: state.tools});
         this.panels = new ChartPanels({chart: this, state: state.panels});
         this.axis = new ChartAxis({chart: this});
@@ -82,11 +83,6 @@ module.exports = class Chart {
         this.element.appendChild(this.tools.element);
         this.element.appendChild(this.panels.element);
         this.element.appendChild(this.axis.element);
-
-
-        if(this.symbol){
-            this.emitter.emit('did-change-symbol', this.symbol);
-        }
 
         //There isn't a great place to initialize uber-general plugins like the crosshairs
         //Might as well do it here...
@@ -173,16 +169,17 @@ module.exports = class Chart {
     }
 
     getTitle(){
-        //TODO make the title more helpful
-        return 'Chart';
+        //TODO Hook up the granularity
+        //${this.market.granularity}
+        return this.market ? `${this.market.name}, ${this.getTypePlugin().title}, 15m` : 'Chart';
     }
 
     getType(){
         return this.type;
     }
 
-    getSymbol(){
-        return this.symbol;
+    getMarket(){
+        return this.market;
     }
 
     getTypePlugin(){
@@ -218,9 +215,12 @@ module.exports = class Chart {
         this.warnings = [];
     }
 
-    changeSymbol(symbol){
-        this.symbol = symbol;
-        this.emitter.emit('did-change-symbol', symbol);
+    changeMarket(market){
+        if(!market || market === this.market) return;
+
+        this.market = market;
+        this.emitter.emit('did-change-market', market);
+        this.emitter.emit('did-change-title');
     }
 
     changeGranularity(granularity){
@@ -230,6 +230,7 @@ module.exports = class Chart {
             this.updateBandwidth();
             this.setNextBandTimeout(false);
             this.emitter.emit('did-change-granularity', granularity);
+            this.emitter.emit('did-change-title');
         }
     }
 
@@ -237,6 +238,7 @@ module.exports = class Chart {
         if(this.type !== type){
             this.type = type;
             this.emitter.emit('did-change-type', this.plugins.get(type));
+            this.emitter.emit('did-change-title');
         }
     }
 
@@ -295,6 +297,10 @@ module.exports = class Chart {
         return this.emitter.on('did-change-type', callback);
     }
 
+    onDidChangeTitle(callback){
+        return this.emitter.on('did-change-title', callback);
+    }
+
     onDidAddWarning(callback){
         return this.emitter.on('did-add-warning', callback);
     }
@@ -303,8 +309,8 @@ module.exports = class Chart {
         return this.emitter.on('did-remove-warning', callback);
     }
 
-    onDidChangeSymbol(callback){
-        return this.emitter.on('did-change-symbol', callback);
+    onDidChangeMarket(callback){
+        return this.emitter.on('did-change-market', callback);
     }
 
     onDidAddStudy(callback){

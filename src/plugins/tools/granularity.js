@@ -21,13 +21,13 @@ class Granularity {
         this.tools = tools;
         etch.initialize(this);
 
-        // this.disposables.add(this.chart.onDidChangeSymbol(this.changedSymbol.bind(this)));
         this.disposables.add(this.chart.onDidChangeGranularity(this.didChangeGranularity.bind(this)));
         this.disposables.add(this.tools.onDidDestroy(this.destroy.bind(this)));
     }
 
     update(){}
 
+    //TODO Combine the timeframes into an omnibar selection type deal
     render(){
         const buttons = keys.map(key => {
             const classes = this.chart.granularity === key ? 'btn btn-subtle selected' : 'btn btn-subtle';
@@ -41,18 +41,19 @@ class Granularity {
         etch.update(this);
     }
 
-    changedSymbol(symbol){
-        if(_.isUndefined(symbol.granularity)){
-            //Hide all of the options
-            this.element.classList.add('hide');
-        }else{
-            this.element.classList.remove('hide');
-
-            if(this.chart.granularity < symbol.granularity){
-                this.chart.changeGranularity(symbol.granularity);
-            }
-        }
-    }
+    //TODO Show the correct timeframes based on the market
+    // changedSymbol(symbol){
+    //     if(_.isUndefined(symbol.granularity)){
+    //         //Hide all of the options
+    //         this.element.classList.add('hide');
+    //     }else{
+    //         this.element.classList.remove('hide');
+    //
+    //         if(this.chart.granularity < symbol.granularity){
+    //             this.chart.changeGranularity(symbol.granularity);
+    //         }
+    //     }
+    // }
 
     change(granularity){
         this.chart.changeGranularity(granularity);

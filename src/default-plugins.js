@@ -4,7 +4,7 @@ const Line = require('./plugins/plots/line');
 const Area = require('./plugins/plots/area');
 const HeikinAshi = require('./plugins/plots/heikin-ashi');
 
-const Symbol = require('./plugins/tools/symbol');
+const Market = require('./plugins/tools/market');
 const Type = require('./plugins/tools/type');
 const Indicators = require('./plugins/tools/indicators');
 const Granularity = require('./plugins/tools/granularity');
@@ -26,7 +26,7 @@ module.exports = [
     Line,
     Area,
     HeikinAshi,
-    Symbol,
+    Market,
     Indicators,
     Type,
     Volume,

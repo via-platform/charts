@@ -1,6 +1,8 @@
 const {CompositeDisposable, Disposable} = require('via');
 const d3 = require('d3');
 const _ = require('underscore-plus');
+const etch = require('etch');
+const $ = etch.dom;
 
 class SMA {
     constructor({chart, state, element, panel}){
@@ -13,6 +15,7 @@ class SMA {
         this.stroke = 1.5;
         this.property = 'close';
         this.length = 15;
+        this.values = [];
 
         this.element.classed('sma', true);
 
@@ -40,34 +43,32 @@ class SMA {
         start.setTime(start.getTime() - (this.length + 1) * this.chart.granularity);
         end.setTime(end.getTime() + this.chart.granularity);
 
-        let data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
-        // let incomplete = data.slice(0, this.length - 1);
-        // let complete = data.slice(this.length - 1);
+        this.values = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
 
-        for(let i = 0; i < this.length - 1 && i < data.length; i++){
+        for(let i = 0; i < this.length - 1 && i < this.values.length; i++){
             let total = 0;
 
             for(let j = 0; j <= i; j++){
-                total += data[j][this.property];
+                total += this.values[j][this.property];
             }
 
-            data[i].average = total / (i + 1);
+            this.values[i].average = total / (i + 1);
         }
 
-        for(let i = this.length - 1; i < data.length; i++){
+        for(let i = this.length - 1; i < this.values.length; i++){
             let total = 0;
 
             for(let j = i - this.length + 1; j <= i; j++){
-                total += data[j][this.property];
+                total += this.values[j][this.property];
             }
 
-            data[i].average = total / this.length;
+            this.values[i].average = total / this.length;
         }
 
         this.element.selectAll('path').remove();
 
         this.element.append('path')
-            .datum(data.slice(0, this.length - 1))
+            .datum(this.values.slice(0, this.length - 1))
             .classed('incomplete', true)
             .attr('fill', 'none')
             .attr('stroke-linejoin', 'round')
@@ -76,7 +77,7 @@ class SMA {
             .attr('d', this.line);
 
         this.element.append('path')
-            .datum(data.slice(this.length - 2))
+            .datum(this.values.slice(this.length - 2))
             .attr('fill', 'none')
             .attr('stroke-linejoin', 'round')
             .attr('stroke-linecap', 'round')
@@ -85,11 +86,16 @@ class SMA {
     }
 
     title(){
-
+        return `SMA (${this.length})`;
     }
 
     value(band){
+        const candle = this.values.find(value => value.date.getTime() === band.getTime());
+        const precision = this.chart.market ? this.chart.market.precision.price : 0;
 
+        return $.div({classList: 'value'},
+            $.span({classList: candle ? 'available' : 'unavailable'}, candle ? candle.average.toFixed(precision) : '-')
+        );
     }
 
     destroy(){

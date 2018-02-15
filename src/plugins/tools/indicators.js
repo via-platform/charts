@@ -21,7 +21,7 @@ class Indicators {
     update(){}
 
     render(){
-        return $.div({classList: 'type btn btn-subtle caret', onClick: this.add.bind(this)}, 'Indicators');
+        return $.div({classList: 'type toolbar-button caret', onClick: this.add.bind(this)}, 'Indicators');
     }
 
     add(){

@@ -21,7 +21,7 @@ class Type {
     render(){
         const plugin = this.chart.getTypePlugin();
 
-        return $.div({classList: 'type btn btn-subtle caret', onClick: this.change.bind(this)}, plugin ? plugin.title : 'Unknown Type');
+        return $.div({classList: 'type toolbar-button caret', onClick: this.change.bind(this)}, plugin ? plugin.title : 'Unknown Type');
     }
 
     selected(){

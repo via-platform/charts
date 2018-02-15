@@ -59,7 +59,7 @@ module.exports = class Chart {
         this.scale = this.basis.copy();
 
         this.element = document.createElement('div');
-        this.element.classList.add('chart');
+        this.element.classList.add('chart', 'pane-item');
 
         this.changeGranularity(params.granularity || 3e5);
 

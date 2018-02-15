@@ -22,8 +22,8 @@
 
 @chart-tools-height: 24px;
 @chart-panel-border-width: 1px;
-@chart-panel-border-color: @pane-border-color;
-@chart-panel-background-color: @pane-content-background-color;
+@chart-panel-border-color: @header-border-color;
+@chart-panel-background-color: @pane-background-color;
 
 .chart
 {
@@ -47,6 +47,7 @@
         flex: 1;
         display: flex;
         flex-direction: column;
+        background: @header-background-color;
 
         .panel
         {
@@ -56,7 +57,7 @@
             border-top: @chart-panel-border-width solid @chart-panel-border-color;
             border-bottom: @chart-panel-border-width solid @chart-panel-border-color;
             position: relative;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             background: @chart-panel-background-color;
 
             &:first-child
@@ -198,8 +199,7 @@
 
         line
         {
-            stroke: #333;
-            // stroke-dasharray: 8;
+            stroke: fade(@header-border-color, 50%);
         }
 
         path
@@ -220,7 +220,7 @@
 
         line
         {
-            stroke: #000;
+            stroke: @header-border-color;
         }
 
         text
@@ -237,6 +237,7 @@
         {
             height: 22px;
             padding-right: 60px;
+            background: @header-background-color;
         }
 
         &.y

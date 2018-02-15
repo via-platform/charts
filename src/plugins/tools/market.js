@@ -18,7 +18,7 @@ class Market {
     update(){}
 
     render(){
-        return $.div({classList: 'market btn btn-subtle', onClick: this.change.bind(this)},
+        return $.div({classList: 'market toolbar-button', onClick: this.change.bind(this)},
             this.chart.market ? this.chart.market.title() : 'Select Market'
         );
     }

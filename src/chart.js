@@ -11,6 +11,25 @@ const ChartDefaults = {end: 0, start: Date.now() - 864e5};
 const ChartAreas = 'top left bottom right'.split(' ');
 const BaseURI = 'via://charts';
 
+const abbreviations = {
+    6e4: '1m',
+    18e4: '3m',
+    3e5: '5m',
+    6e5: '10m',
+    9e5: '15m',
+    18e5: '30m',
+    36e5: '1h',
+    72e5: '2h',
+    108e5: '3h',
+    144e5: '4h',
+    216e5: '6h',
+    288e5: '8h',
+    432e5: '12h',
+    864e5: '1D',
+    2592e5: '3D',
+    6048e5: '1W'
+};
+
 const AXIS_HEIGHT = 30;
 const AXIS_WIDTH = 60;
 
@@ -169,9 +188,7 @@ module.exports = class Chart {
     }
 
     getTitle(){
-        //TODO Hook up the granularity
-        //${this.market.granularity}
-        return this.market ? `${this.market.name}, ${this.getTypePlugin().title}, 15m` : 'Chart';
+        return this.market ? `${this.market.name}, ${this.getTypePlugin().title}, ${abbreviations[this.granularity]}` : 'Chart';
     }
 
     getType(){

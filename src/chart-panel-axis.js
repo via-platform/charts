@@ -66,7 +66,7 @@ module.exports = class ChartPanelAxis {
         };
     }
 
-    zoomed({event, target}){
+    zoomed({event, target} = {}){
         if(target !== this){
             // d3.zoom().transform(this.zoomable, event.transform);
         }

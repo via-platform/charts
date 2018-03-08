@@ -124,9 +124,9 @@ module.exports = class ChartPanel {
         this.emitter.emit('did-draw');
     }
 
-    zoomed({event, target}){
+    zoomed({event, target} = {}){
         if(target !== this){
-            d3.zoom().transform(this.zoomable, event.transform);
+            d3.zoom().transform(this.zoomable, this.chart.transform);
         }
 
         this.rescale();

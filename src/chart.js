@@ -78,7 +78,8 @@ module.exports = class Chart {
         this.scale = this.basis.copy();
 
         this.element = document.createElement('div');
-        this.element.classList.add('chart', 'pane-item');
+        this.element.classList.add('chart', 'pane-item', 'focusable-panel');
+        this.element.tabIndex = -1;
 
         this.changeGranularity(params.granularity || 3e5);
 
@@ -86,6 +87,11 @@ module.exports = class Chart {
 
         this.resizeObserver = new ResizeObserver(this.resize.bind(this));
         this.resizeObserver.observe(this.element);
+
+        this.disposables.add(via.commands.add(this.element, {
+            'charts:zoom-in': () => this.zoom(2),
+            'charts:zoom-out': () => this.zoom(0.5),
+        }));
 
         this.initialize(params);
         this.draw();
@@ -110,6 +116,20 @@ module.exports = class Chart {
                 plugin.instance({chart: this, tools: this});
             }
         });
+    }
+
+    zoom(factor = 2){
+        if(!factor) return;
+
+        const x = this.width / 2;
+        const ix = this.transform.invertX(x);
+
+        this.transform.k *= factor;
+        this.transform.x = x - ix * this.transform.k;
+
+        this.scale.domain(this.transform.rescaleX(this.basis).domain());
+        this.updateBandwidth();
+        this.emitter.emit('did-zoom');
     }
 
     zoomed({event, target}){

@@ -1,0 +1,11 @@
+'.platform-darwin .chart':
+  'cmd-=': 'charts:zoom-in'
+  'cmd-+': 'charts:zoom-in'
+  'cmd--': 'charts:zoom-out'
+  'cmd-_': 'charts:zoom-out'
+
+'.platform-win32 .chart, .platform-linux .chart':
+  'ctrl-=': 'charts:zoom-in'
+  'ctrl-+': 'charts:zoom-in'
+  'ctrl--': 'charts:zoom-out'
+  'ctrl-_': 'charts:zoom-out'

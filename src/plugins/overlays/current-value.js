@@ -52,9 +52,9 @@ class CurrentValue {
         const value = _.first(this.chart.data.fetch({start: candle, end: candle}));
         const aggregation = this.chart.market ? this.chart.market.precision.price : 2;
 
-        this.last = value.close.toFixed(aggregation);
-
         if(value){
+            this.last = value.close.toFixed(aggregation);
+
             this.flag.classed('hide', false)
                 .classed('up', (value.close >= value.open))
                 .classed('down', (value.close < value.open))
@@ -67,7 +67,7 @@ class CurrentValue {
                 .select('path')
                     .attr('class', (value.close >= value.open) ? 'up' : 'down');
         }else{
-            //TODO This method is insufficient for dealing with non-24-hour symbols
+            //TODO This method is insufficient for dealing with non-24-hour symbols, or a halting of trading
             //TODO Hide the current value line because we don't know the current value
             this.flag.classed('hide', true);
             this.element.classed('hide', true);

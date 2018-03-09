@@ -16,6 +16,8 @@ class Indicators {
         etch.initialize(this);
 
         this.disposables.add(this.tools.onDidDestroy(this.destroy.bind(this)));
+        this.disposables.add(via.tooltips.add(this.element, {title: 'Add Indicator', placement: 'bottom', keyBindingCommand: 'charts:add-indicator'}));
+        this.disposables.add(via.commands.add(this.chart.element, 'charts:add-indicator', this.add.bind(this)));
     }
 
     update(){}

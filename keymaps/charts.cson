@@ -1,3 +1,9 @@
+'.chart':
+  'm': 'charts:change-market'
+  'i': 'charts:add-indicator'
+  'g': 'charts:change-granularity'
+  't': 'charts:change-type'
+
 '.platform-darwin .chart':
   'cmd-=': 'charts:zoom-in'
   'cmd-+': 'charts:zoom-in'

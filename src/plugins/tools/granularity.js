@@ -53,6 +53,9 @@ class Granularity {
         this.disposables.add(this.chart.onDidChangeMarket(this.didChangeMarket.bind(this)));
         this.disposables.add(this.tools.onDidDestroy(this.destroy.bind(this)));
 
+        this.disposables.add(via.tooltips.add(this.element, {title: 'Change Granularity', placement: 'bottom', keyBindingCommand: 'charts:change-granularity'}));
+        this.disposables.add(via.commands.add(this.chart.element, 'charts:change-granularity', this.change.bind(this)));
+
         this.didChangeMarket();
     }
 

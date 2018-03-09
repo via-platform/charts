@@ -13,6 +13,8 @@ class Market {
 
         this.disposables.add(this.tools.onDidDestroy(this.destroy.bind(this)));
         this.disposables.add(this.chart.onDidChangeMarket(this.changed.bind(this)));
+        this.disposables.add(via.tooltips.add(this.element, {title: 'Change Market', placement: 'bottom', keyBindingCommand: 'charts:change-market'}));
+        this.disposables.add(via.commands.add(this.chart.element, 'charts:change-market', this.change.bind(this)));
     }
 
     update(){}

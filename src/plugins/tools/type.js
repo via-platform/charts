@@ -14,6 +14,8 @@ class Type {
 
         this.disposables.add(this.tools.onDidDestroy(this.destroy.bind(this)));
         this.disposables.add(this.chart.onDidChangeType(this.changed.bind(this)));
+        this.disposables.add(via.tooltips.add(this.element, {title: 'Change Chart Type', placement: 'bottom', keyBindingCommand: 'charts:change-type'}));
+        this.disposables.add(via.commands.add(this.chart.element, 'charts:change-type', this.change.bind(this)));
     }
 
     update(){}

@@ -153,8 +153,9 @@ module.exports = class Chart {
 
     resize(){
         if(this.transform && this.element.clientWidth && this.width){
-            //TODO This doesn't work very well, but it's suffient to not appear like an obvious bug
-            this.transform.x = this.transform.x * (this.element.clientWidth / this.width);
+            //We have to subtract out the axis width (since it is fixed at AXIS_WIDTH)
+            //If we don't, the ratio of the old-width to new-width is incorrect
+            this.transform.x = this.transform.x * ((this.element.clientWidth - AXIS_WIDTH) / (this.width - AXIS_WIDTH));
         }
 
         this.width = this.element.clientWidth;

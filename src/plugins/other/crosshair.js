@@ -40,9 +40,18 @@ class Crosshair {
                 this.panels.delete(panel);
             }
         }));
+
+        this.disposables.add(this.chart.onDidZoom(this.zoom.bind(this)));
     }
 
-    mousemove({event, target}){
+    zoom(params = {}){
+        //This event may not have a specific panel target as it is possible to trigger from an element resize.
+        if(params.target){
+            this.mousemove({event: params.event.sourceEvent, target: params.target});
+        }
+    }
+
+    mousemove({event, target} = {}){
         //Move the flag on the bottom
         const date = this.chart.scale.invert(event.offsetX);
         const candle = new Date(Math.round(date.getTime() / this.chart.granularity) * this.chart.granularity);

@@ -44,7 +44,7 @@ class BollingerBands {
     value(band){
         const data = this.bands.find(period => period.date.getTime() === band.getTime()) || {};
         const availability = data.incomplete ? 'available' : 'unavailable';
-        const aggregation = this.chart.symbol ? this.chart.symbol.aggregation : 2;
+        const aggregation = this.chart.market ? this.chart.market.aggregation : 2;
 
         //TODO we should fix these values to some sort of user preference or per-symbol basis
         return $.div({classList: 'value'},

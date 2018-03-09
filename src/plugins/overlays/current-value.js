@@ -1,6 +1,8 @@
 const {CompositeDisposable, Disposable} = require('via');
 const d3 = require('d3');
 const _ = require('underscore-plus');
+const etch = require('etch');
+const $ = etch.dom;
 const AXIS_HEIGHT = 22;
 const FLAG_HEIGHT = AXIS_HEIGHT - 3;
 
@@ -36,9 +38,21 @@ class CurrentValue {
         this.element.select('path').attr('d', `M 0 0 h ${this.panel.width}`);
     }
 
+    title(){
+        const base = this.chart.market ? this.chart.market.base : '';
+        return `Current Price (${base})`;
+    }
+
+    value(){
+        return $.div({classList: 'value'}, $.span({classList: 'available first'}, this.last || '-'));
+    }
+
     draw(){
         const candle = new Date(Math.floor(Date.now() / this.chart.granularity) * this.chart.granularity);
         const value = _.first(this.chart.data.fetch({start: candle, end: candle}));
+        const aggregation = this.chart.market ? this.chart.market.precision.price : 2;
+
+        this.last = value.close.toFixed(aggregation);
 
         if(value){
             this.flag.classed('hide', false)
@@ -46,7 +60,7 @@ class CurrentValue {
                 .classed('down', (value.close < value.open))
                 .attr('transform', `translate(0, ${Math.round(this.panel.scale(value.close)) - Math.ceil(FLAG_HEIGHT / 2)})`)
                 .select('text')
-                    .text(value.close.toFixed(2)); //TODO properly format this number
+                    .text(this.last);
 
             this.element.classed('hide', false)
                 .attr('transform', `translate(0, ${Math.round(this.panel.scale(value.close)) - 0.5})`)

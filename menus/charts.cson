@@ -1,3 +1,15 @@
+'menu': [
+  {
+    'label': 'View'
+    'submenu': [
+      'label': 'Components'
+      'submenu': [
+        { 'label': 'Chart', 'command': 'charts:create-chart' }
+      ]
+    ]
+  }
+]
+
 'context-menu':
   '.chart .panel-values .panel-value': [
     {label: 'Remove Layer', command: 'charts:remove-layer'}

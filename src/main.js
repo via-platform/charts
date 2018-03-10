@@ -1,6 +1,6 @@
 const {CompositeDisposable, Disposable, Emitter} = require('via');
 const Chart = require('./chart');
-const BaseURI = 'via://chart';
+const BaseURI = 'via://charts';
 
 const DefaultPlugins = require('./default-plugins');
 
@@ -21,11 +21,11 @@ class ChartPackage {
         this.omnibar = null;
 
         via.commands.add('via-workspace', {
-            'chart:default': () => via.workspace.open(BaseURI)
+            'charts:create-chart': () => via.workspace.open(BaseURI)
         });
 
         this.disposables.add(via.workspace.addOpener((uri, options) => {
-            if(uri.startsWith(BaseURI)){
+            if(uri === BaseURI || uri.startsWith(BaseURI + '/')){
                 let chart = new Chart({manager: this, plugins: this.plugins, omnibar: this.omnibar}, {uri});
 
                 this.charts.push(chart);

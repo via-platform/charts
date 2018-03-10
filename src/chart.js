@@ -90,6 +90,8 @@ module.exports = class Chart {
         this.disposables.add(via.commands.add(this.element, {
             'charts:zoom-in': () => this.zoom(2),
             'charts:zoom-out': () => this.zoom(0.5),
+            'core:move-left': () => this.translate(100),
+            'core:move-right': () => this.translate(-100)
         }));
 
         this.initialize(params);
@@ -97,7 +99,6 @@ module.exports = class Chart {
     }
 
     initialize(state = {}){
-        // debugger;
         this.changeMarket(via.markets.findByIdentifier(this.getURI().slice(BaseURI.length + 1)));
 
         this.tools = new ChartTools({chart: this, state: state.tools});
@@ -117,6 +118,13 @@ module.exports = class Chart {
         });
     }
 
+    translate(distance){
+        if(!distance) return;
+
+        this.transform.x += distance;
+        this.zoomed();
+    }
+
     zoom(factor = 2){
         if(!factor) return;
 
@@ -125,15 +133,15 @@ module.exports = class Chart {
 
         this.transform.k *= factor;
         this.transform.x = x - ix * this.transform.k;
-
-        this.scale.domain(this.transform.rescaleX(this.basis).domain());
-        this.updateBandwidth();
-        this.emitter.emit('did-zoom');
+        this.zoomed();
     }
 
-    zoomed({event, target}){
-        this.transform = event.transform;
-        this.scale.domain(event.transform.rescaleX(this.basis).domain());
+    zoomed({event, target} = {}){
+        if(event){
+            this.transform = event.transform;
+        }
+
+        this.scale.domain(this.transform.rescaleX(this.basis).domain());
         this.updateBandwidth();
         this.emitter.emit('did-zoom', {event, target});
     }
@@ -241,7 +249,7 @@ module.exports = class Chart {
         if(shift){
             //Shift the graph to the left by one bandwidth
             this.transform.x -= this.bandwidth;
-            this.zoomed({event: {transform: this.transform}});
+            this.zoomed();
         }
 
         const nextCandle = this.nearestCandle(new Date(Date.now() + this.granularity));
@@ -261,7 +269,10 @@ module.exports = class Chart {
     }
 
     changeGranularity(granularity){
-        //TODO check to make this is a valid granularity for the symbol
+        if(this.market && !this.market.exchange.timeframes.hasOwnProperty(granularity)){
+            return;
+        }
+
         if(this.granularity !== granularity){
             this.granularity = granularity;
             this.updateBandwidth();

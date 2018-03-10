@@ -168,13 +168,13 @@ module.exports = class ChartPanel {
     }
 
     rescale(){
-        let domains = _.flatten(this.layers.map(layer => layer.domain()));
+        const domains = _.flatten(this.layers.map(layer => layer.domain())).filter(domain => !_.isUndefined(domain));
 
         if(domains.length){
-            let min = _.min(domains);
-            let max = _.max(domains);
-            let range = max - min;
-            let extra = range * this.padding;
+            const min = _.min(domains);
+            const max = _.max(domains);
+            const range = max - min;
+            const extra = range * this.padding;
 
             if(!_.isUndefined(min) && !_.isUndefined(max)){
                 this.basis.domain([max + extra, min - extra]);

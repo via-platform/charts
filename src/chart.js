@@ -65,8 +65,7 @@ module.exports = class Chart {
         this.height = 0;
         this.transform = d3.zoomIdentity;
 
-        //TODO allow the user to set a preference on this
-        this.type = 'candlestick';
+        this.type = via.config.get('charts.defaultChartType');
 
         //TODO allow the padding to be customized
         this.padding = 0.2;

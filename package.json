@@ -21,6 +21,35 @@
   "engines": {
     "via": "*"
   },
+  "configSchema": {
+    "defaultChartType": {
+      "type": "string",
+      "default": "candlestick",
+      "description": "The default chart type for when a new chart window is opened.",
+      "enum": [
+          {
+              "value": "candlestick",
+              "description": "Candlestick"
+          },
+          {
+              "value": "ohlc",
+              "description": "OHLC Bars"
+          },
+          {
+              "value": "line",
+              "description": "Line Chart"
+          },
+          {
+              "value": "area",
+              "description": "Area Chart"
+          },
+          {
+              "value": "heikin-ashi",
+              "description": "Heikin-Ashi Candlesticks"
+          }
+      ]
+    }
+  },
   "providedServices": {
     "charts": {
       "description": "Charts package for creating plugins, studies, tools, etc.",

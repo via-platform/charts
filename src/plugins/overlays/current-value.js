@@ -39,8 +39,8 @@ class CurrentValue {
     }
 
     title(){
-        const base = this.chart.market ? this.chart.market.base : '';
-        return `Current Price (${base})`;
+        const quote = this.chart.market ? this.chart.market.quote : '';
+        return `Current Price (${quote})`;
     }
 
     value(){

@@ -1,6 +1,6 @@
 {
   "name": "charts",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Charting view for a workspace.",
   "main": "./src/main",
   "scripts": {
@@ -27,26 +27,26 @@
       "default": "candlestick",
       "description": "The default chart type for when a new chart window is opened.",
       "enum": [
-          {
-              "value": "candlestick",
-              "description": "Candlestick"
-          },
-          {
-              "value": "ohlc",
-              "description": "OHLC Bars"
-          },
-          {
-              "value": "line",
-              "description": "Line Chart"
-          },
-          {
-              "value": "area",
-              "description": "Area Chart"
-          },
-          {
-              "value": "heikin-ashi",
-              "description": "Heikin-Ashi Candlesticks"
-          }
+        {
+          "value": "candlestick",
+          "description": "Candlestick"
+        },
+        {
+          "value": "ohlc",
+          "description": "OHLC Bars"
+        },
+        {
+          "value": "line",
+          "description": "Line Chart"
+        },
+        {
+          "value": "area",
+          "description": "Area Chart"
+        },
+        {
+          "value": "heikin-ashi",
+          "description": "Heikin-Ashi Candlesticks"
+        }
       ]
     }
   },

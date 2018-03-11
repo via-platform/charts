@@ -159,6 +159,10 @@ module.exports = class Chart {
     }
 
     resize(){
+        if(this.isHidden()){
+            return;
+        }
+
         if(this.transform && this.element.clientWidth && this.width){
             //We have to subtract out the axis width (since it is fixed at AXIS_WIDTH)
             //If we don't, the ratio of the old-width to new-width is incorrect
@@ -185,10 +189,6 @@ module.exports = class Chart {
     draw(){
         //Redraw all panels and the X axis
         this.axis.draw();
-    }
-
-    attachAxis(){
-
     }
 
     consumeActionBar(actionBar){
@@ -319,6 +319,10 @@ module.exports = class Chart {
 
     nearestCandle(date){
         return new Date(Math.floor(date.getTime() / this.granularity) * this.granularity);
+    }
+
+    isHidden(){
+        return this.element.offsetParent === null;
     }
 
     addLeftPanel(){

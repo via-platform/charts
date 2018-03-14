@@ -1,6 +1,7 @@
 const {CompositeDisposable, Disposable, Emitter} = require('via');
 const Chart = require('./chart');
 const BaseURI = 'via://charts';
+const _ = require('underscore-plus');
 
 const DefaultPlugins = require('./default-plugins');
 
@@ -88,12 +89,18 @@ class ChartPackage {
     }
 
     activatePlugin(plugin){
-        plugin.activatePlugin();
+        if(_.isFunction(plugin.activatePlugin)){
+            plugin.activatePlugin();
+        }
+
         this.emitter.emit('did-activate-plugin', plugin);
     }
 
     deactivatePlugin(plugin){
-        plugin.deactivatePlugin();
+        if(_.isFunction(plugin.deactivatePlugin)){
+            plugin.deactivatePlugin();
+        }
+
         this.emitter.emit('did-deactivate-plugin', plugin);
     }
 

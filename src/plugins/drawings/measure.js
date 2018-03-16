@@ -21,7 +21,7 @@ class Measure {
 
         this.background = this.element.append('rect').attr('x', 0).attr('y', 0).attr('class', 'background');
         this.rect = this.element.append('rect').attr('class', 'selection');
-        
+
         this.text = this.element.append('text')
             .attr('alignment-baseline', 'hanging')
             .attr('text-anchor', 'middle');
@@ -98,7 +98,6 @@ class Measure {
         };
 
         const value = (this.end.y - this.start.y).toFixed(this.chart.precision);
-        const unit = this.chart.market ? ' ' + this.chart.market.quote : '';
         const percentage = ((this.end.y - this.start.y) / this.start.y * 100).toFixed(2);
         const bars = (ed.getTime() - sd.getTime()) / this.chart.granularity;
 
@@ -117,7 +116,7 @@ class Measure {
 
         this.text.attr('x', (end.x + start.x) / 2)
             .attr('y', end.y + 6)
-            .text(`${value}${unit} (${percentage}%), ${bars} Bars`);
+            .text(`${value} (${percentage}%), ${bars} Bars`);
     }
 
     destroy(){

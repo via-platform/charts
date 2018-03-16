@@ -52,6 +52,12 @@ module.exports = class ChartAxis {
         return flag;
     }
 
+    range(){
+        const range = this.svg.append('g').attr('class', 'range');
+        range.append('rect').attr('height', FLAG_HEIGHT).attr('y', 1);
+        return range;
+    }
+
     zoom(){
         const _this = this;
 

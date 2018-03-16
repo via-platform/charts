@@ -20,9 +20,11 @@ const BollingerBands = require('./plugins/overlays/bollinger-bands');
 // const IchimokuCloud = require('./plugins/overlays/ichimoku-cloud');
 
 const Crosshair = require('./plugins/other/crosshair');
+const QuickMeasure = require('./plugins/other/quick-measure');
 
 const HorizontalLine = require('./plugins/drawings/horizontal-line');
 const VerticalLine = require('./plugins/drawings/vertical-line');
+const Measure = require('./plugins/drawings/measure');
 
 module.exports = [
     Candlestick,
@@ -43,6 +45,8 @@ module.exports = [
     // IchimokuCloud,
     // MACD
     Crosshair,
+    QuickMeasure,
     HorizontalLine,
-    VerticalLine
+    VerticalLine,
+    Measure
 ];

@@ -23,6 +23,8 @@ class OHLC {
         const _this = this;
 
         return function(d, i){
+            if(d3.event.shiftKey) return;
+            
             d3.event.stopPropagation();
             _this.chart.select(_this.layer);
         };

@@ -103,10 +103,7 @@ module.exports = class Chart {
                 }
             },
             'core:cancel': () => {
-                if(this.drawing){
-                    this.drawing.dispose();
-                }
-
+                this.cancel();
                 this.unselect();
             }
         }));
@@ -180,6 +177,8 @@ module.exports = class Chart {
     }
 
     select(layer){
+        this.cancel();
+        
         if(this.selected){
             this.unselect();
         }
@@ -196,8 +195,15 @@ module.exports = class Chart {
     }
 
     draw(plugin){
-        this.emitter.emit('will-draw', plugin);
         this.drawing = this.emitter.once('did-click', ({event, target}) => target.addLayer(plugin, event));
+    }
+
+    cancel(){
+        if(this.drawing){
+            this.drawing.dispose();
+        }
+
+        this.emitter.emit('did-cancel');
     }
 
     resize(){
@@ -455,5 +461,9 @@ module.exports = class Chart {
 
     onDidUnselect(callback){
         return this.emitter.on('did-unselect', callback);
+    }
+
+    onDidCancel(callback){
+        return this.emitter.on('did-cancel', callback);
     }
 }

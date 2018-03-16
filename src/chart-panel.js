@@ -50,15 +50,18 @@ module.exports = class ChartPanel {
             .append('svg')
             .attr('width', this.width);
 
-        this.zoomable = this.svg.append('rect').attr('class', 'zoomable');
+        this.grid = new ChartPanelGrid({chart: this.chart, panel: this});
+
+        this.zoomable = this.svg.append('g').attr('class', 'zoomable');
         this.zoomable.call(d3.zoom().on('zoom', this.zoom()));
+
+        this.background = this.zoomable.append('rect').attr('class', 'panel-background');
 
         this.zoomable
             .on('mouseover', this.mouseover())
             .on('mouseout', this.mouseout())
-            .on('mousemove', this.mousemove());
-
-        this.grid = new ChartPanelGrid({chart: this.chart, panel: this});
+            .on('mousemove', this.mousemove())
+            .on('click', this.click());
 
         this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
         this.disposables.add(this.chart.onDidDestroy(this.destroy.bind(this)));
@@ -78,8 +81,8 @@ module.exports = class ChartPanel {
         this.rescale();
     }
 
-    addLayer(plugin){
-        let layer = new ChartLayer({chart: this.chart, panel: this, plugin});
+    addLayer(plugin, params){
+        let layer = new ChartLayer({chart: this.chart, panel: this, plugin, params});
         this.layers.push(layer);
         this.emitter.emit('did-add-layer', layer);
         this.draw();
@@ -88,9 +91,13 @@ module.exports = class ChartPanel {
     }
 
     removeLayer(layer){
-        this.layers.splice(this.layers.indexOf(layer), 1);
+        _.remove(this.layers, layer);
         this.emitter.emit('did-remove-layer', layer);
         layer.destroy();
+
+        if(!this.layers.length && !this.isCenter){
+            this.remove();
+        }
     }
 
     didModifyLayer(layer){
@@ -108,7 +115,7 @@ module.exports = class ChartPanel {
         this.scale.range([0, this.height]);
 
         this.svg.attr('height', this.height).attr('width', this.width);
-        this.zoomable.attr('width', this.width).attr('height', this.height);
+        this.background.attr('width', this.width).attr('height', this.height);
 
         if(this.chart.transform){
             d3.zoom().transform(this.zoomable, this.chart.transform);
@@ -164,6 +171,15 @@ module.exports = class ChartPanel {
         return function(d, i){
             _this.emitter.emit('did-mouse-move', {event: d3.event, target: _this});
             _this.chart.mousemove({event: d3.event, target: _this});
+        };
+    }
+
+    click(){
+        const _this = this;
+
+        return function(d, i){
+            _this.emitter.emit('did-click', {event: d3.event, target: _this});
+            _this.chart.click({event: d3.event, target: _this});
         };
     }
 

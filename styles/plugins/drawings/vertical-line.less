@@ -1,0 +1,49 @@
+@import "variables";
+
+.chart
+{
+    .vertical-line-flag
+    {
+        rect
+        {
+            fill: #FFF;
+        }
+
+        text
+        {
+            fill: #333;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'Inconsolata';
+        }
+    }
+
+    .panel .layer.vertical-line
+    {
+        path
+        {
+            stroke: #FFF;
+            fill: transparent;
+            stroke-width: 1px;
+            stroke-dasharray: 2;
+        }
+
+        rect
+        {
+            cursor: col-resize;
+        }
+
+        circle
+        {
+            display: none;
+        }
+
+        &.selected
+        {
+            circle
+            {
+                display: block;
+            }
+        }
+    }
+}

@@ -8,6 +8,7 @@ const Market = require('./plugins/tools/market');
 const Type = require('./plugins/tools/type');
 const Indicators = require('./plugins/tools/indicators');
 const Granularity = require('./plugins/tools/granularity');
+const Draw = require('./plugins/tools/draw');
 
 const Volume = require('./plugins/indicators/volume');
 const RSI = require('./plugins/indicators/rsi');
@@ -20,6 +21,9 @@ const BollingerBands = require('./plugins/overlays/bollinger-bands');
 
 const Crosshair = require('./plugins/other/crosshair');
 
+const HorizontalLine = require('./plugins/drawings/horizontal-line');
+const VerticalLine = require('./plugins/drawings/vertical-line');
+
 module.exports = [
     Candlestick,
     OHLC,
@@ -28,6 +32,7 @@ module.exports = [
     HeikinAshi,
     Market,
     Indicators,
+    Draw,
     Type,
     Volume,
     RSI,
@@ -37,5 +42,7 @@ module.exports = [
     BollingerBands,
     // IchimokuCloud,
     // MACD
-    Crosshair
+    Crosshair,
+    HorizontalLine,
+    VerticalLine
 ];

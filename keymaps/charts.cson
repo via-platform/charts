@@ -3,6 +3,7 @@
   'i': 'charts:add-indicator'
   'g': 'charts:change-granularity'
   't': 'charts:change-type'
+  'd': 'charts:add-drawing'
 
 '.platform-darwin .chart':
   'cmd-=': 'charts:zoom-in'

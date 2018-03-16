@@ -5,16 +5,27 @@ const etch = require('etch');
 const $ = etch.dom;
 
 class OHLC {
-    constructor({chart, state, element, panel}){
+    constructor({chart, state, element, panel, layer}){
         this.disposables = new CompositeDisposable();
         this.chart = chart;
         this.panel = panel;
+        this.layer = layer;
         this.element = element;
         this.padding = 1;
 
         this.element.classed('ohlc', true);
+        this.element.on('click', this.click());
 
         this.body = this.body.bind(this);
+    }
+
+    click(){
+        const _this = this;
+
+        return function(d, i){
+            d3.event.stopPropagation();
+            _this.chart.select(_this.layer);
+        };
     }
 
     title(){
@@ -70,6 +81,26 @@ class OHLC {
             .attr('class', d => (d.open > d.close) ? 'bar down' : 'bar up');
 
         bar.exit().remove();
+
+        if(this.chart.selected === this.layer){
+            let handle = this.element.selectAll('circle.handle')
+                .data(data.filter(d => d.close && d.open && d.date.getTime() % (this.chart.granularity * 10) === 0), d => d.date.getTime())
+                .attr('class', 'handle')
+                .attr('cx', d => this.chart.scale(d.date))
+                .attr('cy', d => this.panel.scale((d.open + d.close) / 2))
+                .attr('r', 4);
+
+            handle.enter()
+                .append('circle')
+                .attr('class', 'handle')
+                .attr('cx', d => this.chart.scale(d.date))
+                .attr('cy', d => this.panel.scale(d3.mean([d.open, d.close])))
+                .attr('r', 4);
+
+            handle.exit().remove();
+        }else{
+            this.element.selectAll('circle.handle').remove();
+        }
     }
 
     destroy(){
@@ -107,6 +138,7 @@ module.exports = {
     type: 'plot',
     settings: {},
     title: 'OHLC Bars',
+    selectable: true,
     description: 'Plot open-high-low-close bars.',
     instance: params => new OHLC(params)
 };

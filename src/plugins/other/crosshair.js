@@ -52,6 +52,8 @@ class Crosshair {
     }
 
     mousemove({event, target} = {}){
+        if(!event) return; //This is a zoom event, not a mouse event
+
         //Move the flag on the bottom
         const date = this.chart.scale.invert(event.offsetX);
         const candle = new Date(Math.round(date.getTime() / this.chart.granularity) * this.chart.granularity);

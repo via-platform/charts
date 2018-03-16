@@ -15,21 +15,20 @@ module.exports = class ChartLayer {
         };
     }
 
-    constructor({chart, panel, isRoot, plugin, pluginState}){
+    constructor({chart, panel, isRoot, plugin, params}){
         this.disposables = new CompositeDisposable();
         this.chart = chart;
         this.panel = panel;
         this.isRoot = isRoot;
-        this.element = this.panel.svg.append('g').classed('layer', true).classed('root', isRoot);
-        this.plugin = plugin.instance({chart, panel, state: pluginState, element: this.element});
-        this.draw();
+        this.selectable = false;
 
-        if(this.isRoot && this.panel.isCenter){
-            this.disposables.add(this.chart.onDidChangeType(this.changePlugin.bind(this)));
-        }
+        this.disposables.add(this.chart.onDidSelect(this.draw.bind(this)));
+        this.disposables.add(this.chart.onDidUnselect(this.draw.bind(this)));
+
+        this.initialize(plugin, params);
     }
 
-    changePlugin(plugin){
+    initialize(plugin, params){
         if(this.plugin){
             this.plugin.destroy();
         }
@@ -39,10 +38,20 @@ module.exports = class ChartLayer {
             this.element = null;
         }
 
-        this.element = this.panel.svg.append('g').classed('layer', true).classed('root', this.isRoot);
-        this.plugin = plugin.instance({chart: this.chart, panel: this.panel, element: this.element});
+        this.element = this.panel.zoomable.append('g').classed('layer', true).classed('root', this.isRoot).classed('selectable', plugin.selectable);
+        this.plugin = plugin.instance({chart: this.chart, panel: this.panel, element: this.element, layer: this, params});
         this.panel.didModifyLayer(this);
+        this.selectable = !!plugin.selectable;
+
+        if(this.chart.selected === this && !this.selectable){
+            this.chart.unselect();
+        }
+
         this.draw();
+    }
+
+    select(){
+        this.chart.select(this);
     }
 
     domain(){
@@ -66,6 +75,10 @@ module.exports = class ChartLayer {
     remove(){
         if(this.panel.isCenter && this.isRoot){
             return;
+        }
+
+        if(this.chart.selected === this){
+            this.chart.unselect();
         }
 
         this.panel.removeLayer(this);

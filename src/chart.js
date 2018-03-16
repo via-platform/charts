@@ -1,6 +1,5 @@
 const {Disposable, CompositeDisposable, Emitter} = require('via');
 const d3 = require('d3');
-const ChartCenter = require('./chart-center');
 const ChartData = require('./chart-data');
 const ChartStudy = require('./chart-study');
 const ChartPanels = require('./chart-panels');
@@ -67,11 +66,12 @@ module.exports = class Chart {
 
         this.type = via.config.get('charts.defaultChartType');
 
-        //TODO allow the padding to be customized
         this.padding = 0.2;
         this.bandwidth = 10;
-        this.bandInterval = null;
         this.granularity = 0;
+        this.precision = 2;
+        this.selected = null;
+        this.drawing = null;
 
         this.basis = d3.scaleTime().domain([new Date(Date.now() - 864e5), new Date()]);
         this.scale = this.basis.copy();
@@ -91,11 +91,27 @@ module.exports = class Chart {
             'charts:zoom-in': () => this.zoom(2),
             'charts:zoom-out': () => this.zoom(0.5),
             'core:move-left': () => this.translate(100),
-            'core:move-right': () => this.translate(-100)
+            'core:move-right': () => this.translate(-100),
+            'core:delete': () => {
+                if(this.selected){
+                    this.selected.remove();
+                }
+            },
+            'core:backspace': () => {
+                if(this.selected){
+                    this.selected.remove();
+                }
+            },
+            'core:cancel': () => {
+                if(this.drawing){
+                    this.drawing.dispose();
+                }
+
+                this.unselect();
+            }
         }));
 
         this.initialize(params);
-        this.draw();
     }
 
     initialize(state = {}){
@@ -146,16 +162,42 @@ module.exports = class Chart {
         this.emitter.emit('did-zoom', {event, target});
     }
 
-    mouseover({event, target}){
-        this.emitter.emit('did-mouse-over', {event, target});
+    mouseover(params){
+        this.emitter.emit('did-mouse-over', params);
     }
 
-    mouseout({event, target}){
-        this.emitter.emit('did-mouse-out', {event, target});
+    mouseout(params){
+        this.emitter.emit('did-mouse-out', params);
     }
 
-    mousemove({event, target}){
-        this.emitter.emit('did-mouse-move', {event, target});
+    mousemove(params){
+        this.emitter.emit('did-mouse-move', params);
+    }
+
+    click(params){
+        this.unselect();
+        this.emitter.emit('did-click', params);
+    }
+
+    select(layer){
+        if(this.selected){
+            this.unselect();
+        }
+
+        this.selected = layer;
+        this.emitter.emit('did-select', layer);
+    }
+
+    unselect(){
+        if(this.selected){
+            this.selected = null;
+            this.emitter.emit('did-unselect');
+        }
+    }
+
+    draw(plugin){
+        this.emitter.emit('will-draw', plugin);
+        this.drawing = this.emitter.once('did-click', ({event, target}) => target.addLayer(plugin, event));
     }
 
     resize(){
@@ -184,11 +226,6 @@ module.exports = class Chart {
         const [start, end] = this.scale.domain();
         const total = Math.ceil((end - start) / this.granularity);
         this.bandwidth = (this.width - AXIS_WIDTH) / total;
-    }
-
-    draw(){
-        //Redraw all panels and the X axis
-        this.axis.draw();
     }
 
     consumeActionBar(actionBar){
@@ -264,6 +301,7 @@ module.exports = class Chart {
         if(!market || market === this.market) return;
 
         this.market = market;
+        this.precision = this.market.precision.price || 2;
         this.emitter.emit('did-change-market', market);
         this.emitter.emit('did-change-title');
     }
@@ -284,8 +322,10 @@ module.exports = class Chart {
 
     changeType(type){
         if(this.type !== type){
+            const plugin = this.plugins.get(type);
             this.type = type;
-            this.emitter.emit('did-change-type', this.plugins.get(type));
+            this.root().initialize(plugin);
+            this.emitter.emit('did-change-type', plugin);
             this.emitter.emit('did-change-title');
         }
     }
@@ -333,8 +373,12 @@ module.exports = class Chart {
 
     }
 
-    addRightPanel(){
+    root(){
+        return this.center().getRoot();
+    }
 
+    center(){
+        return this.panels.getCenter();
     }
 
     onDidChangeGranularity(callback){
@@ -399,5 +443,17 @@ module.exports = class Chart {
 
     onDidMouseOut(callback){
         return this.emitter.on('did-mouse-out', callback);
+    }
+
+    onDidClick(callback){
+        return this.emitter.on('did-click', callback);
+    }
+
+    onDidSelect(callback){
+        return this.emitter.on('did-select', callback);
+    }
+
+    onDidUnselect(callback){
+        return this.emitter.on('did-unselect', callback);
     }
 }

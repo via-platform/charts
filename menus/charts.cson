@@ -17,3 +17,6 @@
   '.chart .panel:not(.center)': [
     {label: 'Remove Panel', command: 'charts:remove-panel'}
   ]
+  '.symbol-explorer .market': [
+    {label: 'Open Chart', command: 'charts:create-chart'}
+  ]

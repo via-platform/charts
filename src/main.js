@@ -1,6 +1,6 @@
 const {CompositeDisposable, Disposable, Emitter} = require('via');
 const Chart = require('./chart');
-const BaseURI = 'via://charts';
+const base = 'via://charts';
 const _ = require('underscore-plus');
 
 const DefaultPlugins = require('./default-plugins');
@@ -8,7 +8,7 @@ const DefaultPlugins = require('./default-plugins');
 const InterfaceConfiguration = {
     name: 'Interactive Chart',
     description: 'A real-time chart for a given symbol with various built-in indicators and overlays.',
-    uri: BaseURI
+    uri: base
 };
 
 class ChartPackage {
@@ -21,12 +21,10 @@ class ChartPackage {
         this.pluginsOrderMap = {};
         this.omnibar = null;
 
-        via.commands.add('via-workspace', {
-            'charts:create-chart': () => via.workspace.open(BaseURI)
-        });
+        this.disposables.add(via.commands.add('via-workspace, .symbol-explorer .market', 'charts:create-chart', this.create.bind(this)));
 
         this.disposables.add(via.workspace.addOpener((uri, options) => {
-            if(uri === BaseURI || uri.startsWith(BaseURI + '/')){
+            if(uri === base || uri.startsWith(base + '/')){
                 let chart = new Chart({manager: this, plugins: this.plugins, omnibar: this.omnibar}, {uri});
 
                 this.charts.push(chart);
@@ -37,6 +35,17 @@ class ChartPackage {
         }, InterfaceConfiguration));
 
         this.registerDefaultPlugins();
+    }
+
+    create(e){
+        e.stopPropagation();
+
+        if(e.currentTarget.classList.contains('market')){
+            const market = e.currentTarget.getMarket();
+            via.workspace.open(`${base}/${market.exchange.id}/${market.symbol}`, {});
+        }else{
+            via.workspace.open(base);
+        }
     }
 
     deactivate(){

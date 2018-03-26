@@ -25,6 +25,8 @@ const QuickMeasure = require('./plugins/other/quick-measure');
 const HorizontalLine = require('./plugins/drawings/horizontal-line');
 const VerticalLine = require('./plugins/drawings/vertical-line');
 const Measure = require('./plugins/drawings/measure');
+const DateValueRange = require('./plugins/drawings/date-value-range');
+// const Circle = require('./plugins/drawings/circle');
 
 module.exports = [
     Candlestick,
@@ -48,5 +50,7 @@ module.exports = [
     QuickMeasure,
     HorizontalLine,
     VerticalLine,
-    Measure
+    Measure,
+    DateValueRange//,
+    // Circle
 ];

@@ -13,7 +13,6 @@
   "repository": "https://github.com/via-platform/charts",
   "author": "Dakota Gordon",
   "dependencies": {
-    "d3": "^4.10.2",
     "etch": "^0.12.5",
     "moment": "^2.20.1",
     "underscore-plus": "^1.6.6"

@@ -21,6 +21,7 @@ module.exports = class ChartLayer {
         this.panel = panel;
         this.isRoot = isRoot;
         this.selectable = false;
+        this.priority = plugin.priority || 0;
 
         this.disposables.add(this.chart.onDidSelect(this.draw.bind(this)));
         this.disposables.add(this.chart.onDidUnselect(this.draw.bind(this)));
@@ -38,8 +39,9 @@ module.exports = class ChartLayer {
             this.element = null;
         }
 
-        this.element = this.panel.zoomable.append('g').classed('layer', true).classed('root', this.isRoot).classed('selectable', plugin.selectable);
+        this.element = this.panel.zoomable.append('g').datum(this.priority).classed('layer', true).classed('root', this.isRoot).classed('selectable', plugin.selectable);
         this.plugin = plugin.instance({chart: this.chart, panel: this.panel, element: this.element, layer: this, params});
+        this.panel.sortLayers();
         this.panel.didModifyLayer(this);
         this.selectable = !!plugin.selectable;
 
@@ -52,6 +54,10 @@ module.exports = class ChartLayer {
 
     select(){
         this.chart.select(this);
+    }
+
+    isSelected(){
+        return this.chart.selected === this;
     }
 
     domain(){

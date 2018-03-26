@@ -25,7 +25,7 @@ class ChartPackage {
 
         this.disposables.add(via.workspace.addOpener((uri, options) => {
             if(uri === base || uri.startsWith(base + '/')){
-                let chart = new Chart({manager: this, plugins: this.plugins, omnibar: this.omnibar}, {uri});
+                const chart = new Chart({manager: this, plugins: this.plugins, omnibar: this.omnibar}, {uri});
 
                 this.charts.push(chart);
                 this.emitter.emit('did-create-chart', chart);
@@ -161,7 +161,7 @@ class ChartPackage {
     }
 
     observeCharts(callback){
-        for(let chart of this.charts){
+        for(const chart of this.getCharts()){
             callback(chart);
         }
 

@@ -1,5 +1,4 @@
-const {Disposable, CompositeDisposable, Emitter} = require('via');
-const d3 = require('d3');
+const {Disposable, CompositeDisposable, Emitter, d3} = require('via');
 const AXIS_HEIGHT = 22;
 const AXIS_WIDTH = 60;
 const FLAG_WIDTH = AXIS_WIDTH - 6;

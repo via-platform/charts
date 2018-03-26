@@ -1,5 +1,4 @@
-const {CompositeDisposable, Disposable} = require('via');
-const d3 = require('d3');
+const {CompositeDisposable, Disposable, d3} = require('via');
 const _ = require('underscore-plus');
 const etch = require('etch');
 const $ = etch.dom;
@@ -50,7 +49,7 @@ class HorizontalLine {
 
         return function(d, i){
             if(d3.event.shiftKey) return;
-            
+
             d3.event.stopPropagation();
             _this.chart.select(_this.layer);
         };

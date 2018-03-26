@@ -1,5 +1,4 @@
-const {CompositeDisposable, Disposable} = require('via');
-const d3 = require('d3');
+const {CompositeDisposable, Disposable, d3} = require('via');
 const _ = require('underscore-plus');
 const etch = require('etch');
 const $ = etch.dom;
@@ -24,7 +23,7 @@ class OHLC {
 
         return function(d, i){
             if(d3.event.shiftKey) return;
-            
+
             d3.event.stopPropagation();
             _this.chart.select(_this.layer);
         };
@@ -84,7 +83,7 @@ class OHLC {
 
         bar.exit().remove();
 
-        if(this.chart.selected === this.layer){
+        if(this.layer.isSelected()){
             let handle = this.element.selectAll('circle.handle')
                 .data(data.filter(d => d.close && d.open && d.date.getTime() % (this.chart.granularity * 10) === 0), d => d.date.getTime())
                 .attr('class', 'handle')

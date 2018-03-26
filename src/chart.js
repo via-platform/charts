@@ -1,5 +1,4 @@
-const {Disposable, CompositeDisposable, Emitter} = require('via');
-const d3 = require('d3');
+const {Disposable, CompositeDisposable, Emitter, d3} = require('via');
 const ChartData = require('./chart-data');
 const ChartStudy = require('./chart-study');
 const ChartPanels = require('./chart-panels');
@@ -178,7 +177,7 @@ module.exports = class Chart {
 
     select(layer){
         this.cancel();
-        
+
         if(this.selected){
             this.unselect();
         }

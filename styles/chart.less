@@ -23,6 +23,8 @@
 @import "plugins/drawings/horizontal-line";
 @import "plugins/drawings/vertical-line";
 @import "plugins/drawings/measure";
+@import "plugins/drawings/date-value-range";
+@import "plugins/drawings/circle";
 
 @chart-tools-height: 24px;
 @chart-panel-border-width: 1px;
@@ -284,6 +286,14 @@
         rect.up
         {
             fill: @primary-color;
+        }
+    }
+
+    .flag, .range
+    {
+        &.hidden
+        {
+            display: none;
         }
     }
 }

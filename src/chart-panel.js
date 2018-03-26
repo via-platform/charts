@@ -1,5 +1,4 @@
-const {Disposable, CompositeDisposable, Emitter} = require('via');
-const d3 = require('d3');
+const {Disposable, CompositeDisposable, Emitter, d3} = require('via');
 const _ = require('underscore-plus');
 const ChartLayer = require('./chart-layer');
 const ChartPanelAxis = require('./chart-panel-axis');
@@ -77,12 +76,13 @@ module.exports = class ChartPanel {
             this.layers.push(new ChartLayer({chart: this.chart, panel: this, isRoot: true, plugin}));
         }
 
+        this.sortLayers();
         this.resize();
         this.rescale();
     }
 
     addLayer(plugin, params){
-        let layer = new ChartLayer({chart: this.chart, panel: this, plugin, params});
+        const layer = new ChartLayer({chart: this.chart, panel: this, plugin, params});
         this.layers.push(layer);
         this.emitter.emit('did-add-layer', layer);
         this.draw();
@@ -98,6 +98,10 @@ module.exports = class ChartPanel {
         if(!this.layers.length && !this.isCenter){
             this.remove();
         }
+    }
+
+    sortLayers(){
+        this.zoomable.selectAll('.layer').sort();
     }
 
     didModifyLayer(layer){

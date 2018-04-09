@@ -1,72 +1,73 @@
 {
-    "name": "charts",
-    "version": "0.8.5",
-    "description": "Charting view for a workspace.",
-    "main": "./src/main",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "keywords": [
-        "via",
-        "trading"
-    ],
-    "repository": "https://github.com/via-platform/charts",
-    "author": "Dakota Gordon",
-    "dependencies": {
-        "etch": "^0.12.5",
-        "moment": "^2.20.1",
-        "underscore-plus": "^1.6.6"
-    },
-    "engines": {
-        "via": "*"
-    },
-    "configSchema": {
-        "defaultChartType": {
-            "type": "string",
-            "default": "candlestick",
-            "description": "The default chart type for when a new chart window is opened.",
-            "enum": [{
-                    "value": "candlestick",
-                    "description": "Candlestick"
-                },
-                {
-                    "value": "ohlc",
-                    "description": "OHLC Bars"
-                },
-                {
-                    "value": "line",
-                    "description": "Line Chart"
-                },
-                {
-                    "value": "area",
-                    "description": "Area Chart"
-                },
-                {
-                    "value": "heikin-ashi",
-                    "description": "Heikin-Ashi Candlesticks"
-                }
-            ]
+  "name": "charts",
+  "version": "0.8.6",
+  "description": "Charting view for a workspace.",
+  "main": "./src/main",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "via",
+    "trading"
+  ],
+  "repository": "https://github.com/via-platform/charts",
+  "author": "Dakota Gordon",
+  "dependencies": {
+    "etch": "^0.12.5",
+    "moment": "^2.20.1",
+    "underscore-plus": "^1.6.6"
+  },
+  "engines": {
+    "via": "*"
+  },
+  "configSchema": {
+    "defaultChartType": {
+      "type": "string",
+      "default": "candlestick",
+      "description": "The default chart type for when a new chart window is opened.",
+      "enum": [
+        {
+          "value": "candlestick",
+          "description": "Candlestick"
         },
-        "resetZoomOnGranularityChange": {
-            "title": "Reset Zoom On Granularity Change",
-            "type": "boolean",
-            "default": true,
-            "description": "Reset the chart zoom and position when the granularity is changed."
+        {
+          "value": "ohlc",
+          "description": "OHLC Bars"
+        },
+        {
+          "value": "line",
+          "description": "Line Chart"
+        },
+        {
+          "value": "area",
+          "description": "Area Chart"
+        },
+        {
+          "value": "heikin-ashi",
+          "description": "Heikin-Ashi Candlesticks"
         }
+      ]
     },
-    "providedServices": {
-        "charts": {
-            "description": "Charts package for creating plugins, studies, tools, etc.",
-            "versions": {
-                "0.1.0": "provideCharts"
-            }
-        }
-    },
-    "consumedServices": {
-        "action-bar": {
-            "versions": {
-                "^0.1.0": "consumeActionBar"
-            }
-        }
+    "resetZoomOnGranularityChange": {
+      "title": "Reset Zoom On Granularity Change",
+      "type": "boolean",
+      "default": true,
+      "description": "Reset the chart zoom and position when the granularity is changed."
     }
+  },
+  "providedServices": {
+    "charts": {
+      "description": "Charts package for creating plugins, studies, tools, etc.",
+      "versions": {
+        "0.1.0": "provideCharts"
+      }
+    }
+  },
+  "consumedServices": {
+    "action-bar": {
+      "versions": {
+        "^0.1.0": "consumeActionBar"
+      }
+    }
+  }
 }

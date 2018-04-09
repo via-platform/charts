@@ -22,6 +22,7 @@ module.exports = class ChartLayer {
         this.isRoot = isRoot;
         this.selectable = false;
         this.priority = plugin.priority || 0;
+        this.metadata = {};
 
         this.disposables.add(this.chart.onDidSelect(this.draw.bind(this)));
         this.disposables.add(this.chart.onDidUnselect(this.draw.bind(this)));
@@ -44,6 +45,7 @@ module.exports = class ChartLayer {
         this.panel.sortLayers();
         this.panel.didModifyLayer(this);
         this.selectable = !!plugin.selectable;
+        this.metadata = plugin;
 
         if(this.chart.selected === this && !this.selectable){
             this.chart.unselect();

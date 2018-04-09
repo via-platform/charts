@@ -56,6 +56,9 @@ class Granularity {
         this.disposables.add(via.tooltips.add(this.element, {title: 'Change Granularity', placement: 'bottom', keyBindingCommand: 'charts:change-granularity'}));
         this.disposables.add(via.commands.add(this.chart.element, 'charts:change-granularity', this.change.bind(this)));
 
+        this.disposables.add(via.commands.add(this.chart.element, 'charts:increase-granularity', this.increase.bind(this)));
+        this.disposables.add(via.commands.add(this.chart.element, 'charts:decrease-granularity', this.decrease.bind(this)));
+
         this.didChangeMarket();
     }
 
@@ -88,6 +91,7 @@ class Granularity {
 
     change(granularity){
         if(!this.chart.omnibar) return;
+        if(!this.chart.market) return via.beep();
 
         const timeframes = this.chart.market.exchange.timeframes;
         const valid = _.intersection(Object.keys(options), Object.keys(timeframes));
@@ -100,6 +104,30 @@ class Granularity {
             maxResultsPerCategory: 30,
             items
         });
+    }
+
+    increase(){
+        if(!this.chart.market) return via.beep();
+
+        const timeframes = this.chart.market.exchange.timeframes;
+        const valid = _.intersection(Object.keys(options), Object.keys(timeframes));
+        const index = valid.indexOf(this.chart.granularity.toString());
+
+        if(index >= valid.length - 1) return via.beep();
+
+        this.chart.changeGranularity(parseInt(valid[index + 1]));
+    }
+
+    decrease(){
+        if(!this.chart.market) return via.beep();
+
+        const timeframes = this.chart.market.exchange.timeframes;
+        const valid = _.intersection(Object.keys(options), Object.keys(timeframes));
+        const index = valid.indexOf(this.chart.granularity.toString());
+
+        if(!index) return via.beep();
+
+        this.chart.changeGranularity(parseInt(valid[index - 1]));
     }
 
     destroy(){

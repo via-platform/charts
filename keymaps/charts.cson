@@ -4,6 +4,8 @@
   'g': 'charts:change-granularity'
   't': 'charts:change-type'
   'd': 'charts:add-drawing'
+  '[': 'charts:decrease-granularity'
+  ']': 'charts:increase-granularity'
 
 '.platform-darwin .chart':
   'cmd-=': 'charts:zoom-in'

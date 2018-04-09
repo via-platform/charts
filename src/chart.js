@@ -72,7 +72,7 @@ module.exports = class Chart {
         this.selected = null;
         this.drawing = null;
 
-        this.basis = d3.scaleTime().domain([new Date(Date.now() - 864e5), new Date()]);
+        this.basis = d3.scaleTime().domain([new Date(Date.now() - (params.granularity || 3e5) * 144), new Date()]);
         this.scale = this.basis.copy();
 
         this.element = document.createElement('div');
@@ -313,13 +313,24 @@ module.exports = class Chart {
 
     changeGranularity(granularity){
         if(this.market && !this.market.exchange.timeframes.hasOwnProperty(granularity)){
-            return;
+            return via.beep();
         }
 
         if(this.granularity !== granularity){
+            this.emitter.emit('will-change-granularity', granularity);
             this.granularity = granularity;
+
+            if(via.config.get('charts.resetZoomOnGranularityChange')){
+                this.basis.domain([new Date(Date.now() - (this.granularity || 3e5) * 144), new Date()]);
+                this.transform = d3.zoomIdentity;
+                this.zoomed();
+            }else{
+                this.updateBandwidth();
+            }
+
             this.updateBandwidth();
             this.setNextBandTimeout(false);
+
             this.emitter.emit('did-change-granularity', granularity);
             this.emitter.emit('did-change-title');
         }
@@ -384,6 +395,10 @@ module.exports = class Chart {
 
     center(){
         return this.panels.getCenter();
+    }
+
+    onWillChangeGranularity(callback){
+        return this.emitter.on('will-change-granularity', callback);
     }
 
     onDidChangeGranularity(callback){

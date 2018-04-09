@@ -11,14 +11,19 @@ module.exports = class ChartData {
 
         this.disposables.add(this.chart.onDidChangeMarket(this.reset.bind(this)));
         this.disposables.add(this.chart.onDidChangeGranularity(this.reset.bind(this)));
+        this.disposables.add(this.chart.onWillChangeGranularity(this.clear.bind(this)));
         this.disposables.add(this.chart.onDidZoom(this.changedDomain.bind(this)));
     }
 
-    reset(){
+    clear(){
         if(this.data){
             this.data.destroy();
             this.data = null;
         }
+    }
+
+    reset(){
+        this.clear();
 
         if(this.chart.market.exchange.hasFetchOHLCV){
             this.data = this.chart.market.data(this.chart.granularity);
@@ -60,11 +65,7 @@ module.exports = class ChartData {
     }
 
     destroy(){
-        if(this.data){
-            this.data.destroy();
-            this.data = null;
-        }
-
+        this.clear();
         this.disposables.dispose();
         this.emitter.emit('did-destroy');
         this.emitter.dispose();

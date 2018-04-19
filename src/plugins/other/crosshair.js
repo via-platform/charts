@@ -18,6 +18,8 @@ class Crosshair {
         this.disposables.add(this.chart.panels.observePanels(panel => {
             this.panels.set(panel, {
                 disposables: new CompositeDisposable(
+                    panel.onDidMouseOver(this.mouseover.bind(this)),
+                    panel.onDidMouseOut(this.mouseout.bind(this)),
                     panel.onDidMouseMove(this.mousemove.bind(this)),
                     panel.onDidResize(this.resize.bind(this))
                 ),
@@ -76,9 +78,25 @@ class Crosshair {
         this.last = event;
     }
 
+    mouseover({event, target} = {}){
+        this.chart.element.classList.add('crosshair-active');
+
+        if(target){
+            target.element.classList.add('crosshair-active');
+        }
+    }
+
+    mouseout({event, target} = {}){
+        this.chart.element.classList.remove('crosshair-active');
+
+        if(target){
+            target.element.classList.remove('crosshair-active');
+        }
+    }
+
     resize({event, target}){
         //Properly transform the flags and numbers as well
-        let panel = this.panels.get(target);
+        const panel = this.panels.get(target);
 
         if(panel){
             panel.crosshairs.x.attr('d', `M 0 0 v ${target.height}`);

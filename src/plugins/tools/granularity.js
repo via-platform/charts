@@ -66,7 +66,7 @@ class Granularity {
 
     //TODO Combine the timeframes into an omnibar selection type deal
     render(){
-        return $.div({classList: 'granularity toolbar-button caret', onClick: this.change.bind(this)}, abbreviations[this.chart.granularity]);
+        return $.div({classList: 'granularity toolbar-button caret', onClick: this.change.bind(this)}, abbreviations[this.chart.granularity] || 'N/A');
     }
 
     didChangeGranularity(granularity){

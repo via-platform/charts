@@ -28,9 +28,6 @@ const abbreviations = {
     6048e5: '1W'
 };
 
-const AXIS_HEIGHT = 30;
-const AXIS_WIDTH = 60;
-
 module.exports = class Chart {
     static deserialize({manager, plugins, omnibar}, params){
         return new Chart({manager, plugins, omnibar}, params);
@@ -46,7 +43,7 @@ module.exports = class Chart {
         };
     }
 
-    constructor({manager, plugins, omnibar}, params = {}){
+    constructor({manager, plugins, omnibar}, state = {}){
         this.manager = manager;
         this.plugins = plugins;
         this.omnibar = omnibar;
@@ -57,7 +54,7 @@ module.exports = class Chart {
 
         this.panels = null;
 
-        this.uri = params.uri;
+        this.uri = state.uri;
 
         this.width = 0;
         this.height = 0;
@@ -72,19 +69,29 @@ module.exports = class Chart {
         this.selected = null;
         this.drawing = null;
 
-        this.basis = d3.scaleTime().domain([new Date(Date.now() - (params.granularity || 3e5) * 144), new Date()]);
+        this.basis = d3.scaleTime().domain([new Date(Date.now() - (state.granularity || 3e5) * 144), new Date()]);
         this.scale = this.basis.copy();
 
         this.element = document.createElement('div');
         this.element.classList.add('chart', 'pane-item', 'focusable-panel');
         this.element.tabIndex = -1;
 
-        this.changeGranularity(params.granularity || 3e5);
-
         this.data = new ChartData(this);
+        this.tools = new ChartTools({chart: this, state: state.tools});
+        this.panels = new ChartPanels({chart: this, state: state.panels});
+        this.axis = new ChartAxis({chart: this});
+
+        this.element.appendChild(this.tools.element);
+        this.element.appendChild(this.panels.element);
+        this.element.appendChild(this.axis.element);
+
+        this.disposables.add(this.panels.onDidUpdateOffset(this.resize.bind(this)));
 
         this.resizeObserver = new ResizeObserver(this.resize.bind(this));
         this.resizeObserver.observe(this.element);
+
+        this.changeGranularity(state.granularity || 3e5);
+        this.changeMarket(via.markets.findByIdentifier(this.getURI().slice(BaseURI.length + 1)));
 
         this.disposables.add(via.commands.add(this.element, {
             'charts:zoom-in': () => this.zoom(2),
@@ -106,20 +113,6 @@ module.exports = class Chart {
                 this.unselect();
             }
         }));
-
-        this.initialize(params);
-    }
-
-    initialize(state = {}){
-        this.changeMarket(via.markets.findByIdentifier(this.getURI().slice(BaseURI.length + 1)));
-
-        this.tools = new ChartTools({chart: this, state: state.tools});
-        this.panels = new ChartPanels({chart: this, state: state.panels});
-        this.axis = new ChartAxis({chart: this});
-
-        this.element.appendChild(this.tools.element);
-        this.element.appendChild(this.panels.element);
-        this.element.appendChild(this.axis.element);
 
         //There isn't a great place to initialize uber-general plugins like the crosshairs
         //Might as well do it here...
@@ -211,16 +204,16 @@ module.exports = class Chart {
         }
 
         if(this.transform && this.element.clientWidth && this.width){
-            //We have to subtract out the axis width (since it is fixed at AXIS_WIDTH)
+            //We have to subtract out the axis width (since it is fixed at `this.panels.offset`)
             //If we don't, the ratio of the old-width to new-width is incorrect
-            this.transform.x = this.transform.x * ((this.element.clientWidth - AXIS_WIDTH) / (this.width - AXIS_WIDTH));
+            this.transform.x = this.transform.x * ((this.element.clientWidth - this.panels.offset) / (this.width - this.panels.offset));
         }
 
         this.width = this.element.clientWidth;
         this.height = this.element.clientHeight;
 
-        this.basis.range([0, this.width - AXIS_WIDTH]);
-        this.scale.range([0, this.width - AXIS_WIDTH]);
+        this.basis.range([0, this.width - this.panels.offset]);
+        this.scale.range([0, this.width - this.panels.offset]);
 
         this.updateBandwidth();
 
@@ -230,7 +223,8 @@ module.exports = class Chart {
     updateBandwidth(){
         const [start, end] = this.scale.domain();
         const total = Math.ceil((end - start) / this.granularity);
-        this.bandwidth = (this.width - AXIS_WIDTH) / total;
+        this.bandwidth = (this.width - this.panels.offset) / total;
+        this.emitter.emit('did-update-bandwidth', this.bandwidth);
     }
 
     consumeActionBar(actionBar){

@@ -5,9 +5,6 @@ const ChartPanelAxis = require('./chart-panel-axis');
 const ChartPanelGrid = require('./chart-panel-grid');
 const ChartPanelValues = require('./chart-panel-values');
 
-//TODO allow the user to set a preference on this
-const AXIS_WIDTH = 60;
-
 module.exports = class ChartPanel {
 
     serialize(){
@@ -17,10 +14,11 @@ module.exports = class ChartPanel {
         };
     }
 
-    constructor({chart, isCenter, state, plugin}){
+    constructor({chart, isCenter, state, plugin, panels}){
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
 
+        this.panels = panels;
         this.chart = chart;
         this.isCenter = isCenter;
         this.layers = [];
@@ -65,6 +63,10 @@ module.exports = class ChartPanel {
         this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
         this.disposables.add(this.chart.onDidDestroy(this.destroy.bind(this)));
         this.disposables.add(this.chart.data.onDidUpdateData(this.rescale.bind(this)));
+        this.disposables.add(this.panels.onDidUpdateOffset(offset => {
+            this.resize();
+            this.emitter.emit('did-update-offset', offset);
+        }));
 
         this.disposables.add(via.commands.add(this.element, {
             'charts:remove-panel': () => this.remove()
@@ -128,6 +130,10 @@ module.exports = class ChartPanel {
         this.emitter.emit('did-resize', {width: this.width, height: this.height, target: this});
 
         this.draw();
+    }
+
+    get offset(){
+        return this.panels.offset;
     }
 
     draw(){
@@ -207,6 +213,12 @@ module.exports = class ChartPanel {
             this.emitter.emit('did-rescale', this.scale);
         }
 
+        if(this.isCenter){
+            //TODO figure out how to make this work for indicator panels as well
+            const figures = this.basis.domain()[0].toFixed(this.chart.precision).length;
+            this.panels.didUpdateOffset(this, figures * 6 + 12);
+        }
+
         this.draw();
     }
 
@@ -264,5 +276,9 @@ module.exports = class ChartPanel {
 
     onDidModifyLayer(callback){
         return this.emitter.on('did-modify-layer', callback);
+    }
+
+    onDidUpdateOffset(callback){
+        return this.emitter.on('did-update-offset', callback);
     }
 }

@@ -4,8 +4,6 @@ const etch = require('etch');
 const moment = require('moment');
 const $ = etch.dom;
 const AXIS_HEIGHT = 22;
-const AXIS_WIDTH = 60;
-const FLAG_WIDTH = AXIS_WIDTH - 6;
 const FLAG_HEIGHT = AXIS_HEIGHT - 2;
 const X_FLAG_WIDTH = 124;
 

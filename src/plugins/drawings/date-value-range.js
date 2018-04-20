@@ -6,7 +6,6 @@ const moment = require('moment');
 
 const AXIS_HEIGHT = 22;
 const FLAG_HEIGHT = AXIS_HEIGHT - 3;
-const AXIS_WIDTH = 60;
 const X_FLAG_WIDTH = 124; //TODO resize based on chart granularity
 
 class DateValueRange {

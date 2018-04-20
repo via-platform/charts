@@ -1,4 +1,4 @@
-const {Disposable, CompositeDisposable, Emitter} = require('via');
+const {Disposable, CompositeDisposable, Emitter, d3} = require('via');
 const ChartPanel = require('./chart-panel');
 
 module.exports = class ChartPanels {
@@ -11,21 +11,24 @@ module.exports = class ChartPanels {
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
         this.panels = [];
+        this.offset = 0;
+        this.offsets = new Map();
 
         this.element = document.createElement('div');
         this.element.classList.add('chart-panels');
 
-        this.initialize(state);
         this.disposables.add(this.chart.onDidResize(this.resize.bind(this)));
+
+        this.initialize(state);
     }
 
     initialize(state){
         if(state){
             for(let panel of state){
-                this.panels.push(new ChartPanel({chart: this.chart, state: panel}));
+                this.panels.push(new ChartPanel({chart: this.chart, panels: this, state: panel}));
             }
         }else{
-            this.panels.push(new ChartPanel({chart: this.chart, isCenter: true, plugin: this.chart.getTypePlugin()}));
+            this.panels.push(new ChartPanel({chart: this.chart, panels: this, isCenter: true, plugin: this.chart.getTypePlugin()}));
         }
 
         for(let panel of this.panels){
@@ -34,8 +37,9 @@ module.exports = class ChartPanels {
     }
 
     addPanel(plugin){
-        let panel = new ChartPanel({chart: this.chart, plugin});
+        let panel = new ChartPanel({chart: this.chart, panels: this, plugin});
         this.panels.push(panel);
+        this.offsets.set(panel, panel.offset);
         this.element.appendChild(panel.element);
         this.emitter.emit('did-add-panel', panel);
         this.resize();
@@ -43,9 +47,21 @@ module.exports = class ChartPanels {
 
     removePanel(panel){
         this.panels.splice(this.panels.indexOf(panel));
+        this.offsets.delete(panel);
         this.emitter.emit('did-remove-panel', panel);
         panel.destroy();
         this.resize();
+    }
+
+    didUpdateOffset(panel, offset){
+        this.offsets.set(panel, offset);
+
+        const max = Math.max(50, d3.max(Array.from(this.offsets.values())));
+
+        if(max !== this.offset){
+            this.offset = max;
+            this.emitter.emit('did-update-offset', this.offset);
+        }
     }
 
     observePanels(callback){
@@ -72,7 +88,12 @@ module.exports = class ChartPanels {
         return this.emitter.on('did-remove-panel', callback);
     }
 
+    onDidUpdateOffset(callback){
+        return this.emitter.on('did-update-offset', callback);
+    }
+
     destroy(){
+        this.offsets.clear();
         this.disposables.dispose();
     }
 }

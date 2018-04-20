@@ -3,9 +3,6 @@ const _ = require('underscore-plus');
 const etch = require('etch');
 const $ = etch.dom;
 
-// const FLAG_HEIGHT = 20;
-const AXIS_WIDTH = 60;
-
 class Candlestick {
     constructor({chart, state, element, panel}){
         this.disposables = new CompositeDisposable();
@@ -26,18 +23,16 @@ class Candlestick {
     value(band){
         const data = _.first(this.chart.data.fetch({start: band, end: band})) || {};
         const direction = data ? ((data.close >= data.open) ? 'up' : 'down') : 'unavailable';
-        const aggregation = this.chart.symbol ? this.chart.symbol.aggregation : 2;
 
-        //TODO we should fix these values to some sort of user preference or per-symbol basis
         return $.div({classList: 'value'},
             'O',
-            $.span({classList: direction}, data.open && data.open.toFixed(aggregation) || '-'),
+            $.span({classList: direction}, data.open && data.open.toFixed(this.chart.precision) || '-'),
             'H',
-            $.span({classList: direction}, data.high && data.high.toFixed(aggregation) || '-'),
+            $.span({classList: direction}, data.high && data.high.toFixed(this.chart.precision) || '-'),
             'L',
-            $.span({classList: direction}, data.low && data.low.toFixed(aggregation) || '-'),
+            $.span({classList: direction}, data.low && data.low.toFixed(this.chart.precision) || '-'),
             'C',
-            $.span({classList: direction}, data.close && data.close.toFixed(aggregation) || '-')
+            $.span({classList: direction}, data.close && data.close.toFixed(this.chart.precision) || '-')
         );
     }
 

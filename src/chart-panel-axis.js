@@ -1,7 +1,5 @@
 const {Disposable, CompositeDisposable, Emitter, d3} = require('via');
 const AXIS_HEIGHT = 22;
-const AXIS_WIDTH = 60;
-const FLAG_WIDTH = AXIS_WIDTH - 6;
 const FLAG_HEIGHT = AXIS_HEIGHT - 3;
 
 //TODO Allow this to be customizable
@@ -18,11 +16,11 @@ module.exports = class ChartPanelAxis {
 
         this.svg = d3.select(this.element)
             .append('svg')
-            .attr('width', AXIS_WIDTH);
+            .attr('width', this.panel.offset);
 
         this.zoomable = this.svg.append('rect')
             .attr('class', 'zoomable')
-            .attr('width', AXIS_WIDTH);
+            .attr('width', this.panel.offset);
 
         this.basis = d3.axisRight(this.panel.scale).tickSizeOuter(0);
         this.axis = this.svg.append('g').attr('class', 'y axis');
@@ -30,6 +28,7 @@ module.exports = class ChartPanelAxis {
         this.zoomable.call(d3.zoom().on('zoom', this.zoom()));
 
         this.disposables.add(this.panel.onDidRescale(this.draw.bind(this)));
+        this.disposables.add(this.panel.onDidUpdateOffset(this.resize.bind(this)));
         this.disposables.add(this.panel.onDidResize(this.resize.bind(this)));
         this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
         this.disposables.add(this.chart.onDidDestroy(this.destroy.bind(this)));
@@ -43,14 +42,12 @@ module.exports = class ChartPanelAxis {
         flag.append('rect')
         .attr('x', 1)
         .attr('y', 0)
-        .attr('width', AXIS_WIDTH - 1)
+        .attr('width', this.panel.offset - 1)
         .attr('height', FLAG_HEIGHT);
 
         flag.append('text')
-        .attr('x', AXIS_WIDTH / 2)
+        .attr('x', this.panel.offset / 2)
         .attr('y', FLAG_HEIGHT / 2 + 1)
-        .attr('width', AXIS_WIDTH)
-        .attr('height', FLAG_HEIGHT)
         .attr('alignment-baseline', 'middle')
         .attr('text-anchor', 'middle');
 
@@ -59,7 +56,7 @@ module.exports = class ChartPanelAxis {
 
     range(){
         const range = this.svg.append('g').attr('class', 'range');
-        range.append('rect').attr('width', AXIS_WIDTH).attr('x', 1);
+        range.append('rect').attr('width', this.panel.offset).attr('x', 1);
         return range;
     }
 
@@ -83,6 +80,11 @@ module.exports = class ChartPanelAxis {
         this.svg.attr('height', this.panel.height);
         this.zoomable.attr('height', this.panel.height);
         this.basis.ticks(Math.floor(this.panel.height / TICK_SPACING));
+
+        this.svg.selectAll('g.flag rect').attr('width', this.panel.offset);
+        this.svg.selectAll('g.flag text').attr('x', this.panel.offset / 2);
+        this.svg.attr('width', this.panel.offset);
+        this.zoomable.attr('width', this.panel.offset);
 
         this.draw();
     }

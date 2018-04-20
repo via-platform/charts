@@ -6,13 +6,13 @@ module.exports = class ChartData {
         this.chart = chart;
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
-        this.changedDomain = _.throttle(this.changedDomain.bind(this), 2000);
+        this.zoomed = _.throttle(this.request.bind(this), 2000);
         this.data = null;
 
         this.disposables.add(this.chart.onDidChangeMarket(this.reset.bind(this)));
         this.disposables.add(this.chart.onDidChangeGranularity(this.reset.bind(this)));
         this.disposables.add(this.chart.onWillChangeGranularity(this.clear.bind(this)));
-        this.disposables.add(this.chart.onDidZoom(this.changedDomain.bind(this)));
+        this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
     }
 
     clear(){
@@ -25,14 +25,14 @@ module.exports = class ChartData {
     reset(){
         this.clear();
 
-        if(this.chart.market.exchange.hasFetchOHLCV){
-            this.data = this.chart.market.data(this.chart.granularity);
-            this.data.onDidUpdateData(this.didUpdateData.bind(this));
-            this.changedDomain();
-        }
+        if(!this.chart.market || !this.chart.market.exchange.hasFetchOHLCV) return;
+
+        this.data = this.chart.market.data(this.chart.granularity);
+        this.data.onDidUpdateData(this.didUpdateData.bind(this));
+        this.request();
     }
 
-    changedDomain(){
+    request(){
         const [start, end] = this.chart.scale.domain();
 
         if(this.data){

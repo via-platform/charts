@@ -2,7 +2,6 @@ const {CompositeDisposable, Disposable, d3} = require('via');
 const _ = require('underscore-plus');
 const moment = require('moment');
 
-const AXIS_WIDTH = 60;
 const AXIS_HEIGHT = 22;
 const FLAG_HEIGHT = AXIS_HEIGHT - 3;
 const X_FLAG_WIDTH = 124; //TODO resize based on chart granularity
@@ -21,7 +20,8 @@ class Crosshair {
                     panel.onDidMouseOver(this.mouseover.bind(this)),
                     panel.onDidMouseOut(this.mouseout.bind(this)),
                     panel.onDidMouseMove(this.mousemove.bind(this)),
-                    panel.onDidResize(this.resize.bind(this))
+                    panel.onDidResize(this.resize.bind(this)),
+                    panel.onDidRescale(this.resize.bind(this))
                 ),
                 flag: panel.axis.flag().classed('crosshair-flag', true),
                 crosshairs: {
@@ -31,7 +31,7 @@ class Crosshair {
             });
 
             if(this.last){
-                this.mousemove({event: this.last});
+                this.mousemove(this.last);
             }
         }));
 
@@ -58,7 +58,7 @@ class Crosshair {
         //Move the flag on the bottom
         const date = this.chart.scale.invert(event.offsetX);
         const candle = new Date(Math.round(date.getTime() / this.chart.granularity) * this.chart.granularity);
-        const position = Math.min(Math.max(Math.floor(this.chart.scale(candle)) - (X_FLAG_WIDTH / 2), 0), this.chart.width - AXIS_WIDTH - X_FLAG_WIDTH);
+        const position = Math.min(Math.max(Math.floor(this.chart.scale(candle)) - (X_FLAG_WIDTH / 2), 0), this.chart.width - this.chart.panels.offset - X_FLAG_WIDTH);
         this.flag.attr('transform', `translate(${position}, 0)`).select('text').text(moment(candle).format('YYYY-MM-DD HH:mm:ss'));
 
         //Figure out which panel was the target and move the y hair and flag on that panel
@@ -75,7 +75,7 @@ class Crosshair {
             structure.crosshairs.x.attr('transform', `translate(${Math.floor(this.chart.scale(candle)) - 0.5}, 0)`);
         }
 
-        this.last = event;
+        this.last = {event, target};
     }
 
     mouseover({event, target} = {}){
@@ -101,6 +101,10 @@ class Crosshair {
         if(panel){
             panel.crosshairs.x.attr('d', `M 0 0 v ${target.height}`);
             panel.crosshairs.y.attr('d', `M 0 0 h ${target.width}`);
+        }
+
+        if(this.last){
+            this.mousemove(this.last);
         }
     }
 

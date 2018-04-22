@@ -87,12 +87,22 @@
             &.center
             {
                 flex: 3;
+
+                .chart-axis.y .zoomable:active
+                {
+                    cursor: ns-resize;
+                }
             }
 
             .panel-center
             {
                 flex: 1;
                 overflow: hidden;
+
+                .zoomable
+                {
+                    cursor: none;
+                }
             }
 
             .panel-background
@@ -209,7 +219,6 @@
     .zoomable
     {
         fill: transparent;
-        cursor: none;
     }
 
     clipPath rect

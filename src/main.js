@@ -12,7 +12,7 @@ const InterfaceConfiguration = {
 };
 
 class ChartPackage {
-    activate(){
+    constructor(){
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
         this.charts = [];
@@ -21,6 +21,10 @@ class ChartPackage {
         this.pluginsOrderMap = {};
         this.omnibar = null;
 
+        this.registerDefaultPlugins();
+    }
+
+    activate(){
         this.disposables.add(via.commands.add('via-workspace, .symbol-explorer .market', 'charts:create-chart', this.create.bind(this)));
 
         this.disposables.add(via.workspace.addOpener((uri, options) => {
@@ -33,8 +37,15 @@ class ChartPackage {
                 return chart;
             }
         }, InterfaceConfiguration));
+    }
 
-        this.registerDefaultPlugins();
+    deserialize(state){
+        const chart = Chart.deserialize({manager: this, plugins: this.plugins, omnibar: this.omnibar}, state);
+
+        this.charts.push(chart);
+        this.emitter.emit('did-create-chart', chart);
+
+        return chart;
     }
 
     create(e){

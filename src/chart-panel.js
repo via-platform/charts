@@ -22,6 +22,7 @@ module.exports = class ChartPanel {
         this.chart = chart;
         this.isCenter = isCenter;
         this.layers = [];
+        this.locked = true;
 
         this.width = 0;
         this.height = 0;
@@ -153,6 +154,7 @@ module.exports = class ChartPanel {
         const _this = this;
 
         return function(d, i){
+            //TODO If the chart is unlocked, calculate the vertical zoom as well...
             _this.chart.zoomed({event: d3.event, target: _this});
         };
     }

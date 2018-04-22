@@ -29,17 +29,18 @@ const abbreviations = {
 };
 
 module.exports = class Chart {
-    static deserialize({manager, plugins, omnibar}, params){
-        return new Chart({manager, plugins, omnibar}, params);
+    static deserialize({manager, plugins, omnibar}, state){
+        return new Chart({manager, plugins, omnibar}, state);
     }
 
     serialize(){
         return {
-            uri: this.getURI(),
-            time: this.time,
-            type: this.type,
-            panels: this.panels.serialize(),
-            tools: this.tools.serialize()
+            deserializer: 'Chart',
+            uri: this.getURI()//,
+            // time: this.time,
+            // type: this.type,
+            // panels: this.panels.serialize(),
+            // tools: this.tools.serialize()
         };
     }
 

@@ -25,7 +25,8 @@ module.exports = class ChartPanelAxis {
         this.basis = d3.axisRight(this.panel.scale).tickSizeOuter(0);
         this.axis = this.svg.append('g').attr('class', 'y axis');
 
-        this.zoomable.call(d3.zoom().on('zoom', this.zoom()));
+        this.zoomable.call(d3.drag().on('drag', this.drag()));
+        // this.zoomable.call(d3.zoom().on('zoom', this.zoom()));
 
         this.disposables.add(this.panel.onDidRescale(this.draw.bind(this)));
         this.disposables.add(this.panel.onDidUpdateOffset(this.resize.bind(this)));
@@ -60,10 +61,20 @@ module.exports = class ChartPanelAxis {
         return range;
     }
 
+    drag(){
+        const _this = this;
+
+        return function(d, i){
+            console.log(d3.event.y)
+            // _this.chart.zoomed({event: d3.event, target: _this});
+        };
+    }
+
     zoom(){
         const _this = this;
 
         return function(d, i){
+            // console.log(d3.event)
             // _this.chart.zoomed({event: d3.event, target: _this});
         };
     }

@@ -142,6 +142,27 @@ module.exports = class ChartPanel {
         this.emitter.emit('did-draw');
     }
 
+    unlock(){
+        this.locked = false;
+    }
+
+    lock(){
+        if(this.locked) return;
+
+        this.locked = true;
+        this.rescale();
+    }
+
+    pan(dy){
+        if(this.locked) return;
+
+        const [start, end] = this.basis.domain();
+
+        this.basis.domain([this.basis.invert(this.basis(start) - dy), this.basis.invert(this.basis(end) - dy)]);
+        this.scale.domain(this.basis.domain());
+        this.rescale();
+    }
+
     zoomed({event, target} = {}){
         if(target !== this){
             d3.zoom().transform(this.zoomable, this.chart.transform);
@@ -154,7 +175,10 @@ module.exports = class ChartPanel {
         const _this = this;
 
         return function(d, i){
-            //TODO If the chart is unlocked, calculate the vertical zoom as well...
+            if(!_this.locked && d3.event.sourceEvent.movementY){
+                _this.pan(d3.event.sourceEvent.movementY);
+            }
+
             _this.chart.zoomed({event: d3.event, target: _this});
         };
     }
@@ -196,22 +220,27 @@ module.exports = class ChartPanel {
     }
 
     rescale(){
-        const domains = _.flatten(this.layers.map(layer => layer.domain())).filter(domain => !_.isUndefined(domain));
+        if(this.locked){
+            const domains = _.flatten(this.layers.map(layer => layer.domain())).filter(domain => !_.isUndefined(domain));
 
-        if(domains.length){
-            const min = _.min(domains);
-            const max = _.max(domains);
-            const range = max - min;
-            const extra = range * this.padding;
+            if(domains.length){
+                const min = _.min(domains);
+                const max = _.max(domains);
+                const range = max - min;
+                const extra = range * this.padding;
 
-            if(!_.isUndefined(min) && !_.isUndefined(max)){
-                this.basis.domain([max + extra, min - extra]);
-                this.scale.domain([max + extra, min - extra]);
+                if(!_.isUndefined(min) && !_.isUndefined(max)){
+                    this.basis.domain([max + extra, min - extra]);
+                    this.scale.domain([max + extra, min - extra]);
+                    this.emitter.emit('did-rescale', this.scale);
+                }
+            }else{
+                this.basis.domain([100, 0]);
+                this.scale.domain([100, 0]);
                 this.emitter.emit('did-rescale', this.scale);
             }
         }else{
-            this.basis.domain([100, 0]);
-            this.scale.domain([100, 0]);
+            //Apply the transformation to the domain instead
             this.emitter.emit('did-rescale', this.scale);
         }
 

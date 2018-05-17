@@ -12,7 +12,7 @@ const InterfaceConfiguration = {
 };
 
 class ChartPackage {
-    constructor(){
+    initialize(){
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
         this.charts = [];
@@ -20,11 +20,6 @@ class ChartPackage {
         this.pluginsSubscriptions = {};
         this.pluginsOrderMap = {};
         this.omnibar = null;
-
-        this.registerDefaultPlugins();
-    }
-
-    activate(){
         this.disposables.add(via.commands.add('via-workspace, .symbol-explorer .market', 'charts:create-chart', this.create.bind(this)));
 
         this.disposables.add(via.workspace.addOpener((uri, options) => {
@@ -37,6 +32,8 @@ class ChartPackage {
                 return chart;
             }
         }, InterfaceConfiguration));
+
+        this.registerDefaultPlugins();
     }
 
     deserialize(state){
@@ -52,8 +49,7 @@ class ChartPackage {
         e.stopPropagation();
 
         if(e.currentTarget.classList.contains('market')){
-            const market = e.currentTarget.getMarket();
-            via.workspace.open(`${base}/${market.exchange.id}/${market.symbol}`, {});
+            via.workspace.open(`${base}/market/${e.currentTarget.market.uri()}`, {});
         }else{
             via.workspace.open(base);
         }
@@ -69,7 +65,7 @@ class ChartPackage {
     consumeActionBar(actionBar){
         this.omnibar = actionBar.omnibar;
 
-        for(let chart of this.charts){
+        for(const chart of this.charts){
             chart.consumeActionBar(actionBar);
         }
     }
@@ -125,7 +121,7 @@ class ChartPackage {
     }
 
     deactivateAllPlugins(){
-        for(let plugin of this.plugins.values()){
+        for(const plugin of this.plugins.values()){
             this.deactivatePlugin(plugin);
         }
     }
@@ -144,7 +140,7 @@ class ChartPackage {
     }
 
     observePlugins(callback){
-        for(let plugin of this.plugins.values()){
+        for(const plugin of this.plugins.values()){
             callback(plugin);
         }
 
@@ -192,8 +188,8 @@ class ChartPackage {
     }
 
     observeSeries(callback){
-        for(let chart of this.getCharts()){
-            for(let series of chart.getSeries()){
+        for(const chart of this.getCharts()){
+            for(const series of chart.getSeries()){
                 callback({chart, series});
             }
         }

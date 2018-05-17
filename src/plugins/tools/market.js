@@ -21,7 +21,7 @@ class Market {
 
     render(){
         return $.div({classList: 'market toolbar-button', onClick: this.change.bind(this)},
-            this.chart.market ? this.chart.market.title() : 'Select Market'
+            this.chart.market ? this.chart.market.title : 'Select Market'
         );
     }
 
@@ -32,7 +32,7 @@ class Market {
             name: 'Change Chart Market',
             placeholder: 'Search For a Market to Display on the Chart...',
             didConfirmSelection: market => this.chart.changeMarket(market),
-            maxResultsPerCategory: 30,
+            maxResultsPerCategory: 60,
             items: via.markets.all()
         });
     }

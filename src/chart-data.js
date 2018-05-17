@@ -6,8 +6,7 @@ module.exports = class ChartData {
         this.chart = chart;
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
-        this.zoomed = _.throttle(this.request.bind(this), 2000);
-        this.data = null;
+        this.zoomed = _.throttle(this.request.bind(this), 3000);
 
         this.disposables.add(this.chart.onDidChangeMarket(this.reset.bind(this)));
         this.disposables.add(this.chart.onDidChangeGranularity(this.reset.bind(this)));
@@ -16,8 +15,12 @@ module.exports = class ChartData {
     }
 
     clear(){
+        if(this.subscription){
+            this.subscription.dispose();
+            this.subscription = null;
+        }
+
         if(this.data){
-            this.data.destroy();
             this.data = null;
         }
     }
@@ -25,19 +28,17 @@ module.exports = class ChartData {
     reset(){
         this.clear();
 
-        if(!this.chart.market || !this.chart.market.exchange.hasFetchOHLCV) return;
+        if(!this.chart.market) return;
 
-        this.data = this.chart.market.data(this.chart.granularity);
-        this.data.onDidUpdateData(this.didUpdateData.bind(this));
+        this.data = this.chart.market.candles(this.chart.granularity);
+        this.subscription = this.data.subscribe(this.didUpdateData.bind(this));
         this.request();
     }
 
     request(){
         const [start, end] = this.chart.scale.domain();
 
-        if(this.data){
-            this.data.request({start, end});
-        }
+        if(this.data) this.data.request({start, end});
     }
 
     fetch(range){

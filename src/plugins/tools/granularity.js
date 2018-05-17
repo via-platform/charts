@@ -5,6 +5,7 @@ const $ = etch.dom;
 
 const options = {
     6e4: '1 Minute',
+    12e4: '2 Minutes',
     18e4: '3 Minutes',
     3e5: '5 Minutes',
     6e5: '10 Minutes',
@@ -19,11 +20,12 @@ const options = {
     432e5: '12 Hours',
     864e5: '1 Day',
     2592e5: '3 Days',
-    6048e5: '1 Week'
+    6048e5: '7 Days'
 };
 
 const abbreviations = {
     6e4: '1m',
+    12e4: '2m',
     18e4: '3m',
     3e5: '5m',
     6e5: '10m',
@@ -38,7 +40,7 @@ const abbreviations = {
     432e5: '12h',
     864e5: '1D',
     2592e5: '3D',
-    6048e5: '1W'
+    6048e5: '7D'
 };
 
 class Granularity {
@@ -76,14 +78,6 @@ class Granularity {
     didChangeMarket(){
         if(this.chart.market){
             this.element.classList.remove('hide');
-
-            const timeframes = this.chart.market.exchange.timeframes;
-            const valid = _.intersection(Object.keys(options), Object.keys(timeframes));
-
-            if(!valid.indexOf(this.chart.granularity)){
-                //The current granularity is no longer available for this symbol
-
-            }
         }else{
             this.element.classList.add('hide');
         }
@@ -93,15 +87,14 @@ class Granularity {
         if(!this.chart.omnibar) return;
         if(!this.chart.market) return via.beep();
 
-        const timeframes = this.chart.market.exchange.timeframes;
-        const valid = _.intersection(Object.keys(options), Object.keys(timeframes));
-        const items = valid.map(granularity => ({name: options[granularity], granularity}));
+        const timeframes = Object.keys(options);
+        const items = timeframes.map(granularity => ({name: options[granularity], granularity}));
 
         this.chart.omnibar.search({
             name: 'Change Chart Market',
             placeholder: 'Search For a Market to Display on the Chart...',
             didConfirmSelection: option => this.chart.changeGranularity(parseInt(option.granularity)),
-            maxResultsPerCategory: 30,
+            maxResultsPerCategory: 60,
             items
         });
     }
@@ -109,25 +102,23 @@ class Granularity {
     increase(){
         if(!this.chart.market) return via.beep();
 
-        const timeframes = this.chart.market.exchange.timeframes;
-        const valid = _.intersection(Object.keys(options), Object.keys(timeframes));
-        const index = valid.indexOf(this.chart.granularity.toString());
+        const timeframes = Object.keys(options);
+        const index = timeframes.indexOf(this.chart.granularity.toString());
 
-        if(index >= valid.length - 1) return via.beep();
+        if(index >= timeframes.length - 1) return via.beep();
 
-        this.chart.changeGranularity(parseInt(valid[index + 1]));
+        this.chart.changeGranularity(parseInt(timeframes[index + 1]));
     }
 
     decrease(){
         if(!this.chart.market) return via.beep();
 
-        const timeframes = this.chart.market.exchange.timeframes;
-        const valid = _.intersection(Object.keys(options), Object.keys(timeframes));
-        const index = valid.indexOf(this.chart.granularity.toString());
+        const timeframes = Object.keys(options);
+        const index = timeframes.indexOf(this.chart.granularity.toString());
 
         if(!index) return via.beep();
 
-        this.chart.changeGranularity(parseInt(valid[index - 1]));
+        this.chart.changeGranularity(parseInt(timeframes[index - 1]));
     }
 
     destroy(){

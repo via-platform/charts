@@ -19,26 +19,40 @@ module.exports = class ChartPanelValues {
         this.disposables.add(this.panel.onDidRemoveLayer(() => this.update()));
         this.disposables.add(this.panel.onDidModifyLayer(() => this.update()));
 
-        this.disposables.add(this.chart.onDidMouseMove(this.update.bind(this)));
-        this.disposables.add(this.chart.onDidMouseOut(this.update.bind(this)));
+        this.disposables.add(this.chart.onDidMouseMove(this.mousemove.bind(this)));
+        this.disposables.add(this.chart.onDidMouseOut(this.mouseout.bind(this)));
     }
 
     render(){
-        return $.div({classList: 'panel-values'}, this.panel.layers.map(layer => $(ChartPanelValue, {layer, candle: this.candle})));
+        if(this.candle){
+            return $.div({classList: 'panel-values'}, this.panel.layers.map(layer => $(ChartPanelValue, {layer, candle: this.candle})));
+        }else{
+            return $.div({classList: 'panel-values'});
+        }
     }
 
-    update({event} = {}){
-        if(event){
-            let date = event.type === 'mousemove' ? this.chart.scale.invert(event.offsetX) : new Date(Math.floor(Date.now() / this.chart.granularity) * this.chart.granularity);
+    update(){
+        etch.update(this);
+    }
+
+    mousemove({event}){
+        if(this.chart.granularity){
+            let date = this.chart.scale.invert(event.offsetX);
 
             if(date.getTime() > Date.now()){
                 date = new Date(Math.floor(Date.now() / this.chart.granularity) * this.chart.granularity);
             }
 
             this.candle = new Date(Math.round(date.getTime() / this.chart.granularity) * this.chart.granularity);
+            this.update();
         }
+    }
 
-        etch.update(this);
+    mouseout(){
+        if(this.chart.granularity){
+            this.candle = new Date(Math.floor(Date.now() / this.chart.granularity) * this.chart.granularity);
+            this.update();
+        }
     }
 
     destroy(){

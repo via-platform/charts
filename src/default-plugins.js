@@ -11,6 +11,7 @@ const Granularity = require('./plugins/tools/granularity');
 const Draw = require('./plugins/tools/draw');
 
 const Volume = require('./plugins/indicators/volume');
+const Trades = require('./plugins/indicators/trades');
 const RSI = require('./plugins/indicators/rsi');
 // const MACD = require('./plugins/indicators/macd');
 
@@ -40,6 +41,7 @@ module.exports = [
     Draw,
     Type,
     Volume,
+    Trades,
     RSI,
     CurrentValue,
     SMA,

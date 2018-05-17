@@ -7,7 +7,7 @@ const ChartAxis = require('./chart-axis');
 const _ = require('underscore-plus');
 const ChartDefaults = {end: 0, start: Date.now() - 864e5};
 const ChartAreas = 'top left bottom right'.split(' ');
-const BaseURI = 'via://charts';
+const base = 'via://charts';
 
 const abbreviations = {
     6e4: '1m',
@@ -36,7 +36,9 @@ module.exports = class Chart {
     serialize(){
         return {
             deserializer: 'Chart',
-            uri: this.getURI()//,
+            uri: this.getURI(),
+            granularity: this.granularity,
+            transform: this.transform
             // time: this.time,
             // type: this.type,
             // panels: this.panels.serialize(),
@@ -52,20 +54,18 @@ module.exports = class Chart {
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
         this.warnings = [];
-
         this.panels = null;
-
         this.uri = state.uri;
+        this.initialized = false;
 
         this.width = 0;
         this.height = 0;
-        this.transform = d3.zoomIdentity;
-
         this.type = via.config.get('charts.defaultChartType');
+        this.transform = d3.zoomIdentity;
 
         this.padding = 0.2;
         this.bandwidth = 10;
-        this.granularity = 0;
+        this.granularity = state.granularity || 3e5;
         this.precision = 2;
         this.selected = null;
         this.drawing = null;
@@ -91,8 +91,7 @@ module.exports = class Chart {
         this.resizeObserver = new ResizeObserver(this.resize.bind(this));
         this.resizeObserver.observe(this.element);
 
-        this.changeGranularity(state.granularity || 3e5);
-        this.changeMarket(via.markets.findByIdentifier(this.getURI().slice(BaseURI.length + 1)));
+        this.setNextBandTimeout(false);
 
         this.disposables.add(via.commands.add(this.element, {
             'charts:zoom-in': () => this.zoom(2),
@@ -122,6 +121,31 @@ module.exports = class Chart {
                 plugin.instance({chart: this, tools: this});
             }
         });
+
+        this.initialize(state);
+    }
+
+    async initialize(state){
+        await via.markets.initialize();
+
+        const [method, id] = this.uri.slice(base.length + 1).split('/');
+
+        if(method === 'market'){
+            const market = via.markets.uri(id);
+            this.changeMarket(market);
+        }else if(method === 'public'){
+            //TODO fetch state from server
+        }
+
+        if(state.transform){
+            //TODO, the chart doesn't draw immediately when the transform is applied. No clue why.
+            // console.log(this.transform);
+            // this.transform = this.transform.scale(state.transform.k).translate(state.transform.x, state.transform.y);
+            // this.zoomed();
+            // console.log(this.transform);
+        }
+
+        this.initialized = true;
     }
 
     translate(distance){
@@ -245,15 +269,15 @@ module.exports = class Chart {
     }
 
     getURI(){
-        return this.uri;
+        return this.market ? `${base}/market/${this.market.uri()}` : base;
     }
 
     getIdentifier(){
-        return this.getURI().slice(BaseURI.length + 1);
+        return this.getURI().slice(base.length + 1);
     }
 
     getTitle(){
-        return this.market ? `${this.market.name}, ${this.getTypePlugin().title}, ${abbreviations[this.granularity]}` : 'Chart';
+        return this.market ? `${this.market.title}, ${this.getTypePlugin().title}, ${abbreviations[this.granularity]}` : 'Chart';
     }
 
     getType(){
@@ -301,34 +325,30 @@ module.exports = class Chart {
         if(!market || market === this.market) return;
 
         this.market = market;
-        this.precision = this.market.precision.price || 2;
+        this.precision = this.market.precision.price;
         this.emitter.emit('did-change-market', market);
         this.emitter.emit('did-change-title');
     }
 
     changeGranularity(granularity){
-        if(this.market && !this.market.exchange.timeframes.hasOwnProperty(granularity)){
-            return via.beep();
-        }
+        if(this.granularity === granularity) return;
 
-        if(this.granularity !== granularity){
-            this.emitter.emit('will-change-granularity', granularity);
-            this.granularity = granularity;
+        this.emitter.emit('will-change-granularity', granularity);
+        this.granularity = granularity;
 
-            if(via.config.get('charts.resetZoomOnGranularityChange')){
-                this.basis.domain([new Date(Date.now() - (this.granularity || 3e5) * 144), new Date()]);
-                this.transform = d3.zoomIdentity;
-                this.zoomed();
-            }else{
-                this.updateBandwidth();
-            }
-
+        if(via.config.get('charts.resetZoomOnGranularityChange')){
+            this.basis.domain([new Date(Date.now() - (this.granularity || 3e5) * 144), new Date()]);
+            this.transform = d3.zoomIdentity;
+            this.zoomed();
+        }else{
             this.updateBandwidth();
-            this.setNextBandTimeout(false);
-
-            this.emitter.emit('did-change-granularity', granularity);
-            this.emitter.emit('did-change-title');
         }
+
+        this.updateBandwidth();
+        this.setNextBandTimeout(false);
+
+        this.emitter.emit('did-change-granularity', granularity);
+        this.emitter.emit('did-change-title');
     }
 
     changeType(type){
@@ -342,11 +362,11 @@ module.exports = class Chart {
     }
 
     addTool(tool){
-        let element = tool.element;
+        const element = tool.element;
         this.emitter.emit('did-add-tool', tool);
 
         //TODO observe the weight of the tool to put it in the proper order
-        let parent = (tool.location === 'left') ? this.refs.toolsLeft : this.refs.toolsRight;
+        const parent = (tool.location === 'left') ? this.refs.toolsLeft : this.refs.toolsRight;
         parent.appendChild(element);
 
         return new Disposable(() => this.removeTool(tool));
@@ -358,7 +378,7 @@ module.exports = class Chart {
     }
 
     addStudy(params){
-        let study = new ChartStudy(this, params);
+        const study = new ChartStudy(this, params);
         this.studies.push(study);
         this.emitter.emit('did-add-study', study);
     }

@@ -1,9 +1,12 @@
 const {CompositeDisposable, Disposable, d3} = require('via');
 const _ = require('underscore-plus');
+const moment = require('moment');
 const etch = require('etch');
 const $ = etch.dom;
 const AXIS_HEIGHT = 22;
 const FLAG_HEIGHT = AXIS_HEIGHT - 3;
+
+require('moment-duration-format')(moment);
 
 class Measure {
     constructor({chart, element, panel, layer, params}){
@@ -99,6 +102,7 @@ class Measure {
         const value = (this.end.y - this.start.y).toFixed(this.chart.precision);
         const percentage = ((this.end.y - this.start.y) / this.start.y * 100).toFixed(2);
         const bars = (ed.getTime() - sd.getTime()) / this.chart.granularity;
+        const duration = moment.duration(ed.getTime() - sd.getTime(), 'milliseconds').format('d[d], h[h], m[m], s[s]', {largest: 2, trim: 'both'});
 
         this.rect.attr('x', start.x)
             .attr('y', start.y)
@@ -115,7 +119,7 @@ class Measure {
 
         this.text.attr('x', (end.x + start.x) / 2)
             .attr('y', end.y + 6)
-            .text(`${value} (${percentage}%), ${bars} Bars`);
+            .text(`${value} (${percentage}%), ${duration} (${bars} Bars)`);
     }
 
     destroy(){

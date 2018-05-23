@@ -1,7 +1,7 @@
 const {Disposable, CompositeDisposable, Emitter, d3} = require('via');
 const AXIS_HEIGHT = 22;
 const FLAG_HEIGHT = AXIS_HEIGHT - 2;
-const X_FLAG_WIDTH = 124; //TODO resize based on chart granularity
+const X_FLAG_WIDTH = 114;
 
 module.exports = class ChartAxis {
     constructor({chart}){
@@ -19,7 +19,7 @@ module.exports = class ChartAxis {
             .attr('class', 'zoomable')
             .attr('height', AXIS_HEIGHT);
 
-        this.basis = d3.axisBottom(this.chart.scale).tickSizeOuter(0);
+        this.basis = d3.axisBottom(this.chart.scale).tickSizeOuter(0).tickSizeInner(4).tickPadding(4);
         this.axis = this.svg.append('g').attr('class', 'x axis');
 
         this.zoomable.call(d3.zoom().on('zoom', this.zoom()));

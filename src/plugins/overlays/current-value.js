@@ -6,23 +6,23 @@ const AXIS_HEIGHT = 22;
 const FLAG_HEIGHT = AXIS_HEIGHT - 3;
 
 class CurrentValue {
-    constructor({chart, state, element, panel}){
+    constructor({chart}){
         this.disposables = new CompositeDisposable();
         this.chart = chart;
-        this.panel = panel;
-        this.element = element;
+        this.panel = chart.center();
+        this.element = this.panel.svg.append('path').attr('class', 'current-value hide');
 
         this.countdown = false;
         this.timer = null;
 
         this.flag = this.panel.axis.flag();
-        this.flag.classed('current-value-flag', true);
+        this.flag.classed('current-value-flag', true).classed('hide', true);
 
         this.disposables.add(new Disposable(() => this.flag.remove()));
         this.disposables.add(this.panel.onDidDestroy(this.destroy.bind(this)));
         this.disposables.add(this.panel.onDidResize(this.resize.bind(this)));
+        this.disposables.add(this.panel.onDidDraw(this.draw.bind(this)));
 
-        this.element.classed('current-value', true).append('path');
         this.resize();
     }
 
@@ -34,7 +34,7 @@ class CurrentValue {
     }
 
     resize(){
-        this.element.select('path').attr('d', `M 0 0 h ${this.panel.width}`);
+        this.element.attr('d', `M 0 0 h ${this.panel.width}`);
     }
 
     title(){
@@ -63,8 +63,8 @@ class CurrentValue {
 
             this.element.classed('hide', false)
                 .attr('transform', `translate(0, ${Math.round(this.panel.scale(value.close)) - 0.5})`)
-                .select('path')
-                    .attr('class', (value.close >= value.open) ? 'up' : 'down');
+                .classed('up', value.close >= value.open)
+                .classed('down', value.close < value.open);
         }else{
             //TODO This method is insufficient for dealing with non-24-hour symbols, or a halting of trading
             //TODO Hide the current value line because we don't know the current value
@@ -80,7 +80,7 @@ class CurrentValue {
 
 module.exports = {
     name: 'current-value',
-    type: 'overlay',
+    type: 'other',
     settings: {
         selectable: false,
         automatic: true,

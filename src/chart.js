@@ -146,6 +146,7 @@ module.exports = class Chart {
         }
 
         this.initialized = true;
+        this.emitter.emit('did-initialize');
     }
 
     translate(distance){

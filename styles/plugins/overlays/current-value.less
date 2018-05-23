@@ -14,9 +14,9 @@
             text
             {
                 fill: #FFF;
-                font-size: 12px;
+                font-size: 11px;
                 font-weight: 700;
-                font-family: 'Inconsolata';
+                font-family: @font-family-serif;
             }
 
             &.up
@@ -37,24 +37,21 @@
         }
     }
 
-    .panel .layer.current-value
+    .panel path.current-value
     {
-        path
+        stroke: #FFF;
+        fill: transparent;
+        stroke-width: 1px;
+        stroke-dasharray: 2;
+
+        &.up
         {
-            stroke: #FFF;
-            fill: transparent;
-            stroke-width: 1px;
-            stroke-dasharray: 2;
+            stroke: fade(@primary-color-up, 50%);
+        }
 
-            &.up
-            {
-                stroke: fade(@primary-color-up, 50%);
-            }
-
-            &.down
-            {
-                stroke: fade(@primary-color-down, 50%);
-            }
+        &.down
+        {
+            stroke: fade(@primary-color-down, 50%);
         }
     }
 }

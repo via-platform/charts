@@ -5,7 +5,7 @@ const moment = require('moment');
 const $ = etch.dom;
 const AXIS_HEIGHT = 22;
 const FLAG_HEIGHT = AXIS_HEIGHT - 2;
-const X_FLAG_WIDTH = 124;
+const X_FLAG_WIDTH = 114;
 
 class VerticalLine {
     constructor({chart, element, panel, layer, params}){

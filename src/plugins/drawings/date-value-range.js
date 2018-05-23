@@ -6,7 +6,7 @@ const moment = require('moment');
 
 const AXIS_HEIGHT = 22;
 const FLAG_HEIGHT = AXIS_HEIGHT - 3;
-const X_FLAG_WIDTH = 124; //TODO resize based on chart granularity
+const X_FLAG_WIDTH = 114; //TODO resize based on chart granularity
 
 class DateValueRange {
     constructor({chart, element, panel, layer, params}){
@@ -146,6 +146,7 @@ class DateValueRange {
         const value = (this.end.y - this.start.y).toFixed(this.chart.precision);
         const percentage = ((this.end.y - this.start.y) / this.start.y * 100).toFixed(2);
         const bars = (ed.getTime() - sd.getTime()) / this.chart.granularity;
+        const duration = moment.duration(ed.getTime() - sd.getTime(), 'milliseconds').format('d[d], h[h], m[m], s[s]', {largest: 2, trim: 'both'});
         const selected = this.layer.isSelected();
         const hidden = !selected;
 
@@ -172,7 +173,7 @@ class DateValueRange {
 
         this.text.attr('x', (end.x + start.x) / 2)
             .attr('y', end.y + 6)
-            .text(`${value} (${percentage}%), ${bars} Bars`);
+            .text(`${value} (${percentage}%), ${duration} (${bars} Bars)`);
 
         this.flag.start.x.attr('transform', `translate(${start.x}, 0)`).select('text').text(moment(sd).format('YYYY-MM-DD HH:mm:ss'));
         this.flag.end.x.attr('transform', `translate(${end.x - X_FLAG_WIDTH}, 0)`).select('text').text(moment(ed).format('YYYY-MM-DD HH:mm:ss'));

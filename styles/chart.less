@@ -31,7 +31,7 @@
 @chart-tools-height: 24px;
 @chart-panel-border-width: 1px;
 @chart-panel-border-color: @header-border-color;
-@chart-panel-background-color: @pane-background-color;
+@chart-panel-background-color: #282828;//@pane-background-color;
 
 .chart
 {
@@ -67,23 +67,18 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-        background: @header-background-color;
+        background: @chart-panel-background-color;
 
         .panel
         {
             display: flex;
             flex: 1;
             overflow: hidden;
-            border-top: @chart-panel-border-width solid @chart-panel-border-color;
+            // border-top: @chart-panel-border-width solid @chart-panel-border-color;
             border-bottom: @chart-panel-border-width solid @chart-panel-border-color;
             position: relative;
-            margin-bottom: 3px;
+            // margin-bottom: 3px;
             background: @chart-panel-background-color;
-
-            &:first-child
-            {
-                border-top: 0;
-            }
 
             &.center
             {
@@ -114,8 +109,8 @@
             .panel-values
             {
                 position: absolute;
-                top: 10px;
-                left: 10px;
+                top: 4px;
+                left: 8px;
                 z-index: 2;
 
                 .panel-value
@@ -138,11 +133,9 @@
 
                     span
                     {
-                        font-family: 'Inconsolata';
-                        font-size: 12px;
+                        font-size: 11px;
                         margin: 0 6px;
-                        font-weight: 700;
-                        color: #FFF;
+                        color: @text-color;
 
                         &.up
                         {
@@ -234,6 +227,10 @@
         line
         {
             stroke: fade(@header-border-color, 50%);
+            // stroke: @header-border-color;
+            // stroke: fade(@text-color-subtle, 20%);
+            // stroke: fade(@text-color-subtle, 0%);
+            // stroke-dasharray: 5, 15;
         }
 
         path
@@ -254,13 +251,15 @@
 
         line
         {
-            stroke: @header-border-color;
+            stroke: fade(@text-color-subtle, 40%);
+            // stroke: @header-border-color;
         }
 
         text
         {
+            -webkit-font-smoothing: auto;
             fill: @text-color-subtle;
-            font-weight: 700;
+            // font-weight: 500;
             font-size: 10px;
         }
     }
@@ -271,6 +270,11 @@
         {
             height: 22px;
             background: @header-background-color;
+        }
+
+        &.y
+        {
+            border-left: 1px solid @header-border-color;
         }
     }
 

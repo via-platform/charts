@@ -4,7 +4,7 @@ const moment = require('moment');
 
 const AXIS_HEIGHT = 22;
 const FLAG_HEIGHT = AXIS_HEIGHT - 3;
-const X_FLAG_WIDTH = 124; //TODO resize based on chart granularity
+const X_FLAG_WIDTH = 114;
 
 class Crosshair {
     constructor({chart}){

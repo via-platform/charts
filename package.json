@@ -28,7 +28,7 @@
     "defaultChartType": {
       "type": "string",
       "default": "candlestick",
-      "description": "The default chart type for when a new chart window is opened.",
+      "description": "The default chart type when a new chart window is opened.",
       "enum": [
         {
           "value": "candlestick",
@@ -50,6 +50,29 @@
           "value": "heikin-ashi",
           "description": "Heikin-Ashi Candlesticks"
         }
+      ]
+    },
+    "defaultChartGranularity": {
+      "type": "integer",
+      "default": 3e5,
+      "description": "The default chart granularity when a new chart window is opened.",
+      "enum": [
+        {"value": 6e4, "description": "1 Minute"},
+        {"value": 18e4, "description": "3 Minutes"},
+        {"value": 3e5, "description": "5 Minutes"},
+        {"value": 6e5, "description": "10 Minutes"},
+        {"value": 9e5, "description": "15 Minutes"},
+        {"value": 18e5, "description": "30 Minutes"},
+        {"value": 36e5, "description": "1 Hour"},
+        {"value": 72e5, "description": "2 Hours"},
+        {"value": 108e5, "description": "3 Hours"},
+        {"value": 144e5, "description": "4 Hours"},
+        {"value": 216e5, "description": "6 Hours"},
+        {"value": 288e5, "description": "8 Hours"},
+        {"value": 432e5, "description": "12 Hours"},
+        {"value": 864e5, "description": "1 Day"},
+        {"value": 2592e5, "description": "3 Days"},
+        {"value": 6048e5, "description": "1 Week"}
       ]
     },
     "resetZoomOnGranularityChange": {

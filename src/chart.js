@@ -65,12 +65,12 @@ module.exports = class Chart {
 
         this.padding = 0.2;
         this.bandwidth = 10;
-        this.granularity = state.granularity || 3e5;
+        this.granularity = state.granularity || via.config.get('charts.defaultChartGranularity');
         this.precision = 2;
         this.selected = null;
         this.drawing = null;
 
-        this.basis = d3.scaleTime().domain([new Date(Date.now() - (state.granularity || 3e5) * 144), new Date()]);
+        this.basis = d3.scaleTime().domain([new Date(Date.now() - this.granularity * 144), new Date()]);
         this.scale = this.basis.copy();
 
         this.element = document.createElement('div');

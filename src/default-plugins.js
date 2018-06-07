@@ -19,6 +19,7 @@ const CurrentValue = require('./plugins/overlays/current-value');
 const SMA = require('./plugins/overlays/sma');
 const EMA = require('./plugins/overlays/ema');
 const BollingerBands = require('./plugins/overlays/bollinger-bands');
+const BidAsk = require('./plugins/overlays/bid-ask');
 // const IchimokuCloud = require('./plugins/overlays/ichimoku-cloud');
 
 const Crosshair = require('./plugins/other/crosshair');
@@ -48,6 +49,7 @@ module.exports = [
     // EMA,
     Granularity,
     BollingerBands,
+    BidAsk,
     // IchimokuCloud,
     // MACD
     Crosshair,

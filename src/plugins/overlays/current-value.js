@@ -49,10 +49,10 @@ class CurrentValue {
     draw(){
         const candle = new Date(Math.floor(Date.now() / this.chart.granularity) * this.chart.granularity);
         const value = _.first(this.chart.data.fetch({start: candle, end: candle}));
-        const aggregation = this.chart.market ? this.chart.market.precision.price : 2;
+        const precision = this.chart.market ? this.chart.market.precision.price : 8;
 
         if(value){
-            this.last = value.close.toFixed(aggregation);
+            this.last = value.close.toFixed(precision);
 
             this.flag.classed('hide', false)
                 .classed('up', (value.close >= value.open))

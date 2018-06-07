@@ -1,0 +1,45 @@
+@import "variables";
+
+.chart .panel .layer.bid-ask
+{
+    path
+    {
+        stroke: #FFF;
+        fill: transparent;
+        stroke-width: 1px;
+        opacity: 0.5;
+    }
+
+    text
+    {
+        font-size: 11px;
+        font-weight: 700;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .bid
+    {
+        path
+        {
+            stroke: @primary-color-up;
+        }
+
+        text
+        {
+            fill: @primary-color-up;
+        }
+    }
+
+    .ask
+    {
+        path
+        {
+            stroke: @primary-color-down;
+        }
+
+        text
+        {
+            fill: @primary-color-down;
+        }
+    }
+}

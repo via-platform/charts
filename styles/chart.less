@@ -27,7 +27,11 @@
 @import "plugins/drawings/vertical-line";
 @import "plugins/drawings/measure";
 @import "plugins/drawings/date-value-range";
-@import "plugins/drawings/circle";
+@import "plugins/drawings/ellipse";
+@import "plugins/drawings/rectangle";
+@import "plugins/drawings/rotated-rectangle";
+@import "plugins/drawings/arbitrary-line";
+@import "plugins/drawings/fibonacci-retracement";
 
 @chart-tools-height: 24px;
 @chart-panel-border-width: 1px;
@@ -125,11 +129,13 @@
                     height: 20px;
                     cursor: default;
                     user-select: none;
+                    pointer-events: none;
 
                     .title
                     {
                         margin-right: 12px;
                         color: #FFF;
+                        pointer-events: all;
                     }
 
                     span

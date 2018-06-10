@@ -101,6 +101,8 @@ module.exports = class ChartPanel {
         if(!this.layers.length && !this.isCenter){
             this.remove();
         }
+
+        this.draw();
     }
 
     sortLayers(){

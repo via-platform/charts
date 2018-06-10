@@ -1,0 +1,67 @@
+@import "variables";
+
+.chart
+{
+    .chart-axis
+    {
+        .rectangle-range
+        {
+            rect
+            {
+                fill: fade(@primary-color, 20%);
+            }
+        }
+
+        .rectangle-flag
+        {
+            rect
+            {
+                fill: @primary-color;
+            }
+
+            text
+            {
+                fill: @text-color;
+                font-size: 11px;
+                font-weight: 700;
+                font-family: @font-family-serif;
+            }
+        }
+    }
+
+    .panel .layer.rectangle
+    {
+        .selection
+        {
+            fill: fade(@primary-color, 15%);
+            stroke: @primary-color;
+            stroke-width: 1.5;
+        }
+
+        .background
+        {
+            fill: transparent;
+        }
+
+        text
+        {
+            fill: #FFF;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .handle
+        {
+            display: none;
+            pointer-events: none;
+        }
+
+        &.selected
+        {
+            .handle
+            {
+                display: block;
+            }
+        }
+    }
+}

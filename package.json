@@ -75,6 +75,10 @@
         {"value": 6048e5, "description": "1 Week"}
       ]
     },
+    "showCurrentValueLine": {
+      "type": "boolean",
+      "default": true
+    },
     "resetZoomOnGranularityChange": {
       "title": "Reset Zoom On Granularity Change",
       "type": "boolean",

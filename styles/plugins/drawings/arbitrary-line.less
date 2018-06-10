@@ -1,0 +1,65 @@
+@import "variables";
+
+.chart
+{
+    .chart-axis
+    {
+        .arbitrary-line-range
+        {
+            rect
+            {
+                fill: fade(@primary-color, 20%);
+            }
+        }
+
+        .arbitrary-line-flag
+        {
+            rect
+            {
+                fill: @primary-color;
+            }
+
+            text
+            {
+                fill: @text-color;
+                font-size: 11px;
+                font-weight: 700;
+                font-family: @font-family-serif;
+            }
+        }
+    }
+
+    .panel .layer.arbitrary-line
+    {
+        path.selection
+        {
+            stroke: @primary-color;
+            stroke-width: 1.5;
+        }
+
+        path.target
+        {
+            stroke: rgba(0, 0, 0, 0);
+            stroke-width: 8px;
+        }
+
+        .background
+        {
+            fill: transparent;
+        }
+
+        .handle
+        {
+            display: none;
+            pointer-events: none;
+        }
+
+        &.selected
+        {
+            .handle
+            {
+                display: block;
+            }
+        }
+    }
+}

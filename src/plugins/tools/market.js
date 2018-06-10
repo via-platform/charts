@@ -31,9 +31,9 @@ class Market {
         this.chart.omnibar.search({
             name: 'Change Chart Market',
             placeholder: 'Search For a Market to Display on the Chart...',
-            didConfirmSelection: market => this.chart.changeMarket(market),
+            didConfirmSelection: selection => this.chart.changeMarket(selection.market),
             maxResultsPerCategory: 60,
-            items: via.markets.all()
+            items: via.markets.all().filter(m => m.active && m.type === 'SPOT').map(m => ({name: m.title, description: m.description, market: m}))
         });
     }
 

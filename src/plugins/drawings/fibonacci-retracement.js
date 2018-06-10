@@ -1,9 +1,15 @@
 const {CompositeDisposable, Disposable, d3} = require('via');
 const _ = require('underscore-plus');
+const moment = require('moment');
 const etch = require('etch');
 const $ = etch.dom;
 
-class Circle {
+const AXIS_HEIGHT = 22;
+const FLAG_HEIGHT = AXIS_HEIGHT - 3;
+const X_FLAG_WIDTH = 114;
+const FibonacciLevels = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.618, 2.618, 3.618, 4.236];
+
+class FibonacciRetracement {
     constructor({chart, element, panel, layer, params}){
         this.disposables = new CompositeDisposable();
         this.working = new CompositeDisposable();
@@ -12,15 +18,16 @@ class Circle {
         this.layer = layer;
         this.start = {x: this.chart.scale.invert(event.offsetX), y: this.panel.scale.invert(event.offsetY)};
         this.end = _.clone(this.start);
-        this.chart.select(this.layer);
-        this.radius = 0;
         this.done = false;
 
         this.element = element;
-        this.element.classed('circle', true);
+        this.element.classed('fibonacci-retracement', true);
 
         this.background = this.element.append('rect').attr('x', 0).attr('y', 0).attr('class', 'background');
-        this.circle = this.element.append('circle').attr('class', 'selection');
+        this.direction = this.element.append('path').attr('class', 'direction');
+        this.boxes = this.element.append('g').attr('class', 'boxes');
+        this.lines = this.element.append('g').attr('class', 'lines');
+        this.labels = this.element.append('g').attr('class', 'labels');
 
         this.working.add(this.chart.onDidClick(this.click.bind(this)));
         this.working.add(this.chart.onDidMouseMove(this.mousemove.bind(this)));
@@ -28,13 +35,42 @@ class Circle {
         this.working.add(this.chart.onDidCancel(() => this.panel.removeLayer(this.layer)));
         this.working.add(new Disposable(() => this.background.remove()));
 
-        this.handle = {
-            top: this.element.append('circle').attr('r', 5).classed('handle', true),
-            right: this.element.append('circle').attr('r', 5).classed('handle', true),
-            bottom: this.element.append('circle').attr('r', 5).classed('handle', true),
-            left: this.element.append('circle').attr('r', 5).classed('handle', true),
-            center: this.element.append('circle').attr('r', 5).classed('handle', true)
+        this.range = {
+            x: this.chart.axis.range(),
+            y: this.panel.axis.range()
         };
+
+        this.flag = {
+            start: {
+                x: this.chart.axis.flag(),
+                y: this.panel.axis.flag()
+            },
+            end: {
+                x: this.chart.axis.flag(),
+                y: this.panel.axis.flag()
+            }
+        };
+
+        this.handle = {
+            start: this.element.append('circle').attr('r', 5).classed('handle', true),
+            end: this.element.append('circle').attr('r', 5).classed('handle', true)
+        };
+
+        this.range.x.classed('fibonacci-retracement-range', true);
+        this.range.y.classed('fibonacci-retracement-range', true);
+        this.flag.start.x.classed('fibonacci-retracement-flag', true);
+        this.flag.start.y.classed('fibonacci-retracement-flag', true);
+        this.flag.end.x.classed('fibonacci-retracement-flag', true);
+        this.flag.end.y.classed('fibonacci-retracement-flag', true);
+
+        this.disposables.add(new Disposable(() => {
+            this.range.x.remove();
+            this.range.y.remove();
+            this.flag.start.x.remove();
+            this.flag.start.y.remove();
+            this.flag.end.x.remove();
+            this.flag.end.y.remove();
+        }));
 
         this.disposables.add(this.panel.onDidDestroy(this.destroy.bind(this)));
         this.disposables.add(this.panel.onDidResize(this.resize.bind(this)));
@@ -66,9 +102,10 @@ class Circle {
 
         this.end = {x: this.chart.scale.invert(event.offsetX), y: this.panel.scale.invert(event.offsetY)};
         this.working.dispose();
+        this.working = null;
         this.done = true;
+        this.chart.done();
         this.element.on('click', this.select());
-        this.chart.select(this.layer);
         this.draw();
     }
 
@@ -106,12 +143,39 @@ class Circle {
             y: Math.max(sy, ey)
         };
 
-        const value = (this.end.y - this.start.y).toFixed(this.chart.precision);
-        const percentage = ((this.end.y - this.start.y) / this.start.y * 100).toFixed(2);
-        const bars = (ed.getTime() - sd.getTime()) / this.chart.granularity;
         const selected = this.layer.isSelected();
         const hidden = !selected;
+        const difference = end.y - start.y;
 
+        const boxes = this.boxes.selectAll('rect').data(FibonacciLevels.slice(1));
+
+        boxes.enter()
+                .append('rect')
+            .merge(boxes)
+                .attr('x', start.x)
+                .attr('y', (d, i) => start.y + FibonacciLevels[i] * difference)
+                .attr('width', end.x - start.x)
+                .attr('height', (d, i) => (d - FibonacciLevels[i]) * difference);
+
+        const lines = this.lines.selectAll('path').data(FibonacciLevels);
+
+        lines.enter()
+                .append('path')
+            .merge(lines)
+                .attr('d', (d, i) => `M ${start.x} ${Math.floor(start.y + FibonacciLevels[i] * difference) - 0.5} h ${end.x - start.x}`);
+
+        const labels = this.labels.selectAll('text').data(FibonacciLevels);
+
+        labels.enter()
+                .append('text')
+            .merge(labels)
+                .attr('alignment-baseline', 'middle')
+                .attr('text-anchor', 'end')
+                .attr('x', start.x - 5)
+                .attr('y', (d, i) => Math.floor(start.y + FibonacciLevels[i] * difference))
+                .text(d => `${d} (${this.panel.scale.invert(start.y + d * difference).toFixed(this.chart.precision)})`)
+
+        this.direction.attr('d', `M ${sx} ${sy} L ${ex} ${ey}`)
         this.element.classed('selected', selected);
         this.range.x.classed('hidden', hidden);
         this.range.y.classed('hidden', hidden);
@@ -120,11 +184,6 @@ class Circle {
         this.flag.end.x.classed('hidden', hidden);
         this.flag.end.y.classed('hidden', hidden);
 
-        this.rect.attr('x', start.x)
-            .attr('y', start.y)
-            .attr('width', end.x - start.x)
-            .attr('height', end.y - start.y);
-
         this.range.x.select('rect')
             .attr('x', start.x)
             .attr('width', end.x - start.x);
@@ -132,10 +191,6 @@ class Circle {
         this.range.y.select('rect')
             .attr('y', start.y)
             .attr('height', end.y - start.y);
-
-        this.text.attr('x', (end.x + start.x) / 2)
-            .attr('y', end.y + 6)
-            .text(`${value} (${percentage}%), ${bars} Bars`);
 
         this.flag.start.x.attr('transform', `translate(${start.x}, 0)`).select('text').text(moment(sd).format('YYYY-MM-DD HH:mm:ss'));
         this.flag.end.x.attr('transform', `translate(${end.x - X_FLAG_WIDTH}, 0)`).select('text').text(moment(ed).format('YYYY-MM-DD HH:mm:ss'));
@@ -148,16 +203,17 @@ class Circle {
     }
 
     destroy(){
+        if(this.working) this.working.dispose();
         this.disposables.dispose();
     }
 }
 
 module.exports = {
-    name: 'circle',
+    name: 'fibonacci-retracement',
     type: 'drawing',
     settings: {},
-    title: 'Circle',
-    description: 'Draw a circle on the chart.',
+    title: 'Fibonacci Retracement',
+    description: 'Draw a Fibonacci Retracement on the chart.',
     selectable: true,
-    instance: params => new Circle(params)
+    instance: params => new FibonacciRetracement(params)
 };

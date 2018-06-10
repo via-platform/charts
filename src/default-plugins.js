@@ -29,7 +29,11 @@ const HorizontalLine = require('./plugins/drawings/horizontal-line');
 const VerticalLine = require('./plugins/drawings/vertical-line');
 const Measure = require('./plugins/drawings/measure');
 const DateValueRange = require('./plugins/drawings/date-value-range');
-// const Circle = require('./plugins/drawings/circle');
+const Ellipse = require('./plugins/drawings/ellipse');
+const Rectangle = require('./plugins/drawings/rectangle');
+// const RotatedRectangle = require('./plugins/drawings/rotated-rectangle');
+const ArbitraryLine = require('./plugins/drawings/arbitrary-line');
+const FibonacciRetracement = require('./plugins/drawings/fibonacci-retracement');
 
 module.exports = [
     Candlestick,
@@ -57,6 +61,10 @@ module.exports = [
     HorizontalLine,
     VerticalLine,
     Measure,
-    DateValueRange//,
-    // Circle
+    DateValueRange,
+    Ellipse,
+    Rectangle,
+    // RotatedRectangle,
+    ArbitraryLine,
+    FibonacciRetracement
 ];

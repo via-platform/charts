@@ -44,8 +44,8 @@ class Candlestick {
     }
 
     domain(){
-        let [start, end] = this.chart.scale.domain();
-        let data = this.chart.data.fetch({start, end});
+        const [start, end] = this.chart.scale.domain();
+        const data = this.chart.data.fetch({start, end});
 
         if(data.length){
             return [ _.min(data.map(d => d.low)), _.max(data.map(d => d.high)) ];
@@ -53,28 +53,20 @@ class Candlestick {
     }
 
     draw(){
-        let [start, end] = this.chart.scale.domain();
-        let data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
+        const [start, end] = this.chart.scale.domain();
+        const data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
 
-        let body = this.element.selectAll('path.candle.body')
-            .data(data, d => d.date.getTime())
-            .attr('class', d => (d.open > d.close) ? 'candle body down' : 'candle body up')
-            .attr('d', this.body);
+        const body = this.element.selectAll('path.candle.body').data(data, d => d.date.getTime());
 
-        body.enter()
-            .append('path')
+        body.enter().append('path').merge(body)
             .attr('d', this.body)
             .attr('class', d => (d.open > d.close) ? 'candle body down' : 'candle body up');
 
         body.exit().remove();
 
-        let wick = this.element.selectAll('path.candle.wick')
-            .data(data, d => d.date.getTime())
-            .attr('class', d => (d.open > d.close) ? 'candle wick down' : 'candle wick up')
-            .attr('d', this.wick);
+        const wick = this.element.selectAll('path.candle.wick').data(data, d => d.date.getTime());
 
-        wick.enter()
-            .append('path')
+        wick.enter().append('path').merge(wick)
             .attr('class', d => (d.open > d.close) ? 'candle wick down' : 'candle wick up')
             .attr('d', this.wick);
 
@@ -86,8 +78,8 @@ class Candlestick {
     }
 
     body(d){
-        let width = Math.min(this.chart.bandwidth - 2, Math.floor(this.chart.bandwidth * (1 - this.padding) - 1));
-        let x = this.chart.scale(d.date) - width / 2;
+        const width = Math.min(this.chart.bandwidth - 2, Math.floor(this.chart.bandwidth * (1 - this.padding) - 1));
+        const x = this.chart.scale(d.date) - width / 2;
         let open = this.panel.scale(d.open);
         let close = this.panel.scale(d.close);
 
@@ -103,7 +95,7 @@ class Candlestick {
     }
 
     wick(d){
-        let x = Math.round(this.chart.scale(d.date)),
+        const x = Math.round(this.chart.scale(d.date)),
             open = this.panel.scale(d.open),
             close = this.panel.scale(d.close),
             high = this.panel.scale(d.high),

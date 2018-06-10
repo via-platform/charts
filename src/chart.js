@@ -99,11 +99,15 @@ module.exports = class Chart {
             'core:move-left': () => this.translate(100),
             'core:move-right': () => this.translate(-100),
             'core:delete': () => {
+                this.cancel();
+
                 if(this.selected){
                     this.selected.remove();
                 }
             },
             'core:backspace': () => {
+                this.cancel();
+
                 if(this.selected){
                     this.selected.remove();
                 }
@@ -190,11 +194,16 @@ module.exports = class Chart {
     }
 
     click(params){
-        this.unselect();
+        if(!this.drawing){
+            this.unselect();
+        }
+
         this.emitter.emit('did-click', params);
     }
 
     select(layer){
+        if(this.drawing) return;
+
         this.cancel();
 
         if(this.selected){
@@ -213,15 +222,32 @@ module.exports = class Chart {
     }
 
     draw(plugin){
-        this.drawing = this.emitter.once('did-click', ({event, target}) => target.addLayer(plugin, event));
+        this.drawing = this.emitter.once('did-click', ({event, target}) => {
+            const layer = target.addLayer(plugin, event);
+
+            if(this.selected){
+                this.unselect();
+            }
+
+            this.selected = layer;
+            this.emitter.emit('did-select', layer);
+        });
     }
 
     cancel(){
         if(this.drawing){
             this.drawing.dispose();
+            this.drawing = null;
         }
 
         this.emitter.emit('did-cancel');
+    }
+
+    done(){
+        if(this.drawing){
+            this.drawing.dispose();
+            this.drawing = null;
+        }
     }
 
     resize(){

@@ -22,6 +22,7 @@ class CurrentValue {
         this.disposables.add(this.panel.onDidDestroy(this.destroy.bind(this)));
         this.disposables.add(this.panel.onDidResize(this.resize.bind(this)));
         this.disposables.add(this.panel.onDidDraw(this.draw.bind(this)));
+        this.disposables.add(via.config.observe('charts.showCurrentValueLine', this.draw.bind(this)));
 
         this.resize();
     }

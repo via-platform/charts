@@ -5,42 +5,36 @@ const $ = etch.dom;
 
 const options = {
     6e4: '1 Minute',
-    12e4: '2 Minutes',
     18e4: '3 Minutes',
     3e5: '5 Minutes',
-    6e5: '10 Minutes',
     9e5: '15 Minutes',
     18e5: '30 Minutes',
     36e5: '1 Hour',
     72e5: '2 Hours',
-    108e5: '3 Hours',
     144e5: '4 Hours',
-    216e5: '6 Hours',
     288e5: '8 Hours',
     432e5: '12 Hours',
     864e5: '1 Day',
-    2592e5: '3 Days',
-    6048e5: '7 Days'
+    1728e5: '2 Days',
+    6048e5: '7 Days',
+    864e6: '10 Days'
 };
 
 const abbreviations = {
     6e4: '1m',
-    12e4: '2m',
     18e4: '3m',
     3e5: '5m',
-    6e5: '10m',
     9e5: '15m',
     18e5: '30m',
     36e5: '1h',
     72e5: '2h',
-    108e5: '3h',
     144e5: '4h',
-    216e5: '6h',
     288e5: '8h',
     432e5: '12h',
-    864e5: '1D',
-    2592e5: '3D',
-    6048e5: '7D'
+    864e5: '1d',
+    1728e5: '2d',
+    6048e5: '7d',
+    864e6: '10d'
 };
 
 class Granularity {

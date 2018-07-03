@@ -70,10 +70,6 @@
           "description": "5 Minutes"
         },
         {
-          "value": 600000,
-          "description": "10 Minutes"
-        },
-        {
           "value": 900000,
           "description": "15 Minutes"
         },
@@ -90,16 +86,8 @@
           "description": "2 Hours"
         },
         {
-          "value": 10800000,
-          "description": "3 Hours"
-        },
-        {
           "value": 14400000,
           "description": "4 Hours"
-        },
-        {
-          "value": 21600000,
-          "description": "6 Hours"
         },
         {
           "value": 28800000,
@@ -114,12 +102,16 @@
           "description": "1 Day"
         },
         {
-          "value": 259200000,
-          "description": "3 Days"
+          "value": 172800000,
+          "description": "2 Days"
         },
         {
           "value": 604800000,
-          "description": "1 Week"
+          "description": "7 Days"
+        },
+        {
+          "value": 864000000,
+          "description": "10 Days"
         }
       ]
     },

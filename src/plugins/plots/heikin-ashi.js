@@ -47,7 +47,7 @@ class HeikinAshi {
 
     domain(){
         let [start, end] = this.chart.scale.domain();
-        let data = this.chart.data.fetch({start, end});
+        let data = this.chart.data.fetch({start, end}).filter(candle => candle.close);
 
         if(data.length){
             return [ _.min(data.map(d => d.low)), _.max(data.map(d => d.high)) ];
@@ -59,7 +59,7 @@ class HeikinAshi {
 
         start.setTime(start.getTime() - this.chart.granularity);
 
-        let data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
+        let data = this.chart.data.fetch({start, end}).filter(candle => candle.trades_count).sort((a, b) => a.date - b.date);
         this.candles = [];
 
         if(!data.length){

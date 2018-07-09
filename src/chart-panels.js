@@ -46,7 +46,7 @@ module.exports = class ChartPanels {
     }
 
     removePanel(panel){
-        this.panels.splice(this.panels.indexOf(panel));
+        this.panels.splice(this.panels.indexOf(panel), 1);
         this.offsets.delete(panel);
         this.emitter.emit('did-remove-panel', panel);
         panel.destroy();

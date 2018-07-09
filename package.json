@@ -19,7 +19,7 @@
     "underscore-plus": "^1.6.6"
   },
   "engines": {
-    "via": "*"
+    "via": "^0.9.1-alpha"
   },
   "deserializers": {
     "Chart": "deserialize"

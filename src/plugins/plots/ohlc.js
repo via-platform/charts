@@ -58,7 +58,7 @@ class OHLC {
 
     domain(){
         let [start, end] = this.chart.scale.domain();
-        let data = this.chart.data.fetch({start, end});
+        let data = this.chart.data.fetch({start, end}).filter(candle => candle.close);
 
         if(data.length){
             return [ _.min(data.map(d => d.low)), _.max(data.map(d => d.high)) ];
@@ -67,7 +67,7 @@ class OHLC {
 
     draw(){
         let [start, end] = this.chart.scale.domain();
-        let data = this.chart.data.fetch({start, end});
+        let data = this.chart.data.fetch({start, end}).filter(candle => candle.close);
 
         let bar = this.element.selectAll('path.bar')
             .data(data, d => d.date.getTime())

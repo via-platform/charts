@@ -45,7 +45,7 @@ class Candlestick {
 
     domain(){
         const [start, end] = this.chart.scale.domain();
-        const data = this.chart.data.fetch({start, end});
+        const data = this.chart.data.fetch({start, end}).filter(candle => candle.close);
 
         if(data.length){
             return [ _.min(data.map(d => d.low)), _.max(data.map(d => d.high)) ];
@@ -54,21 +54,37 @@ class Candlestick {
 
     draw(){
         const [start, end] = this.chart.scale.domain();
-        const data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
+        const data = this.chart.data.fetch({start, end}).filter(candle => candle.close).sort((a, b) => a.date - b.date);
 
         const body = this.element.selectAll('path.candle.body').data(data, d => d.date.getTime());
 
         body.enter().append('path').merge(body)
             .attr('d', this.body)
-            .attr('class', d => (d.open > d.close) ? 'candle body down' : 'candle body up');
+            .attr('class', d => {
+                if(d.trades_count === 0){
+                    return 'candle body empty';
+                }else if(d.open === d.close){
+                    return 'candle body unchanged';
+                }else{
+                    return (d.open > d.close) ? 'candle body down' : 'candle body up';
+                }
+            });
 
         body.exit().remove();
 
         const wick = this.element.selectAll('path.candle.wick').data(data, d => d.date.getTime());
 
         wick.enter().append('path').merge(wick)
-            .attr('class', d => (d.open > d.close) ? 'candle wick down' : 'candle wick up')
-            .attr('d', this.wick);
+            .attr('d', this.wick)
+            .attr('class', d => {
+                if(d.trades_count === 0){
+                    return 'candle wick empty';
+                }else if(d.open === d.close){
+                    return 'candle wick unchanged';
+                }else{
+                    return (d.open > d.close) ? 'candle wick down' : 'candle wick up';
+                }
+            });
 
         wick.exit().remove();
     }

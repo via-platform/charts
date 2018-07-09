@@ -7,7 +7,7 @@
         // stroke: #000000;
     }
 
-    path.candle.up
+    path.candle.up, path.candle.unchanged
     {
         fill: @primary-color-up;
         stroke: @primary-color-up;
@@ -17,6 +17,18 @@
     {
         fill: @primary-color-down;
         stroke: @primary-color-down;
+    }
+
+    // path.candle.unchanged
+    // {
+    //     fill: @text-color;
+    //     stroke: @text-color;
+    // }
+
+    path.candle.empty
+    {
+        fill: @text-color-subtle;
+        stroke: @text-color-subtle;
     }
 
     path.candle.body

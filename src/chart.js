@@ -92,6 +92,12 @@ module.exports = class Chart {
         this.resizeObserver.observe(this.element);
 
         this.setNextBandTimeout(false);
+        
+        this.disposables.add(new Disposable(() => {
+            if(this.bandTimeout){
+                clearTimeout(this.bandTimeout);
+            }
+        }));
 
         this.disposables.add(via.commands.add(this.element, {
             'charts:zoom-in': () => this.zoom(2),

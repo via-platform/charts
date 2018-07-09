@@ -47,8 +47,8 @@ class Area {
     }
 
     domain(){
-        let [start, end] = this.chart.scale.domain();
-        let data = this.chart.data.fetch({start, end});
+        const [start, end] = this.chart.scale.domain();
+        const data = this.chart.data.fetch({start, end}).filter(candle => candle.close);
 
         if(data.length){
             return [ _.min(data.map(d => d.low)), _.max(data.map(d => d.high)) ];
@@ -56,12 +56,12 @@ class Area {
     }
 
     draw(){
-        let [start, end] = this.chart.scale.domain();
+        const [start, end] = this.chart.scale.domain();
 
         start.setTime(start.getTime() - this.chart.granularity);
         end.setTime(end.getTime() + this.chart.granularity);
 
-        let data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
+        const data = this.chart.data.fetch({start, end}).filter(candle => candle.close).sort((a, b) => a.date - b.date);
 
         this.element.selectAll('path').remove();
 

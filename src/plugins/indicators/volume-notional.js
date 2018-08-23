@@ -3,7 +3,7 @@ const _ = require('underscore-plus');
 const etch = require('etch');
 const $ = etch.dom;
 
-class Volume {
+class VolumeNotional {
     constructor({chart, state, element, panel}){
         this.disposables = new CompositeDisposable();
         this.chart = chart;
@@ -11,7 +11,7 @@ class Volume {
         this.element = element;
         this.padding = 0.6;
 
-        this.element.classed('volume', true);
+        this.element.classed('volume-notional', true);
 
         this.body = this.body.bind(this);
     }
@@ -19,23 +19,23 @@ class Volume {
     serialize(){
         return {
             version: 1,
-            name: 'volume'
+            name: 'volume-notional'
         };
     }
 
     title(){
-        return `Trading Volume`;
+        return `Notional Volume`;
     }
 
     value(band){
         const data = _.first(this.chart.data.fetch({start: band, end: band})) || {};
-        const aggregation = this.chart.market ? this.chart.market.precision.amount : 2;
-        const value = (_.isUndefined(data) || _.isUndefined(data.volume_traded)) ? '-' : data.volume_traded.toFixed(aggregation);
-        const base = this.chart.market ? this.chart.market.base : '';
+        const aggregation = this.chart.market ? this.chart.market.precision.price : 2;
+        const value = (_.isUndefined(data) || _.isUndefined(data.volume_notional)) ? '-' : data.volume_notional.toFixed(aggregation);
+        const quote = this.chart.market ? this.chart.market.quote : '';
 
         return $.div({classList: 'value'},
             $.span({classList: 'available first'}, value),
-            base
+            quote
         );
     }
 
@@ -44,7 +44,7 @@ class Volume {
         let data = this.chart.data.fetch({start, end});
 
         if(data.length){
-            return [0, _.max(data.map(d => d.volume_traded)) * 1.2];
+            return [0, _.max(data.map(d => d.volume_notional)) * 1.2];
         }
     }
 
@@ -67,7 +67,7 @@ class Volume {
 
     body(d){
         let w = Math.max(1, Math.min(this.chart.bandwidth - 2, Math.floor(this.chart.bandwidth * (1 - this.padding) - 1))),
-            vol = this.panel.scale(d.volume_traded),
+            vol = this.panel.scale(d.volume_notional),
             x = this.chart.scale(d.date) - w / 2,
             y = this.panel.scale.range()[1] + 10;
 
@@ -80,10 +80,10 @@ class Volume {
 }
 
 module.exports = {
-    name: 'volume',
+    name: 'volume-notional',
     type: 'indicator',
     settings: {},
-    title: 'Trading Volume',
-    description: 'A volume bar for each time period corresponding to the relative number of units traded.',
-    instance: params => new Volume(params)
+    title: 'Notional Trading Volume',
+    description: 'A volume bar for each time period corresponding to the total amount of notional volume traded.',
+    instance: params => new VolumeNotional(params)
 };

@@ -92,6 +92,14 @@ module.exports = class ChartLayer {
         this.panel.removeLayer(this);
     }
 
+    async customize(){
+        const modal = await via.modal.form({height: 200}, {});
+
+        modal.on('did-change-value', data => {
+            console.log(data);
+        });
+    }
+
     destroy(){
         this.element.remove();
         this.disposables.dispose();

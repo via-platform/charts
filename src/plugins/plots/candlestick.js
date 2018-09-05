@@ -124,7 +124,9 @@ class Candlestick {
 module.exports = {
     name: 'candlestick',
     type: 'plot',
-    settings: {},
+    settings: {
+        
+    },
     title: 'Candlesticks',
     description: 'Plot candlesticks.',
     instance: params => new Candlestick(params)

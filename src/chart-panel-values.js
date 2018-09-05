@@ -71,7 +71,8 @@ class ChartPanelValue {
         etch.initialize(this);
 
         this.disposables.add(via.commands.add(this.element, {
-            'charts:remove-layer': () => this.layer.remove()
+            'charts:remove-layer': () => this.layer.remove(),
+            'charts:customize-layer': () => this.layer.customize(),
         }));
     }
 

@@ -38,7 +38,8 @@ module.exports = class Chart {
             deserializer: 'Chart',
             uri: this.getURI(),
             granularity: this.granularity,
-            transform: this.transform
+            transform: this.transform,
+            group: this.group ? this.group.color : ''
             // time: this.time,
             // type: this.type,
             // panels: this.panels.serialize(),
@@ -92,7 +93,7 @@ module.exports = class Chart {
         this.resizeObserver.observe(this.element);
 
         this.setNextBandTimeout(false);
-        
+
         this.disposables.add(new Disposable(() => {
             if(this.bandTimeout){
                 clearTimeout(this.bandTimeout);
@@ -137,6 +138,8 @@ module.exports = class Chart {
 
     async initialize(state){
         await via.markets.initialize();
+        
+        this.changeGroup(state.group ? via.workspace.groups.get(state.group) : null);
 
         const [method, id] = this.uri.slice(base.length + 1).split('/');
 
@@ -290,6 +293,10 @@ module.exports = class Chart {
     }
 
     destroy(){
+        if(this.groupDisposables){
+            this.groupDisposables.dispose();
+        }
+
         this.data.destroy();
         this.panels.destroy();
         this.tools.destroy();
@@ -361,6 +368,37 @@ module.exports = class Chart {
         this.precision = this.market.precision.price;
         this.emitter.emit('did-change-market', market);
         this.emitter.emit('did-change-title');
+
+        if(this.group){
+            this.group.market = market;
+        }
+    }
+
+    changeGroup(group){
+        if(this.group === group){
+            return;
+        }
+
+        this.group = group;
+
+        if(this.groupDisposables){
+            this.groupDisposables.dispose();
+            this.groupDisposables = null;
+        }
+
+        if(this.group){
+            this.groupDisposables = new CompositeDisposable(
+                this.group.onDidChangeMarket(this.changeMarket.bind(this))
+            );
+
+            if(this.group.market){
+                this.changeMarket(this.group.market);
+            }else{
+                this.group.market = this.market;
+            }
+        }
+
+        this.emitter.emit('did-change-group', this.group);
     }
 
     changeGranularity(granularity){
@@ -443,6 +481,10 @@ module.exports = class Chart {
 
     center(){
         return this.panels.getCenter();
+    }
+
+    onDidChangeGroup(callback){
+        return this.emitter.on('did-change-group', callback);
     }
 
     onWillChangeGranularity(callback){

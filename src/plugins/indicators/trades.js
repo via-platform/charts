@@ -30,7 +30,7 @@ class Trades {
     value(band){
         const data = _.first(this.chart.data.fetch({start: band, end: band})) || {};
         const aggregation = this.chart.market ? this.chart.market.aggregation : 2;
-        const value = (_.isUndefined(data) || _.isUndefined(data.trades)) ? '-' : data.trades.toFixed(aggregation);
+        const value = (_.isUndefined(data) || _.isUndefined(data.trades_count)) ? '-' : data.trades_count.toFixed(aggregation);
         const base = this.chart.market ? this.chart.market.base : '';
 
         return $.div({classList: 'value'},
@@ -43,7 +43,7 @@ class Trades {
         const data = this.chart.data.fetch({start, end});
 
         if(data.length){
-            return [0, d3.max(data, d => d.trades) * 1.2];
+            return [0, d3.max(data, d => d.trades_count) * 1.2];
         }
     }
 
@@ -66,7 +66,7 @@ class Trades {
 
     body(d){
         const w = Math.max(1, Math.min(this.chart.bandwidth - 2, Math.floor(this.chart.bandwidth * (1 - this.padding) - 1))),
-            vol = this.panel.scale(d.trades),
+            vol = this.panel.scale(d.trades_count),
             x = this.chart.scale(d.date) - w / 2,
             y = this.panel.scale.range()[1] + 10;
 

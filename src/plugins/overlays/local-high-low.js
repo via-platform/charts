@@ -53,7 +53,9 @@ class LocalHighLow {
             'H',
             $.span({classList: this.high ? 'up' : 'unavailable'}, this.high ? this.high.toFixed(this.chart.precision) : '-'),
             'L',
-            $.span({classList: this.low ? 'down' : 'unavailable'}, this.low ? this.low.toFixed(this.chart.precision) : '-')
+            $.span({classList: this.low ? 'down' : 'unavailable'}, this.low ? this.low.toFixed(this.chart.precision) : '-'),
+            '∆',
+            $.span({classList: (this.high && this.low) ? 'available' : 'unavailable'}, (this.high && this.low) ? (this.high - this.low).toFixed(this.chart.precision) : '-')
         );
     }
 

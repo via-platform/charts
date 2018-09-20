@@ -33,7 +33,7 @@ class Market {
             placeholder: 'Search For a Market to Display on the Chart...',
             didConfirmSelection: selection => this.chart.changeMarket(selection.market),
             maxResultsPerCategory: 60,
-            items: via.markets.all().filter(m => m.active && m.type === 'SPOT').map(m => ({name: m.title, description: m.description, market: m}))
+            items: via.markets.all().filter(m => m.tradeable).map(m => ({name: m.title, description: m.description, market: m}))
         });
     }
 

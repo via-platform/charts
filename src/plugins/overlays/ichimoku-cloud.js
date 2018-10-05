@@ -22,11 +22,11 @@ class IchimokuCloud {
         this.cache = new Map();
 
         this.lines = {
-            tenkan: d3.line().x(d => this.chart.scale(d.date)).y(d => this.panel.scale(d.tenkan.value)).bind(this),
-            kijun: d3.line().x(d => this.chart.scale(d.date)).y(d => this.panel.scale(d.kijun.value)).bind(this),
-            senkouA: d3.line().x(d => this.chart.scale(d.date)).y(d => this.panel.scale(d.senkouA.value)).bind(this),
-            senkouB: d3.line().x(d => this.chart.scale(d.date)).y(d => this.panel.scale(d.senkouB.value)).bind(this),
-            chikou: d3.line().x(d => this.chart.scale(d.date)).y(d => this.panel.scale(d.chikou.value)).bind(this)
+            tenkan: d3.line().x(d => this.chart.scale(d.time_period_start)).y(d => this.panel.scale(d.tenkan.value)).bind(this),
+            kijun: d3.line().x(d => this.chart.scale(d.time_period_start)).y(d => this.panel.scale(d.kijun.value)).bind(this),
+            senkouA: d3.line().x(d => this.chart.scale(d.time_period_start)).y(d => this.panel.scale(d.senkouA.value)).bind(this),
+            senkouB: d3.line().x(d => this.chart.scale(d.time_period_start)).y(d => this.panel.scale(d.senkouB.value)).bind(this),
+            chikou: d3.line().x(d => this.chart.scale(d.time_period_start)).y(d => this.panel.scale(d.chikou.value)).bind(this)
         };
 
         this.element.classed('ichimoku-cloud', true);
@@ -81,7 +81,7 @@ class IchimokuCloud {
         //Shift the end over to the displacement
         end.setTime(end.getTime() + (this.displacement + 1) * this.chart.granularity);
 
-        const data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
+        const data = this.chart.data.fetch({start, end}).sort((a, b) => a.time_period_start - b.time_period_start);
         let iterator = this.chart.nearestCandle(start);
 
         //Eventually, we might work out a caching strategy, but today is not this day
@@ -98,12 +98,12 @@ class IchimokuCloud {
 
         for(let i = 0; i < data.length; i++){
             const band = data[i];
-            const cloud = this.clouds.get(band.date.getTime());
+            const cloud = this.clouds.get(band.time_period_start.getTime());
 
             if(cloud){
-                cloud.high = band.high;
-                cloud.low = band.low;
-                cloud.close = band.close;
+                cloud.price_high = band.price_high;
+                cloud.price_low = band.price_low;
+                cloud.price_close = band.price_close;
             }
         }
 
@@ -116,22 +116,22 @@ class IchimokuCloud {
             const cloud = this.clouds.get(time);
 
             if(cloud){
-                const tenkan = all.filter(d => (d.date.getTime() >= time - ((this.tenkan - 1) * this.chart.granularity)) && d.date.getTime() <= time);
-                const kijun = all.filter(d => (d.date.getTime() >= time - ((this.kijun - 1) * this.chart.granularity)) && d.date.getTime() <= time);
-                const senkou = all.filter(d => (d.date.getTime() >= time - ((this.senkou - 1) * this.chart.granularity)) && d.date.getTime() <= time);
+                const tenkan = all.filter(d => (d.time_period_start.getTime() >= time - ((this.tenkan - 1) * this.chart.granularity)) && d.time_period_start.getTime() <= time);
+                const kijun = all.filter(d => (d.time_period_start.getTime() >= time - ((this.kijun - 1) * this.chart.granularity)) && d.time_period_start.getTime() <= time);
+                const senkou = all.filter(d => (d.time_period_start.getTime() >= time - ((this.senkou - 1) * this.chart.granularity)) && d.time_period_start.getTime() <= time);
                 const chikouDate = new Date(time - this.displacement * this.chart.granularity);
                 const senkouDate = new Date(time + this.displacement * this.chart.granularity);
 
-                cloud.tenkan = {available: tenkan.length === this.tenkan, value: (d3.max(tenkan, d => d.high) + d3.min(tenkan, d => d.low)) / 2};
-                cloud.kijun = {available: kijun.length === this.kijun, value: (d3.max(kijun, d => d.high) + d3.min(kijun, d => d.low)) / 2};
+                cloud.tenkan = {available: tenkan.length === this.tenkan, value: (d3.max(tenkan, d => d.price_high) + d3.min(tenkan, d => d.price_low)) / 2};
+                cloud.kijun = {available: kijun.length === this.kijun, value: (d3.max(kijun, d => d.price_high) + d3.min(kijun, d => d.price_low)) / 2};
 
-                if(this.clouds.has(chikouDate.getTime()) && cloud.close){
-                    this.clouds.get(chikouDate.getTime()).chikou = {available: true, value: cloud.close};
+                if(this.clouds.has(chikouDate.getTime()) && cloud.price_close){
+                    this.clouds.get(chikouDate.getTime()).chikou = {available: true, value: cloud.price_close};
                 }
 
                 if(this.clouds.has(senkouDate.getTime())){
                     this.clouds.get(senkouDate.getTime()).senkouA = {available: cloud.tenkan.available && cloud.kijun.available, value: (cloud.tenkan.value + cloud.kijun.value) / 2};
-                    this.clouds.get(senkouDate.getTime()).senkouB = {available: senkou.length === this.senkou, value: (d3.max(senkou, d => d.high) + d3.min(senkou, d => d.low)) / 2};
+                    this.clouds.get(senkouDate.getTime()).senkouB = {available: senkou.length === this.senkou, value: (d3.max(senkou, d => d.price_high) + d3.min(senkou, d => d.price_low)) / 2};
                 }
             }
 

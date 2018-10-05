@@ -48,26 +48,24 @@ class CurrentValue {
     }
 
     draw(){
-        const candle = new Date(Math.floor(Date.now() / this.chart.granularity) * this.chart.granularity);
-        const value = _.first(this.chart.data.fetch({start: candle, end: candle}));
-        const precision = this.chart.market ? this.chart.market.precision.price : 8;
+        //This should be good enough because we send a snapshot of the latest candle upon subscribing to the stream
+        const value = this.chart.data.last();
 
         if(value){
-            this.last = value.close.toFixed(precision);
+            this.last = value.price_close.toFixed(this.chart.precision);
 
             this.flag.classed('hide', false)
-                .classed('up', (value.close >= value.open))
-                .classed('down', (value.close < value.open))
-                .attr('transform', `translate(0, ${Math.round(this.panel.scale(value.close)) - Math.ceil(FLAG_HEIGHT / 2)})`)
+                .classed('up', (value.price_close >= value.price_open))
+                .classed('down', (value.price_close < value.price_open))
+                .attr('transform', `translate(0, ${Math.round(this.panel.scale(value.price_close)) - Math.ceil(FLAG_HEIGHT / 2)})`)
                 .select('text')
                     .text(this.last);
 
             this.element.classed('hide', false)
-                .attr('transform', `translate(0, ${Math.round(this.panel.scale(value.close)) - 0.5})`)
-                .classed('up', value.close >= value.open)
-                .classed('down', value.close < value.open);
+                .attr('transform', `translate(0, ${Math.round(this.panel.scale(value.price_close)) - 0.5})`)
+                .classed('up', value.price_close >= value.price_open)
+                .classed('down', value.price_close < value.price_open);
         }else{
-            //TODO This method is insufficient for dealing with non-24-hour symbols, or a halting of trading
             //TODO Hide the current value line because we don't know the current value
             this.flag.classed('hide', true);
             this.element.classed('hide', true);

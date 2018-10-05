@@ -53,14 +53,14 @@ class Volume {
         let data = this.chart.data.fetch({start, end});
 
         let body = this.element.selectAll('path')
-            .data(data, d => d.date.getTime())
-            .attr('class', d => (d.open > d.close) ? 'down' : 'up')
+            .data(data, d => d.time_period_start.getTime())
+            .attr('class', d => (d.price_open > d.price_close) ? 'down' : 'up')
             .attr('d', this.body);
 
         body.enter()
             .append('path')
             .attr('d', this.body)
-            .attr('class', d => (d.open > d.close) ? 'down' : 'up');
+            .attr('class', d => (d.price_open > d.price_close) ? 'down' : 'up');
 
         body.exit().remove();
     }
@@ -68,7 +68,7 @@ class Volume {
     body(d){
         let w = Math.max(1, Math.min(this.chart.bandwidth - 2, Math.floor(this.chart.bandwidth * (1 - this.padding) - 1))),
             vol = this.panel.scale(d.volume_traded),
-            x = this.chart.scale(d.date) - w / 2,
+            x = this.chart.scale(d.time_period_start) - w / 2,
             y = this.panel.scale.range()[1] + 10;
 
         return `M ${x} ${vol} h ${w} V ${y} h ${-w} Z`;

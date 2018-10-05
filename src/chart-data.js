@@ -50,7 +50,7 @@ module.exports = class ChartData {
     }
 
     last(){
-        return this.data ? this.data.last() : {};
+        return this.data ? this.data.last() : null;
     }
 
     didUpdateData(){

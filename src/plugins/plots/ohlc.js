@@ -35,17 +35,17 @@ class OHLC {
 
     value(band){
         const data = _.first(this.chart.data.fetch({start: band, end: band})) || {};
-        const direction = data ? ((data.close >= data.open) ? 'up' : 'down') : 'unavailable';
+        const direction = data ? ((data.price_close >= data.price_open) ? 'up' : 'down') : 'unavailable';
 
         return $.div({classList: 'value'},
             'O',
-            $.span({classList: direction}, data.open && data.open.toFixed(this.chart.precision) || '-'),
+            $.span({classList: direction}, data.price_open && data.price_open.toFixed(this.chart.precision) || '-'),
             'H',
-            $.span({classList: direction}, data.high && data.high.toFixed(this.chart.precision) || '-'),
+            $.span({classList: direction}, data.price_high && data.price_high.toFixed(this.chart.precision) || '-'),
             'L',
-            $.span({classList: direction}, data.low && data.low.toFixed(this.chart.precision) || '-'),
+            $.span({classList: direction}, data.price_low && data.price_low.toFixed(this.chart.precision) || '-'),
             'C',
-            $.span({classList: direction}, data.close && data.close.toFixed(this.chart.precision) || '-')
+            $.span({classList: direction}, data.price_close && data.price_close.toFixed(this.chart.precision) || '-')
         );
     }
 
@@ -58,42 +58,42 @@ class OHLC {
 
     domain(){
         let [start, end] = this.chart.scale.domain();
-        let data = this.chart.data.fetch({start, end}).filter(candle => candle.close);
+        let data = this.chart.data.fetch({start, end}).filter(candle => candle.price_close);
 
         if(data.length){
-            return [ _.min(data.map(d => d.low)), _.max(data.map(d => d.high)) ];
+            return [ _.min(data.map(d => d.price_low)), _.max(data.map(d => d.price_high)) ];
         }
     }
 
     draw(){
         let [start, end] = this.chart.scale.domain();
-        let data = this.chart.data.fetch({start, end}).filter(candle => candle.close);
+        let data = this.chart.data.fetch({start, end}).filter(candle => candle.price_close);
 
         let bar = this.element.selectAll('path.bar')
-            .data(data, d => d.date.getTime())
-            .attr('class', d => (d.open > d.close) ? 'bar down' : 'bar up')
+            .data(data, d => d.time_period_start.getTime())
+            .attr('class', d => (d.price_open > d.price_close) ? 'bar down' : 'bar up')
             .attr('d', this.body);
 
         bar.enter()
             .append('path')
             .attr('d', this.body)
-            .attr('class', d => (d.open > d.close) ? 'bar down' : 'bar up');
+            .attr('class', d => (d.price_open > d.price_close) ? 'bar down' : 'bar up');
 
         bar.exit().remove();
 
         if(this.layer.isSelected()){
             let handle = this.element.selectAll('circle.handle')
-                .data(data.filter(d => d.close && d.open && d.date.getTime() % (this.chart.granularity * 10) === 0), d => d.date.getTime())
+                .data(data.filter(d => d.price_close && d.price_open && d.time_period_start.getTime() % (this.chart.granularity * 10) === 0), d => d.time_period_start.getTime())
                 .attr('class', 'handle')
-                .attr('cx', d => this.chart.scale(d.date))
-                .attr('cy', d => this.panel.scale((d.open + d.close) / 2))
+                .attr('cx', d => this.chart.scale(d.time_period_start))
+                .attr('cy', d => this.panel.scale((d.price_open + d.price_close) / 2))
                 .attr('r', 4);
 
             handle.enter()
                 .append('circle')
                 .attr('class', 'handle')
-                .attr('cx', d => this.chart.scale(d.date))
-                .attr('cy', d => this.panel.scale(d3.mean([d.open, d.close])))
+                .attr('cx', d => this.chart.scale(d.time_period_start))
+                .attr('cy', d => this.panel.scale(d3.mean([d.price_open, d.price_close])))
                 .attr('r', 4);
 
             handle.exit().remove();
@@ -108,11 +108,11 @@ class OHLC {
 
     body(d){
         let w = Math.max((this.chart.bandwidth - (2 * this.padding)) / 3, 1),
-            x = this.chart.scale(d.date),
-            open = this.panel.scale(d.open),
-            close = this.panel.scale(d.close),
-            high = this.panel.scale(d.high),
-            low = this.panel.scale(d.low),
+            x = this.chart.scale(d.time_period_start),
+            open = this.panel.scale(d.price_open),
+            close = this.panel.scale(d.price_close),
+            high = this.panel.scale(d.price_high),
+            low = this.panel.scale(d.price_low),
             oc = Math.max(low + w / 2, Math.min(high - w / 2, open)),
             cc = Math.max(low + w / 2, Math.min(high - w / 2, close));
 

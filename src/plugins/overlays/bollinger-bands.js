@@ -20,16 +20,16 @@ class BollingerBands {
         this.element.classed('bollinger-bands', true);
 
         this.upper = d3.line()
-            .x(d => this.chart.scale(d.date))
+            .x(d => this.chart.scale(d.time_period_start))
             .y(d => this.panel.scale(d.upper));
 
         this.middle = d3.line()
-            .x(d => this.chart.scale(d.date))
+            .x(d => this.chart.scale(d.time_period_start))
             .y(d => this.panel.scale(d.middle));
 
         this.lower = d3.line()
-            .x(d => this.chart.scale(d.date))
-            .y(d => this.panel.scale(d.lower));
+            .x(d => this.chart.scale(d.time_period_start))
+            .y(d => this.panel.scale(d.price_lower));
 
         this.upper = this.upper.bind(this);
         this.middle = this.middle.bind(this);
@@ -41,14 +41,14 @@ class BollingerBands {
     }
 
     value(band){
-        const data = this.bands.find(period => period.date.getTime() === band.getTime()) || {};
+        const data = this.bands.find(period => period.time_period_start.getTime() === band.getTime()) || {};
         const availability = data.incomplete ? 'available' : 'unavailable';
         const aggregation = this.chart.market ? this.chart.market.precision.price : 2;
 
         //TODO we should fix these values to some sort of user preference or per-symbol basis
         return $.div({classList: 'value'},
             'L',
-            $.span({classList: availability}, data.lower && data.lower.toFixed(aggregation) || '-'),
+            $.span({classList: availability}, data.price_lower && data.price_lower.toFixed(aggregation) || '-'),
             'M',
             $.span({classList: availability}, data.middle && data.middle.toFixed(aggregation) || '-'),
             'U',
@@ -69,7 +69,7 @@ class BollingerBands {
         const deviation = d3.deviation(elements) || 0;
 
         return {
-            date: _.last(data).date,
+            time_period_start: _.last(data).time_period_start,
             upper: mean + this.multiple * deviation,
             middle: mean,
             lower: mean - this.multiple * deviation,
@@ -87,7 +87,7 @@ class BollingerBands {
         start.setTime(start.getTime() - (this.length + 1) * this.chart.granularity);
         end.setTime(end.getTime() + this.chart.granularity);
 
-        let data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
+        let data = this.chart.data.fetch({start, end}).sort((a, b) => a.time_period_start - b.time_period_start);
         this.bands = [];
 
         for(let i = 0; i < data.length; i++){

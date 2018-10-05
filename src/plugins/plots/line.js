@@ -24,17 +24,17 @@ class Line {
 
     value(band){
         const data = _.first(this.chart.data.fetch({start: band, end: band})) || {};
-        const direction = data ? ((data.close >= data.open) ? 'up' : 'down') : 'unavailable';
+        const direction = data ? ((data.price_close >= data.price_open) ? 'up' : 'down') : 'unavailable';
 
         return $.div({classList: 'value'},
             'O',
-            $.span({classList: direction}, data.open && data.open.toFixed(this.chart.precision) || '-'),
+            $.span({classList: direction}, data.price_open && data.price_open.toFixed(this.chart.precision) || '-'),
             'H',
-            $.span({classList: direction}, data.high && data.high.toFixed(this.chart.precision) || '-'),
+            $.span({classList: direction}, data.price_high && data.price_high.toFixed(this.chart.precision) || '-'),
             'L',
-            $.span({classList: direction}, data.low && data.low.toFixed(this.chart.precision) || '-'),
+            $.span({classList: direction}, data.price_low && data.price_low.toFixed(this.chart.precision) || '-'),
             'C',
-            $.span({classList: direction}, data.close && data.close.toFixed(this.chart.precision) || '-')
+            $.span({classList: direction}, data.price_close && data.price_close.toFixed(this.chart.precision) || '-')
         );
     }
 
@@ -47,10 +47,10 @@ class Line {
 
     domain(){
         const [start, end] = this.chart.scale.domain();
-        const data = this.chart.data.fetch({start, end}).filter(candle => candle.close).sort((a, b) => a.date - b.date);
+        const data = this.chart.data.fetch({start, end}).filter(candle => candle.price_close).sort((a, b) => a.time_period_start - b.time_period_start);
 
         if(data.length){
-            return [ _.min(data.map(d => d.low)), _.max(data.map(d => d.high)) ];
+            return [ _.min(data.map(d => d.price_low)), _.max(data.map(d => d.price_high)) ];
         }
     }
 
@@ -60,7 +60,7 @@ class Line {
         start.setTime(start.getTime() - this.chart.granularity);
         end.setTime(end.getTime() + this.chart.granularity);
 
-        const data = this.chart.data.fetch({start, end}).filter(candle => candle.close).sort((a, b) => a.date - b.date);
+        const data = this.chart.data.fetch({start, end}).filter(candle => candle.price_close).sort((a, b) => a.time_period_start - b.time_period_start);
 
         this.element.selectAll('path').remove();
         this.element.append('path').classed('stroke', true).datum(data).attr('d', this.stroke);
@@ -71,7 +71,7 @@ class Line {
             return '';
         }
 
-        return 'M ' + data.map(d => this.chart.scale(d.date) + ' ' + this.panel.scale(d.close)).join(' L ');
+        return 'M ' + data.map(d => this.chart.scale(d.time_period_start) + ' ' + this.panel.scale(d.price_close)).join(' L ');
     }
 
     destroy(){

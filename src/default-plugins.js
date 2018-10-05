@@ -36,6 +36,7 @@ const Rectangle = require('./plugins/drawings/rectangle');
 const ArbitraryLine = require('./plugins/drawings/arbitrary-line');
 const FibonacciRetracement = require('./plugins/drawings/fibonacci-retracement');
 const LocalHighLow = require('./plugins/overlays/local-high-low');
+// const VolumeProfile = require('./plugins/overlays/volume-profile');
 
 module.exports = [
     Candlestick,
@@ -70,5 +71,6 @@ module.exports = [
     // RotatedRectangle,
     ArbitraryLine,
     FibonacciRetracement,
-    LocalHighLow
+    LocalHighLow,
+    VolumeProfile
 ];

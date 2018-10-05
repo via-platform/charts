@@ -23,18 +23,18 @@ class HeikinAshi {
     }
 
     value(band){
-        const data = this.candles.find(candle => candle.date.getTime() === band.getTime()) || {};
-        const direction = data ? ((data.close >= data.open) ? 'up' : 'down') : 'unavailable';
+        const data = this.candles.find(candle => candle.time_period_start.getTime() === band.getTime()) || {};
+        const direction = data ? ((data.price_close >= data.price_open) ? 'up' : 'down') : 'unavailable';
 
         return $.div({classList: 'value'},
             'O',
-            $.span({classList: direction}, data.open && data.open.toFixed(this.chart.precision) || '-'),
+            $.span({classList: direction}, data.price_open && data.price_open.toFixed(this.chart.precision) || '-'),
             'H',
-            $.span({classList: direction}, data.high && data.high.toFixed(this.chart.precision) || '-'),
+            $.span({classList: direction}, data.price_high && data.price_high.toFixed(this.chart.precision) || '-'),
             'L',
-            $.span({classList: direction}, data.low && data.low.toFixed(this.chart.precision) || '-'),
+            $.span({classList: direction}, data.price_low && data.price_low.toFixed(this.chart.precision) || '-'),
             'C',
-            $.span({classList: direction}, data.close && data.close.toFixed(this.chart.precision) || '-')
+            $.span({classList: direction}, data.price_close && data.price_close.toFixed(this.chart.precision) || '-')
         );
     }
 
@@ -47,10 +47,10 @@ class HeikinAshi {
 
     domain(){
         let [start, end] = this.chart.scale.domain();
-        let data = this.chart.data.fetch({start, end}).filter(candle => candle.close);
+        let data = this.chart.data.fetch({start, end}).filter(candle => candle.price_close);
 
         if(data.length){
-            return [ _.min(data.map(d => d.low)), _.max(data.map(d => d.high)) ];
+            return [ _.min(data.map(d => d.price_low)), _.max(data.map(d => d.price_high)) ];
         }
     }
 
@@ -59,7 +59,7 @@ class HeikinAshi {
 
         start.setTime(start.getTime() - this.chart.granularity);
 
-        let data = this.chart.data.fetch({start, end}).filter(candle => candle.trades_count).sort((a, b) => a.date - b.date);
+        let data = this.chart.data.fetch({start, end}).sort((a, b) => a.time_period_start - b.time_period_start);
         this.candles = [];
 
         if(!data.length){
@@ -70,50 +70,50 @@ class HeikinAshi {
         let first = _.first(data);
 
         this.candles.push({
-            date: first.date,
-            open: (first.open + first.close) / 2,
-            close: (first.open + first.close + first.high + first.low) / 4,
-            high: first.high,
-            low: first.low,
+            time_period_start: first.time_period_start,
+            price_open: (first.price_open + first.price_close) / 2,
+            price_close: (first.price_open + first.price_close + first.price_high + first.price_low) / 4,
+            price_high: first.price_high,
+            price_low: first.price_low,
             incomplete: true
         });
 
         for(let i = 1; i < data.length; i++){
             let candle = data[i], previous = data[i - 1];
-            let open = (previous.open + previous.close) / 2;
-            let close = (candle.open + candle.close + candle.high + candle.low) / 4;
+            let price_open = (previous.price_open + previous.price_close) / 2;
+            let price_close = (candle.price_open + candle.price_close + candle.price_high + candle.price_low) / 4;
 
             this.candles.push({
-                date: candle.date,
-                open,
-                close,
-                high: Math.max(candle.high, open, close),
-                low: Math.min(candle.low, open, close)
+                time_period_start: candle.time_period_start,
+                price_open,
+                price_close,
+                price_high: Math.max(candle.price_high, price_open, price_close),
+                price_low: Math.min(candle.price_low, price_open, price_close)
             });
         }
 
         let body = this.element.selectAll('path.candle.body')
-            .data(this.candles, d => d.date.getTime())
-            .attr('class', d => (d.open > d.close) ? 'candle body down' : 'candle body up')
+            .data(this.candles, d => d.time_period_start.getTime())
+            .attr('class', d => (d.price_open > d.price_close) ? 'candle body down' : 'candle body up')
             .classed('incomplete', d => d.incomplete)
             .attr('d', this.body);
 
         body.enter()
             .append('path')
             .attr('d', this.body)
-            .attr('class', d => (d.open > d.close) ? 'candle body down' : 'candle body up')
+            .attr('class', d => (d.price_open > d.price_close) ? 'candle body down' : 'candle body up')
             .classed('incomplete', d => d.incomplete);
 
         body.exit().remove();
 
         let wick = this.element.selectAll('path.candle.wick')
-            .data(this.candles, d => d.date.getTime())
-            .attr('class', d => (d.open > d.close) ? 'candle wick down' : 'candle wick up')
+            .data(this.candles, d => d.time_period_start.getTime())
+            .attr('class', d => (d.price_open > d.price_close) ? 'candle wick down' : 'candle wick up')
             .attr('d', this.wick);
 
         wick.enter()
             .append('path')
-            .attr('class', d => (d.open > d.close) ? 'candle wick down' : 'candle wick up')
+            .attr('class', d => (d.price_open > d.price_close) ? 'candle wick down' : 'candle wick up')
             .attr('d', this.wick);
 
         wick.exit().remove();
@@ -125,29 +125,29 @@ class HeikinAshi {
 
     body(d){
         let width = Math.min(this.chart.bandwidth - 2, Math.floor(this.chart.bandwidth * (1 - this.padding) - 1));
-        let x = this.chart.scale(d.date) - width / 2;
-        let open = this.panel.scale(d.open);
-        let close = this.panel.scale(d.close);
+        let x = this.chart.scale(d.time_period_start) - width / 2;
+        let price_open = this.panel.scale(d.price_open);
+        let price_close = this.panel.scale(d.price_close);
 
-        if(Math.abs(open - close) < 1){
-            if(close < open){
-                close = open - 1;
+        if(Math.abs(price_open - price_close) < 1){
+            if(price_close < price_open){
+                price_close = price_open - 1;
             }else{
-                open = close + 1;
+                price_open = price_close + 1;
             }
         }
 
-        return `M ${x - 0.5} ${open} h ${width} V ${close} h ${-1 * width} Z`;
+        return `M ${x - 0.5} ${price_open} h ${width} V ${price_close} h ${-1 * width} Z`;
     }
 
     wick(d){
-        let x = Math.round(this.chart.scale(d.date)),
-            open = this.panel.scale(d.open),
-            close = this.panel.scale(d.close),
-            high = this.panel.scale(d.high),
-            low = this.panel.scale(d.low);
+        let x = Math.round(this.chart.scale(d.time_period_start)),
+            price_open = this.panel.scale(d.price_open),
+            price_close = this.panel.scale(d.price_close),
+            price_high = this.panel.scale(d.price_high),
+            price_low = this.panel.scale(d.price_low);
 
-        return `M ${x - 0.5} ${high} V ${Math.min(open, close)} M ${x - 0.5} ${Math.max(open, close)} V ${low}`;
+        return `M ${x - 0.5} ${price_high} V ${Math.min(price_open, price_close)} M ${x - 0.5} ${Math.max(price_open, price_close)} V ${price_low}`;
     }
 }
 

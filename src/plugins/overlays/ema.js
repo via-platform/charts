@@ -19,7 +19,7 @@ class EMA {
         this.element.classed('ema', true);
 
         this.line = d3.line()
-            .x(d => this.chart.scale(d.date))
+            .x(d => this.chart.scale(d.time_period_start))
             .y(d => this.panel.scale(d.average));
 
         this.line = this.line.bind(this);
@@ -42,7 +42,7 @@ class EMA {
         start.setTime(start.getTime() - (this.length + 1) * this.chart.granularity);
         end.setTime(end.getTime() + this.chart.granularity);
 
-        this.values = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
+        this.values = this.chart.data.fetch({start, end}).sort((a, b) => a.time_period_start - b.time_period_start);
 
         for(let i = 0; i < this.length - 1 && i < this.values.length; i++){
             let total = 0;
@@ -89,7 +89,7 @@ class EMA {
     }
 
     value(band){
-        const candle = this.values.find(value => value.date.getTime() === band.getTime());
+        const candle = this.values.find(value => value.time_period_start.getTime() === band.getTime());
         const precision = this.chart.market ? this.chart.market.precision.price : 0;
 
         return $.div({classList: 'value'},

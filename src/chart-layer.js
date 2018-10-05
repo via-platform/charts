@@ -21,7 +21,7 @@ module.exports = class ChartLayer {
         this.panel = panel;
         this.isRoot = isRoot;
         this.selectable = false;
-        this.priority = plugin.priority || 0;
+        this.priority = plugin.priority || 1;
         this.metadata = {};
 
         this.disposables.add(this.chart.onDidSelect(this.draw.bind(this)));

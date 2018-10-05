@@ -1,0 +1,19 @@
+@import "variables";
+
+.chart .panel .layer.volume-profile
+{
+    rect
+    {
+        opacity: 0.5;
+
+        &.buy
+        {
+            fill: @primary-color-up;
+        }
+
+        &.sell
+        {
+            fill: @primary-color-down;
+        }
+    }
+}

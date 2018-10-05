@@ -23,7 +23,7 @@ class RSI {
         this.range = this.element.append('rect').classed('range', true).attr('x', 0);
 
         this.line = d3.line()
-            .x(d => this.chart.scale(d.date))
+            .x(d => this.chart.scale(d.time_period_start))
             .y(d => this.panel.scale(d.value))
             .bind(this);
     }
@@ -40,7 +40,7 @@ class RSI {
     }
 
     value(band){
-        const data = this.values.find(period => period.date.getTime() === band.getTime());
+        const data = this.values.find(period => period.time_period_start.getTime() === band.getTime());
         const value = data ? data.value.toFixed(4) : '-';
 
         return $.div({classList: 'value'},
@@ -50,7 +50,7 @@ class RSI {
 
     domain(){
         const [start, end] = this.chart.scale.domain();
-        const data = this.values.filter(d => d.date >= start && d.date <= end);
+        const data = this.values.filter(d => d.time_period_start >= start && d.time_period_start <= end);
 
         if(data.length){
             return d3.extent(data, d => d.value);
@@ -60,7 +60,7 @@ class RSI {
     draw(){
         const [start, end] = this.chart.scale.domain();
         start.setTime(start.getTime() - (this.chart.granularity * this.factor * this.periods));
-        const data = this.chart.data.fetch({start, end}).sort((a, b) => a.date - b.date);
+        const data = this.chart.data.fetch({start, end}).sort((a, b) => a.time_period_start - b.time_period_start);
 
         if(data.length < this.periods){
             return;
@@ -69,8 +69,8 @@ class RSI {
         this.values = [];
 
         data.reduce((accumulator, candle, index) => {
-            const gain = Math.max(candle.close - candle.open, 0);
-            const loss = Math.max(candle.open - candle.close, 0);
+            const gain = Math.max(candle.price_close - candle.price_open, 0);
+            const loss = Math.max(candle.price_open - candle.price_close, 0);
             let ag, al;
 
             if(index < this.periods - 1){
@@ -83,7 +83,7 @@ class RSI {
                 al = ((this.periods - 1) * accumulator.loss + loss) / this.periods;
             }
 
-            this.values.push({date: new Date(candle.date), value: 100 - (100 / (1 + (ag / al)))});
+            this.values.push({time_period_start: new Date(candle.time_period_start), value: 100 - (100 / (1 + (ag / al)))});
 
             return {gain: ag, loss: al};
         }, {gain: 0, loss: 0});

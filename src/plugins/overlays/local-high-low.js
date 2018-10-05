@@ -61,20 +61,20 @@ class LocalHighLow {
 
     draw(){
         const [start, end] = this.chart.scale.domain();
-        const data = this.chart.data.fetch({start, end}).filter(candle => candle.close);
+        const data = this.chart.data.fetch({start, end}).filter(candle => candle.price_close);
         const precision = this.chart.market ? this.chart.market.precision.price : 8;
 
-        this.high = d3.max(data, d => d.high);
-        this.low = d3.min(data, d => d.low);
+        this.high = d3.max(data, d => d.price_high);
+        this.low = d3.min(data, d => d.price_low);
 
         if(data.length){
-            this.high = d3.max(data, d => d.high);
-            this.low = d3.min(data, d => d.low);
+            this.high = d3.max(data, d => d.price_high);
+            this.low = d3.min(data, d => d.price_low);
 
             // this.element.classed('hide', false)
-            //     .attr('transform', `translate(0, ${Math.round(this.panel.scale(value.close)) - 0.5})`)
-            //     .classed('up', value.close >= value.open)
-            //     .classed('down', value.close < value.open);
+            //     .attr('transform', `translate(0, ${Math.round(this.panel.scale(value.price_close)) - 0.5})`)
+            //     .classed('up', value.price_close >= value.price_open)
+            //     .classed('down', value.price_close < value.price_open);
         }else{
             this.high = null;
             this.low = null;

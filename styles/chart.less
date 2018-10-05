@@ -21,6 +21,7 @@
 @import "plugins/overlays/bollinger-bands";
 @import "plugins/overlays/bid-ask";
 @import "plugins/overlays/ichimoku-cloud";
+@import "plugins/overlays/volume-profile";
 
 @import "plugins/other/crosshair";
 
@@ -36,8 +37,9 @@
 
 @chart-tools-height: 24px;
 @chart-panel-border-width: 1px;
-@chart-panel-border-color: @header-border-color;
-@chart-panel-background-color: #282828;//@pane-background-color;
+@chart-panel-border-color: lighten(@pane-background-color, 15%);
+@chart-panel-grid-color: lighten(@pane-background-color, 7.5%);
+@chart-panel-background-color: @pane-background-color;
 
 .chart
 {
@@ -171,6 +173,7 @@
             &:last-child
             {
                 margin-bottom: 0;
+                border-bottom: 0;
             }
         }
     }
@@ -234,11 +237,7 @@
 
         line
         {
-            stroke: fade(@header-border-color, 50%);
-            // stroke: @header-border-color;
-            // stroke: fade(@text-color-subtle, 20%);
-            // stroke: fade(@text-color-subtle, 0%);
-            // stroke-dasharray: 5, 15;
+            stroke: @chart-panel-grid-color;
         }
 
         path
@@ -259,15 +258,13 @@
 
         line
         {
-            stroke: fade(@text-color-subtle, 40%);
-            // stroke: @header-border-color;
+            stroke: @chart-panel-border-color;
         }
 
         text
         {
             -webkit-font-smoothing: auto;
             fill: @text-color-subtle;
-            // font-weight: 500;
             font-size: 10px;
         }
     }
@@ -277,12 +274,17 @@
         &.x
         {
             height: 22px;
-            background: @header-background-color;
+            background: @chart-panel-background-color;
+
+            svg
+            {
+                border-top: 1px solid @chart-panel-border-color;
+            }
         }
 
         &.y
         {
-            border-left: 1px solid @header-border-color;
+            border-left: 1px solid @chart-panel-border-color;
         }
     }
 

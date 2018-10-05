@@ -3,7 +3,7 @@ const _ = require('underscore-plus');
 const etch = require('etch');
 const $ = etch.dom;
 
-class RotatedRectangle {
+class Parallelogram {
     constructor({chart, element, panel, layer, params}){
         this.disposables = new CompositeDisposable();
         this.working = new CompositeDisposable();
@@ -18,7 +18,7 @@ class RotatedRectangle {
         this.done = false;
 
         this.element = element;
-        this.element.classed('rotated-rectangle', true);
+        this.element.classed('parallelogram', true);
 
         this.background = this.element.append('rect').attr('x', 0).attr('y', 0).attr('class', 'background');
         this.path = this.element.append('path');
@@ -57,7 +57,6 @@ class RotatedRectangle {
         this.working.add(this.chart.onDidZoom(this.draw.bind(this)));
         this.working.add(this.chart.onDidCancel(() => this.panel.removeLayer(this.layer)));
         this.working.add(new Disposable(() => this.background.remove()));
-        this.working.add(new Disposable(() => this.line.remove()));
 
         // this.disposables.add(new Disposable(() => {
         //     this.range.x.remove();
@@ -188,16 +187,6 @@ class RotatedRectangle {
         const dx = ex - mx;
         const dy = ey - my;
 
-
-
-
-
-
-
-
-
-
-
         this.path.attr('d', `M ${sx + dx} ${sy + dy} L ${sx - dx} ${sy - dy} L ${mx - dx} ${my - dy} L ${ex} ${ey} Z`);
 
         this.handle.topLeft.attr('cx', sx + dx).attr('cy', sy + dy).classed('hide', false);
@@ -235,11 +224,11 @@ class RotatedRectangle {
 }
 
 module.exports = {
-    name: 'rotated-rectangle',
+    name: 'parallelogram',
     type: 'drawing',
     settings: {},
-    title: 'Rotated Rectangle',
-    description: 'Draw a rotated rectangle on the chart.',
+    title: 'Parallelogram',
+    description: 'Draw a parallelogram on the chart.',
     selectable: true,
-    instance: params => new RotatedRectangle(params)
+    instance: params => new Parallelogram(params)
 };

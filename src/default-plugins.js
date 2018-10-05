@@ -32,11 +32,12 @@ const Measure = require('./plugins/drawings/measure');
 const DateValueRange = require('./plugins/drawings/date-value-range');
 const Ellipse = require('./plugins/drawings/ellipse');
 const Rectangle = require('./plugins/drawings/rectangle');
-// const RotatedRectangle = require('./plugins/drawings/rotated-rectangle');
+const Triangle = require('./plugins/drawings/triangle');
+const Parallelogram = require('./plugins/drawings/parallelogram');
 const ArbitraryLine = require('./plugins/drawings/arbitrary-line');
 const FibonacciRetracement = require('./plugins/drawings/fibonacci-retracement');
 const LocalHighLow = require('./plugins/overlays/local-high-low');
-// const VolumeProfile = require('./plugins/overlays/volume-profile');
+const VolumeProfile = require('./plugins/overlays/volume-profile');
 
 module.exports = [
     Candlestick,
@@ -68,7 +69,8 @@ module.exports = [
     DateValueRange,
     Ellipse,
     Rectangle,
-    // RotatedRectangle,
+    Triangle,
+    Parallelogram,
     ArbitraryLine,
     FibonacciRetracement,
     LocalHighLow,

@@ -10,10 +10,10 @@ class Trades {
         this.panel = panel;
         this.element = element;
         this.padding = 0.6;
+        this.buy = this.buy.bind(this);
+        this.sell = this.sell.bind(this);
 
         this.element.classed('trades', true);
-
-        this.body = this.body.bind(this);
     }
 
     serialize(){
@@ -29,12 +29,20 @@ class Trades {
 
     value(band){
         const data = _.first(this.chart.data.fetch({start: band, end: band})) || {};
-        const aggregation = this.chart.market ? this.chart.market.aggregation : 2;
-        const value = (_.isUndefined(data) || _.isUndefined(data.trades_count)) ? '-' : data.trades_count.toFixed(aggregation);
-        const base = this.chart.market ? this.chart.market.base : '';
 
         return $.div({classList: 'value'},
-            $.span({classList: 'available first'}, value)
+            'Buys',
+            $.span({classList: 'up'},
+                (_.isUndefined(data) || _.isUndefined(data.buy_count)) ? '-' : data.buy_count
+            ),
+            'Sells',
+            $.span({classList: 'down'},
+                (_.isUndefined(data) || _.isUndefined(data.sell_count)) ? '-' : data.sell_count
+            ),
+            'Total',
+            $.span({classList: 'available'},
+                (_.isUndefined(data) || _.isUndefined(data.trades_count)) ? '-' : data.trades_count
+            )
         );
     }
 
@@ -51,26 +59,30 @@ class Trades {
         const [start, end] = this.chart.scale.domain();
         const data = this.chart.data.fetch({start, end});
 
-        const body = this.element.selectAll('path')
-            .data(data, d => d.time_period_start.getTime())
-            .attr('class', d => (d.price_open > d.price_close) ? 'down' : 'up')
-            .attr('d', this.body);
+        this.width = Math.max(1, Math.min(this.chart.bandwidth - 2, Math.floor(this.chart.bandwidth * (1 - this.padding) - 1)));
 
-        body.enter()
-            .append('path')
-            .attr('d', this.body)
-            .attr('class', d => (d.price_open > d.price_close) ? 'down' : 'up');
+        const volume_bar = this.element.selectAll('g').data(data, d => d.time_period_start.getTime());
 
-        body.exit().remove();
+        volume_bar.select('path.sell').attr('d', this.sell);
+        volume_bar.select('path.buy').attr('d', this.buy);
+
+        const volume_bar_enter = volume_bar.enter().append('g');
+
+        volume_bar_enter.append('path').attr('class', 'sell').attr('d', this.sell);
+        volume_bar_enter.append('path').attr('class', 'buy').attr('d', this.buy);
+
+        volume_bar.exit().remove();
     }
 
-    body(d){
-        const w = Math.max(1, Math.min(this.chart.bandwidth - 2, Math.floor(this.chart.bandwidth * (1 - this.padding) - 1))),
-            vol = this.panel.scale(d.trades_count),
-            x = this.chart.scale(d.time_period_start) - w / 2,
-            y = this.panel.scale.range()[1] + 10;
+    buy(d){
+        const width = Math.max(1, Math.min(this.chart.bandwidth - 2, Math.floor(this.chart.bandwidth * (1 - this.padding) - 1)));
+        const x = this.chart.scale(d.time_period_start) - this.width / 2;
+        return `M ${x} ${this.panel.scale(d.sell_count + d.buy_count)} h ${this.width} V ${this.panel.scale(d.sell_count)} h ${-this.width} Z`;
+    }
 
-        return `M ${x} ${vol} h ${w} V ${y} h ${-w} Z`;
+    sell(d){
+        const x = this.chart.scale(d.time_period_start) - this.width / 2;
+        return `M ${x} ${this.panel.scale(d.sell_count)} h ${this.width} V ${this.panel.scale(0)} h ${-this.width} Z`;
     }
 
     destroy(){

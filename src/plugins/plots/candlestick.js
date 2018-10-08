@@ -46,9 +46,11 @@ class Candlestick {
     domain(){
         const [start, end] = this.chart.scale.domain();
         const data = this.chart.data.fetch({start, end}).filter(candle => candle.price_close);
+        const min = _.min(data.map(d => d.price_low));
+        const max = _.max(data.map(d => d.price_high));
 
         if(data.length){
-            return [ _.min(data.map(d => d.price_low)), _.max(data.map(d => d.price_high)) ];
+            return [min, max];
         }
     }
 

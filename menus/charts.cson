@@ -21,3 +21,6 @@
   '.symbol-explorer .market': [
     {label: 'Open Chart', command: 'charts:create-chart'}
   ]
+  '.watchlist .market': [
+    {label: 'Open Chart', command: 'charts:create-chart'}
+  ]

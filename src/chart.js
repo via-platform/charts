@@ -122,6 +122,11 @@ module.exports = class Chart {
             'core:cancel': () => {
                 this.cancel();
                 this.unselect();
+            },
+            'charts:lock-scale': () => {
+                for(const panel of this.panels.all()){
+                    panel.lock();
+                }
             }
         }));
 
@@ -138,7 +143,7 @@ module.exports = class Chart {
 
     async initialize(state){
         await via.markets.initialize();
-        
+
         this.changeGroup(state.group ? via.workspace.groups.get(state.group) : null);
 
         const [method, id] = this.uri.slice(base.length + 1).split('/');

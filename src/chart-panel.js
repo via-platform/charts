@@ -63,9 +63,15 @@ module.exports = class ChartPanel {
 
         this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
         this.disposables.add(this.chart.onDidDestroy(this.destroy.bind(this)));
-        this.disposables.add(this.chart.data.onDidUpdateData(this.rescale.bind(this)));
+
+        this.disposables.add(this.chart.data.onDidUpdateData(() => {
+            this.rescale();
+            this.draw();
+        }));
+
         this.disposables.add(this.panels.onDidUpdateOffset(offset => {
             this.resize();
+            this.draw();
             this.emitter.emit('did-update-offset', offset);
         }));
 
@@ -82,6 +88,7 @@ module.exports = class ChartPanel {
         this.sortLayers();
         this.resize();
         this.rescale();
+        this.draw();
     }
 
     addLayer(plugin, params){
@@ -153,6 +160,7 @@ module.exports = class ChartPanel {
 
         this.locked = true;
         this.rescale();
+        this.draw();
     }
 
     pan(dy){
@@ -163,6 +171,7 @@ module.exports = class ChartPanel {
         this.basis.domain([this.basis.invert(this.basis(start) - dy), this.basis.invert(this.basis(end) - dy)]);
         this.scale.domain(this.basis.domain());
         this.rescale();
+        this.draw();
     }
 
     zoomed({event, target} = {}){
@@ -171,6 +180,7 @@ module.exports = class ChartPanel {
         }
 
         this.rescale();
+        this.draw();
     }
 
     zoom(){
@@ -251,8 +261,6 @@ module.exports = class ChartPanel {
             const figures = this.basis.domain()[0].toFixed(this.chart.precision).length;
             this.panels.didUpdateOffset(this, figures * 6 + 12);
         }
-
-        this.draw();
     }
 
     remove(){

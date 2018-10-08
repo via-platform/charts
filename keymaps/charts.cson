@@ -4,6 +4,7 @@
   'g': 'charts:change-granularity'
   't': 'charts:change-type'
   'd': 'charts:add-drawing'
+  'l': 'charts:lock-scale'
   '[': 'charts:decrease-granularity'
   ']': 'charts:increase-granularity'
 

@@ -20,7 +20,7 @@ class ChartPackage {
         this.pluginsSubscriptions = {};
         this.pluginsOrderMap = {};
         this.omnibar = null;
-        this.disposables.add(via.commands.add('via-workspace, .symbol-explorer .market', 'charts:create-chart', this.create.bind(this)));
+        this.disposables.add(via.commands.add('via-workspace, .symbol-explorer .market, .watchlist .market', 'charts:create-chart', this.create.bind(this)));
 
         this.disposables.add(via.workspace.addOpener((uri, options) => {
             if(uri === base || uri.startsWith(base + '/')){

@@ -22,6 +22,10 @@ module.exports = class ChartPanels {
         this.initialize(state);
     }
 
+    all(){
+        return this.panels.slice();
+    }
+
     initialize(state){
         if(state){
             for(let panel of state){
@@ -37,7 +41,7 @@ module.exports = class ChartPanels {
     }
 
     addPanel(plugin){
-        let panel = new ChartPanel({chart: this.chart, panels: this, plugin});
+        const panel = new ChartPanel({chart: this.chart, panels: this, plugin});
         this.panels.push(panel);
         this.offsets.set(panel, panel.offset);
         this.element.appendChild(panel.element);

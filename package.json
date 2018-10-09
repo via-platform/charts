@@ -1,6 +1,6 @@
 {
   "name": "charts",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "description": "Charting view for a workspace.",
   "main": "./src/main",
   "scripts": {

@@ -52,7 +52,7 @@ class CurrentValue {
         const value = this.chart.data.last();
 
         if(value){
-            this.last = value.price_close.toFixed(this.chart.precision);
+            this.last = via.fn.number.formatPrice(value.price_close, this.chart.market);
 
             this.flag.classed('hide', false)
                 .classed('up', (value.price_close >= value.price_open))

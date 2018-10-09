@@ -24,8 +24,8 @@ const BidAsk = require('./plugins/overlays/bid-ask');
 // const IchimokuCloud = require('./plugins/overlays/ichimoku-cloud');
 
 const Crosshair = require('./plugins/other/crosshair');
-const ShadowValue = require('./plugins/other/shadow-value');
-const ReferenceMarket = require('./plugins/other/reference-market');
+// const ShadowValue = require('./plugins/other/shadow-value');
+// const ReferenceMarket = require('./plugins/other/reference-market');
 const QuickMeasure = require('./plugins/other/quick-measure');
 
 const HorizontalLine = require('./plugins/drawings/horizontal-line');

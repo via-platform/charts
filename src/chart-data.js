@@ -7,7 +7,6 @@ module.exports = class ChartData {
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
         this.zoomed = _.throttle(this.request.bind(this), 3000);
-        this.reference = {};
 
         this.disposables.add(this.chart.onDidChangeMarket(this.reset.bind(this)));
         this.disposables.add(this.chart.onDidChangeGranularity(this.reset.bind(this)));
@@ -21,12 +20,6 @@ module.exports = class ChartData {
             this.subscription = null;
             this.data = null;
         }
-
-        if(this.reference.market){
-            this.reference.subscription.dispose();
-            this.reference.subscription = null;
-            this.reference.data = null;
-        }
     }
 
     reset(){
@@ -39,15 +32,6 @@ module.exports = class ChartData {
         this.data = this.chart.market.candles(this.chart.granularity);
         this.subscription = this.data.subscribe(this.didUpdateData.bind(this));
 
-        if(this.chart.market.reference_market_id){
-            this.reference.market = via.markets.get(this.chart.market.reference_market_id);
-
-            if(this.reference.market){
-                this.reference.data = this.reference.market.candles(this.chart.granularity);
-                this.reference.subscription = this.reference.data.subscribe(this.didUpdateData.bind(this));
-            }
-        }
-
         this.request();
     }
 
@@ -56,10 +40,6 @@ module.exports = class ChartData {
 
         if(this.data){
             this.data.request({start, end});
-        }
-
-        if(this.reference.data){
-            this.reference.data.request({start, end});
         }
     }
 

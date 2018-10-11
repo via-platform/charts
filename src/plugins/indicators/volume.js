@@ -38,15 +38,15 @@ class Volume {
         return $.div({classList: 'value'},
             'Bought',
             $.span({classList: 'up'},
-                (_.isUndefined(data) || _.isUndefined(data.volume_buy)) ? '-' : data.volume_buy.toFixed(aggregation)
+                (_.isUndefined(data) || _.isUndefined(data.volume_buy)) ? '-' : via.fn.number.formatAmount(data.volume_buy, this.chart.market)
             ),
             'Sold',
             $.span({classList: 'down'},
-                (_.isUndefined(data) || _.isUndefined(data.volume_sell)) ? '-' : data.volume_sell.toFixed(aggregation)
+                (_.isUndefined(data) || _.isUndefined(data.volume_sell)) ? '-' : via.fn.number.formatAmount(data.volume_sell, this.chart.market)
             ),
             'Total',
             $.span({classList: 'available'},
-                (_.isUndefined(data) || _.isUndefined(data.volume_traded)) ? '-' : data.volume_traded.toFixed(aggregation)
+                (_.isUndefined(data) || _.isUndefined(data.volume_traded)) ? '-' : via.fn.number.formatAmount(data.volume_traded, this.chart.market)
             )
         );
     }

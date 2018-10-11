@@ -30,7 +30,7 @@ class VolumeNotional {
     value(band){
         const data = _.first(this.chart.data.fetch({start: band, end: band})) || {};
         const aggregation = this.chart.market ? this.chart.market.precision.price : 2;
-        const value = (_.isUndefined(data) || _.isUndefined(data.volume_notional)) ? '-' : data.volume_notional.toFixed(aggregation);
+        const value = (_.isUndefined(data) || _.isUndefined(data.volume_notional)) ? '-' : via.fn.number.formatPrice(data.volume_notional, this.chart.market);
         const quote = this.chart.market ? this.chart.market.quote : '';
 
         return $.div({classList: 'value'},

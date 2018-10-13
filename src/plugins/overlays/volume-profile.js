@@ -142,7 +142,7 @@ class VolumeProfile {
 
 module.exports = {
     name: 'volume-profile',
-    type: 'overlay',
+    type: 'special',
     priority: 1,
     settings: {
         selectable: false,

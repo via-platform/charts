@@ -11,10 +11,26 @@ module.exports = class RSI {
     describe(){
         return {
             components: {
-                rsi: 'plot',
-                upper_limit: 'line',
-                lower_limit: 'line',
-                limit_range: 'fill'
+                rsi: {
+                    type: 'plot',
+                    default: 'line',
+                    stroke: '#0000FF'
+                },
+                upper_limit: {
+                    type: 'line',
+                    style: 'dashed',
+                    stroke: '#0000FF'
+                },
+                lower_limit: {
+                    type: 'line',
+                    style: 'dashed',
+                    stroke: '#0000FF'
+                },
+                limit_range: {
+                    type: 'fill',
+                    fill: '#0000FF',
+                    opacity: 0.5
+                }
             },
             params: {
                 length: {
@@ -40,10 +56,10 @@ module.exports = class RSI {
     }
 
     calculate(vs){
-        vs.fill({id: 'limit_range', value: [vs.param('upper_limit'), vs.param('lower_limit')]});
-        vs.plot({id: 'upper_limit', value: vs.param('upper_limit')});
-        vs.plot({id: 'lower_limit', value: vs.param('lower_limit')});
-        vs.plot({id: 'rsi', value: vs.rsi(vs.param('length'))});
+        vs.plot('limit_range', [vs.param('lower_limit'), vs.param('upper_limit')]);
+        vs.plot('upper_limit', vs.param('upper_limit'));
+        vs.plot('lower_limit', vs.param('lower_limit'));
+        vs.plot('rsi', vs.rsi(vs.param('length')));
     }
 }
 

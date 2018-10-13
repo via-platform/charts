@@ -46,9 +46,7 @@ module.exports = class MACD {
 
     calculate(vs){
         const [ml, sl, hl] = vs.macd(
-            vs.prop(
-                vs.param('property')
-            ),
+            vs.param('property'),
             vs.param('fast_length'),
             vs.param('slow_length'),
             vs.param('signal_length')

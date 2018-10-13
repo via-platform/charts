@@ -31,6 +31,6 @@ module.exports = class SMA {
     }
 
     calculate(vs){
-        vs.plot({value: vs.sma(vs.prop(vs.param('property')), vs.param('length'))});
+        vs.plot(vs.sma(vs.prop(vs.param('property')), vs.param('length')));
     }
 }

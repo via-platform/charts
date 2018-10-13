@@ -8,7 +8,7 @@ module.exports = class RSI {
         }
     }
 
-    describe(){
+    static describe(){
         return {
             components: {
                 midline: 'plot',
@@ -20,39 +20,41 @@ module.exports = class RSI {
                 length: {
                     title: 'Length',
                     type: 'number',
-                    constraint: x => x => 0 && x <= 100,
+                    constraint: x => x >= 0 && x <= 100,
+                    default: 14
+                },
+                deviations: {
+                    title: 'Deviations',
+                    type: 'number',
+                    constraint: x => x >= 1 && x <= 5,
                     default: 14
                 },
                 upper_band: {
                     title: 'Upper Limit',
                     type: 'integer',
-                    constraint: x => x => 0 && x <= 100,
+                    constraint: x => x >= 0 && x <= 100,
                     default: 70
                 },
                 lower_band: {
                     title: 'Lower Limit',
                     type: 'integer',
-                    constraint: x => x => 0 && x <= 100,
+                    constraint: x => x >= 0 && x <= 100,
                     default: 30
                 }
             }
         };
     }
 
-    calculate(vs){
-        vs.fill({id: 'limit_range', value: [vs.param('upper_band'), vs.param('lower_band')]});
-        vs.plot({id: 'upper_band', value: vs.param('upper_band')});
-        vs.plot({id: 'lower_band', value: vs.param('lower_band')});
+    static calculate(vs){
+        const sma = vs.sma(vs.property(vs.param('property')), vs.param('length'));
+        const deviations = vs.multiply(vs.deviation(vs.property(vs.param('property')), vs.param('length')), vs.param('deviations'));
+        const upper = vs.add(sma, deviations);
+        const lower = vs.subtract(sma, deviations);
 
-        vs.plot({
-            id: 'rsi',
-            value: vs.rsi(
-                vs.prop(
-                    vs.param('property')
-                ),
-                vs.param('length')
-            )
-        });
+        vs.fill({id: 'band_range', value: [lower, upper]});
+        vs.plot({id: 'upper_band', value: upper});
+        vs.plot({id: 'lower_band', value: lower});
+        vs.plot({id: 'midline', value: mean});
     }
 }
 

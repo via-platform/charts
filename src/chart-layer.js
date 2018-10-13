@@ -22,7 +22,6 @@ module.exports = class ChartLayer {
         this.isRoot = isRoot;
         this.selectable = false;
         this.priority = plugin.priority || 1;
-        this.metadata = {};
 
         this.disposables.add(this.chart.onDidSelect(this.draw.bind(this)));
         this.disposables.add(this.chart.onDidUnselect(this.draw.bind(this)));
@@ -45,7 +44,6 @@ module.exports = class ChartLayer {
         this.panel.sortLayers();
         this.panel.didModifyLayer(this);
         this.selectable = !!plugin.selectable;
-        this.metadata = plugin;
 
         if(this.chart.selected === this && !this.selectable){
             this.chart.unselect();
@@ -76,7 +74,8 @@ module.exports = class ChartLayer {
 
     draw(){
         if(this.plugin){
-            this.plugin.draw();
+            //TODO Draw the layer instead of recalculating things with the plugin
+            // this.plugin.draw();
         }
     }
 

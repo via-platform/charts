@@ -1,3 +1,69 @@
+module.exports = class RSI {
+    static metadata(){
+        return {
+            name: 'bollinger-bands',
+            type: 'overlay',
+            title: 'Bollinger Bands',
+            description: 'The n-period moving average and two bands, one standard deviation above and below the moving average.'
+        }
+    }
+
+    describe(){
+        return {
+            components: {
+                midline: 'plot',
+                upper_band: 'plot',
+                lower_band: 'plot',
+                band_range: 'fill'
+            },
+            params: {
+                length: {
+                    title: 'Length',
+                    type: 'number',
+                    constraint: x => x => 0 && x <= 100,
+                    default: 14
+                },
+                upper_band: {
+                    title: 'Upper Limit',
+                    type: 'integer',
+                    constraint: x => x => 0 && x <= 100,
+                    default: 70
+                },
+                lower_band: {
+                    title: 'Lower Limit',
+                    type: 'integer',
+                    constraint: x => x => 0 && x <= 100,
+                    default: 30
+                }
+            }
+        };
+    }
+
+    calculate(vs){
+        vs.fill({id: 'limit_range', value: [vs.param('upper_band'), vs.param('lower_band')]});
+        vs.plot({id: 'upper_band', value: vs.param('upper_band')});
+        vs.plot({id: 'lower_band', value: vs.param('lower_band')});
+
+        vs.plot({
+            id: 'rsi',
+            value: vs.rsi(
+                vs.prop(
+                    vs.param('property')
+                ),
+                vs.param('length')
+            )
+        });
+    }
+}
+
+
+
+
+
+
+
+
+
 const {CompositeDisposable, Disposable, d3} = require('via');
 const _ = require('underscore-plus');
 const etch = require('etch');

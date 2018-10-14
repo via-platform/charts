@@ -248,6 +248,7 @@ module.exports = class VS {
         return this.divide(avg_ups, avg_downs).map(value => 100 - 100 / (1 + value));
     }
 
+    //TODO
     alma(series, length, offset, sigma){
         const m = Math.floor(offset * (length - 1));
         const s = length / sigma;
@@ -295,12 +296,21 @@ module.exports = class VS {
 
     }
 
+    condition(series, condition){
+
+    }
+
     correlation(){
 
     }
 
     cross(a, b){
         //Returns a new series of booleans, true if the series have crossed, false if not
+        const signs = this.sign(this.subtract());
+
+        return a.map((value, index) => {
+
+        });
     }
 
     crossover(a, b){

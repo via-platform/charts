@@ -7,7 +7,7 @@ module.exports = class Line {
 
     draw(series, properties){
         //TODO handle properties like color / width
-        this.line.datum(series).attr('d', this.stroke.bind(this));
+        this.line.datum(series.entries()).attr('d', this.stroke.bind(this));
     }
 
     stroke(data){

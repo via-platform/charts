@@ -62,25 +62,3 @@ module.exports = class RSI {
         vs.plot('rsi', vs.rsi(vs.param('length')));
     }
 }
-
-// this.values = [];
-//
-// data.reduce((accumulator, candle, index) => {
-//     const gain = Math.max(candle.price_close - candle.price_open, 0);
-//     const loss = Math.max(candle.price_open - candle.price_close, 0);
-//     let ag, al;
-//
-//     if(index < this.periods - 1){
-//         return {gain: accumulator.gain + gain, loss: accumulator.loss + loss};
-//     }else if(index === this.periods - 1){
-//         ag = (accumulator.gain + gain) / this.periods;
-//         al = (accumulator.loss + loss) / this.periods;
-//     }else{
-//         ag = ((this.periods - 1) * accumulator.gain + gain) / this.periods;
-//         al = ((this.periods - 1) * accumulator.loss + loss) / this.periods;
-//     }
-//
-//     this.values.push({time_period_start: new Date(candle.time_period_start), value: 100 - (100 / (1 + (ag / al)))});
-//
-//     return {gain: ag, loss: al};
-// }, {gain: 0, loss: 0});

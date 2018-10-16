@@ -9,18 +9,18 @@ module.exports = class ChartPanel {
 
     serialize(){
         return {
-            isCenter: this.isCenter,
+            center: this.center,
             layers: this.layers.map(object => object.serialize())
         };
     }
 
-    constructor({chart, isCenter, state, plugin, panels}){
+    constructor({chart, center, state, plugin, panels}){
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
 
         this.panels = panels;
         this.chart = chart;
-        this.isCenter = isCenter;
+        this.center = center;
         this.layers = [];
         this.locked = true;
 
@@ -32,7 +32,7 @@ module.exports = class ChartPanel {
         this.scale = this.basis.copy();
 
         this.element = document.createElement('div');
-        this.element.classList.add('panel', this.isCenter ? 'center' : 'indicator');
+        this.element.classList.add('panel', this.center ? 'center' : 'accessory');
 
         this.center = document.createElement('div');
         this.center.classList.add('panel-center');
@@ -64,10 +64,10 @@ module.exports = class ChartPanel {
         this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
         this.disposables.add(this.chart.onDidDestroy(this.destroy.bind(this)));
 
-        this.disposables.add(this.chart.data.onDidUpdateData(() => {
-            this.rescale();
-            this.draw();
-        }));
+        // this.disposables.add(this.chart.data.onDidUpdateData(() => {
+        //     this.rescale();
+        //     this.draw();
+        // }));
 
         this.disposables.add(this.panels.onDidUpdateOffset(offset => {
             this.resize();
@@ -82,13 +82,21 @@ module.exports = class ChartPanel {
         if(state && state.layers){
             this.layers = state.layers.map(layer => ChartLayer.deserialize({chart: this.chart, panel: this, state: layer}));
         }else{
-            this.layers.push(new ChartLayer({chart: this.chart, panel: this, isRoot: true, plugin}));
+            // this.layers.push(new ChartLayer({chart: this.chart, panel: this, plugin}));
         }
 
         this.sortLayers();
         this.resize();
         this.rescale();
         this.draw();
+    }
+
+    add(params){
+
+    }
+
+    remove(layer){
+
     }
 
     addLayer(plugin, params){
@@ -105,7 +113,7 @@ module.exports = class ChartPanel {
         this.emitter.emit('did-remove-layer', layer);
         layer.destroy();
 
-        if(!this.layers.length && !this.isCenter){
+        if(!this.layers.length && !this.center){
             this.remove();
         }
 
@@ -256,15 +264,17 @@ module.exports = class ChartPanel {
             this.emitter.emit('did-rescale', this.scale);
         }
 
-        if(this.isCenter){
+        if(this.center){
             //TODO figure out how to make this work for indicator panels as well
             const figures = this.basis.domain()[0].toFixed(this.chart.precision).length;
             this.panels.didUpdateOffset(this, figures * 6 + 12);
         }
+
+        this.draw();
     }
 
     remove(){
-        if(this.isCenter){
+        if(this.center){
             return;
         }
 

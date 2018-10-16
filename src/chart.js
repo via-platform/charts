@@ -1,32 +1,14 @@
 const {Disposable, CompositeDisposable, Emitter, d3} = require('via');
-const ChartData = require('./chart-data');
-const ChartStudy = require('./chart-study');
+// const ChartData = require('./chart-data');
+// const ChartStudy = require('./chart-study');
+const granularities = require('./chart-granularities');
 const ChartPanels = require('./chart-panels');
 const ChartTools = require('./chart-tools');
 const ChartAxis = require('./chart-axis');
 const _ = require('underscore-plus');
 const ChartDefaults = {end: 0, start: Date.now() - 864e5};
-const ChartAreas = 'top left bottom right'.split(' ');
 const base = 'via://charts';
 
-const abbreviations = {
-    6e4: '1m',
-    18e4: '3m',
-    3e5: '5m',
-    6e5: '10m',
-    9e5: '15m',
-    18e5: '30m',
-    36e5: '1h',
-    72e5: '2h',
-    108e5: '3h',
-    144e5: '4h',
-    216e5: '6h',
-    288e5: '8h',
-    432e5: '12h',
-    864e5: '1D',
-    2592e5: '3D',
-    6048e5: '1W'
-};
 
 module.exports = class Chart {
     static deserialize({manager, plugins, omnibar}, state){
@@ -40,10 +22,7 @@ module.exports = class Chart {
             granularity: this.granularity,
             transform: this.transform,
             group: this.group ? this.group.color : ''
-            // time: this.time,
-            // type: this.type,
-            // panels: this.panels.serialize(),
-            // tools: this.tools.serialize()
+            // panels: this.panels.serialize()
         };
     }
 
@@ -54,22 +33,18 @@ module.exports = class Chart {
 
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
-        this.warnings = [];
         this.panels = null;
         this.uri = state.uri;
         this.initialized = false;
 
         this.width = 0;
         this.height = 0;
-        this.type = via.config.get('charts.defaultChartType');
         this.transform = d3.zoomIdentity;
 
         this.padding = 0.2;
         this.bandwidth = 10;
         this.granularity = state.granularity || via.config.get('charts.defaultChartGranularity');
-        this.precision = 2;
         this.selected = null;
-        this.drawing = null;
 
         this.basis = d3.scaleTime().domain([new Date(Date.now() - this.granularity * 144), new Date()]);
         this.scale = this.basis.copy();
@@ -78,8 +53,8 @@ module.exports = class Chart {
         this.element.classList.add('chart', 'pane-item', 'focusable-panel');
         this.element.tabIndex = -1;
 
-        this.data = new ChartData(this);
-        this.tools = new ChartTools({chart: this, state: state.tools});
+        // this.data = new ChartData(this);
+        this.tools = new ChartTools({chart: this});
         this.panels = new ChartPanels({chart: this, state: state.panels});
         this.axis = new ChartAxis({chart: this});
 
@@ -105,38 +80,11 @@ module.exports = class Chart {
             'charts:zoom-out': () => this.zoom(0.5),
             'core:move-left': () => this.translate(100),
             'core:move-right': () => this.translate(-100),
-            'core:delete': () => {
-                this.cancel();
-
-                if(this.selected){
-                    this.selected.remove();
-                }
-            },
-            'core:backspace': () => {
-                this.cancel();
-
-                if(this.selected){
-                    this.selected.remove();
-                }
-            },
-            'core:cancel': () => {
-                this.cancel();
-                this.unselect();
-            },
-            'charts:lock-scale': () => {
-                for(const panel of this.panels.all()){
-                    panel.lock();
-                }
-            }
+            'core:delete': this.delete.bind(this),
+            'core:backspace': this.delete.bind(this),
+            'core:cancel': this.unselect.bind(this),
+            'charts:lock-scale': this.lock.bind(this)
         }));
-
-        //There isn't a great place to initialize uber-general plugins like the crosshairs
-        //Might as well do it here...
-        this.manager.observePlugins(plugin => {
-            if(plugin.type === 'other'){
-                plugin.instance({chart: this, tools: this});
-            }
-        });
 
         this.initialize(state);
     }
@@ -208,18 +156,11 @@ module.exports = class Chart {
     }
 
     click(params){
-        if(!this.drawing){
-            this.unselect();
-        }
-
+        this.unselect();
         this.emitter.emit('did-click', params);
     }
 
     select(layer){
-        if(this.drawing) return;
-
-        this.cancel();
-
         if(this.selected){
             this.unselect();
         }
@@ -235,36 +176,8 @@ module.exports = class Chart {
         }
     }
 
-    draw(plugin){
-        this.drawing = this.emitter.once('did-click', ({event, target}) => {
-            const layer = target.addLayer(plugin, event);
-
-            if(this.selected){
-                this.unselect();
-            }
-
-            this.selected = layer;
-            this.emitter.emit('did-select', layer);
-        });
-    }
-
-    cancel(){
-        if(this.drawing){
-            this.drawing.dispose();
-            this.drawing = null;
-        }
-
-        this.emitter.emit('did-cancel');
-    }
-
-    done(){
-        if(this.drawing){
-            this.drawing.dispose();
-            this.drawing = null;
-        }
-    }
-
     resize(){
+        //NOTE This is almost certainly what is causing the bug where the chart does not draw immediately - only after you move the chart
         if(this.isHidden()){
             return;
         }
@@ -297,6 +210,18 @@ module.exports = class Chart {
         this.omnibar = actionBar.omnibar;
     }
 
+    delete(){
+        if(this.selected){
+            this.selected.remove();
+        }
+    }
+
+    lock(){
+        for(const panel of this.panels.all()){
+            panel.lock();
+        }
+    }
+
     destroy(){
         if(this.groupDisposables){
             this.groupDisposables.dispose();
@@ -317,34 +242,12 @@ module.exports = class Chart {
         return this.market ? `${base}/market/${this.market.uri()}` : base;
     }
 
-    getIdentifier(){
-        return this.getURI().slice(base.length + 1);
-    }
-
     getTitle(){
-        return this.market ? `${this.market.title}, ${this.getTypePlugin().title}, ${abbreviations[this.granularity]}` : 'Chart';
-    }
-
-    getType(){
-        return this.type;
+        return this.market ? `${this.market.title}, ${granularities[this.granularity].abbreviation}` : 'Chart';
     }
 
     getMarket(){
         return this.market;
-    }
-
-    getTypePlugin(){
-        return this.plugins.get(this.getType());
-    }
-
-    addWarning(warning){
-        this.warnings.push(warning);
-        this.emitter.emit('did-add-warning', warning);
-    }
-
-    removeWarning(warning){
-        _.remove(this.warnings, warning);
-        this.emitter.emit('did-remove-warning', warning);
     }
 
     setNextBandTimeout(shift = true){
@@ -362,15 +265,12 @@ module.exports = class Chart {
         this.bandTimeout = setTimeout(() => this.setNextBandTimeout(), nextCandle.getTime() - Date.now());
     }
 
-    clearWarnings(){
-        this.warnings = [];
-    }
-
     changeMarket(market){
-        if(!market || market === this.market) return;
+        if(!market || market === this.market){
+            return;
+        }
 
         this.market = market;
-        this.precision = this.market.precision.price;
         this.emitter.emit('did-change-market', market);
         this.emitter.emit('did-change-title');
 
@@ -427,57 +327,12 @@ module.exports = class Chart {
         this.emitter.emit('did-change-title');
     }
 
-    changeType(type){
-        if(this.type !== type){
-            const plugin = this.plugins.get(type);
-            this.type = type;
-            this.root().initialize(plugin);
-            this.emitter.emit('did-change-type', plugin);
-            this.emitter.emit('did-change-title');
-        }
-    }
-
-    addTool(tool){
-        const element = tool.element;
-        this.emitter.emit('did-add-tool', tool);
-
-        //TODO observe the weight of the tool to put it in the proper order
-        const parent = (tool.location === 'left') ? this.refs.toolsLeft : this.refs.toolsRight;
-        parent.appendChild(element);
-
-        return new Disposable(() => this.removeTool(tool));
-    }
-
-    removeTool(tool){
-        tool.element.remove();
-        this.emitter.emit('did-remove-tool', tool);
-    }
-
-    addStudy(params){
-        const study = new ChartStudy(this, params);
-        this.studies.push(study);
-        this.emitter.emit('did-add-study', study);
-    }
-
-    removeStudy(study){
-        _.remove(this.studies, study);
-        this.emitter.emit('did-remove-study', study);
-    }
-
     nearestCandle(date){
         return new Date(Math.floor(date.getTime() / this.granularity) * this.granularity);
     }
 
     isHidden(){
         return this.element.offsetParent === null;
-    }
-
-    addLeftPanel(){
-
-    }
-
-    addRightPanel(){
-
     }
 
     root(){
@@ -512,24 +367,8 @@ module.exports = class Chart {
         return this.emitter.on('did-change-title', callback);
     }
 
-    onDidAddWarning(callback){
-        return this.emitter.on('did-add-warning', callback);
-    }
-
-    onDidRemoveWarning(callback){
-        return this.emitter.on('did-remove-warning', callback);
-    }
-
     onDidChangeMarket(callback){
         return this.emitter.on('did-change-market', callback);
-    }
-
-    onDidAddStudy(callback){
-        return this.emitter.on('did-add-study', callback);
-    }
-
-    onDidRemoveStudy(callback){
-        return this.emitter.on('did-remove-study', callback);
     }
 
     onDidDestroy(callback){

@@ -32,7 +32,7 @@ module.exports = class ChartPanels {
                 this.panels.push(new ChartPanel({chart: this.chart, panels: this, state: panel}));
             }
         }else{
-            this.panels.push(new ChartPanel({chart: this.chart, panels: this, isCenter: true, plugin: this.chart.getTypePlugin()}));
+            this.panels.push(new ChartPanel({chart: this.chart, panels: this, center: true}));
         }
 
         for(let panel of this.panels){
@@ -81,7 +81,7 @@ module.exports = class ChartPanels {
     }
 
     getCenter(){
-        return this.panels.find(panel => panel.isCenter);
+        return this.panels.find(panel => panel.center);
     }
 
     onDidAddPanel(callback){

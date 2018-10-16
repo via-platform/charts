@@ -16,15 +16,21 @@ class ChartPackage {
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
         this.charts = [];
-        this.plugins = new Map();
-        this.pluginsSubscriptions = {};
-        this.pluginsOrderMap = {};
+        this.plugins = [];
+        this.drawings = [];
+        this.indicators = [];
+        this.plots = [];
         this.omnibar = null;
+
         this.disposables.add(via.commands.add('via-workspace, .symbol-explorer .market, .watchlist .market', 'charts:create-chart', this.create.bind(this)));
 
         this.disposables.add(via.workspace.addOpener((uri, options) => {
             if(uri === base || uri.startsWith(base + '/')){
-                const chart = new Chart({manager: this, plugins: this.plugins, omnibar: this.omnibar}, {uri});
+                const chart = new Chart({manager: this, omnibar: this.omnibar}, {uri});
+
+                for(const plugin of this.plugins){
+                    plugin.instance({chart, manager: this});
+                }
 
                 this.charts.push(chart);
                 this.emitter.emit('did-create-chart', chart);
@@ -33,11 +39,19 @@ class ChartPackage {
             }
         }, InterfaceConfiguration));
 
-        this.registerDefaultPlugins();
+        for(const [type, plugins] of Object.entries(DefaultPlugins)){
+            for(const plugin of plugins){
+                this[type](plugin);
+            }
+        }
     }
 
     deserialize(state){
-        const chart = Chart.deserialize({manager: this, plugins: this.plugins, omnibar: this.omnibar}, state);
+        const chart = Chart.deserialize({manager: this, omnibar: this.omnibar}, state);
+
+        for(const plugin of this.plugins){
+            plugin.instance({chart, manager: this});
+        }
 
         this.charts.push(chart);
         this.emitter.emit('did-create-chart', chart);
@@ -56,7 +70,10 @@ class ChartPackage {
     }
 
     deactivate(){
-        this.deactivateAllPlugins();
+        for(const plugin of this.plugins.values()){
+            this.deactivatePlugin(plugin);
+        }
+
         this.disposables.dispose();
         this.disposables = null;
         this.active = false;
@@ -78,94 +95,42 @@ class ChartPackage {
         return this;
     }
 
-    registerDefaultPlugins(){
-        DefaultPlugins.forEach(plugin => this.disposables.add(this.registerPlugin(plugin)));
-    }
 
-    registerPlugin(plugin){
-        this.plugins.set(plugin.name, plugin);
-        this.emitter.emit('did-register-plugin', plugin);
-        this.updatePluginActivationState(plugin);
-        return new Disposable(() => this.unregisterPlugin(plugin));
-    }
 
-    unregisterPlugin(plugin){
-        if(this.plugins.has(plugin.name)){
-            this.plugins.delete(plugin.name);
-            this.emitter.emit('did-unregister-plugin', plugin);
-        }
-    }
 
-    updatePluginActivationState(plugin){
-        // const plugin = this.plugins.get(plugin.name)
-        // const pluginActive = plugin.isActive();
-        // const settingActive = via.config.get(`charts.plugins.${name}`);
-        //
-        // this.activatePlugin(plugin);
-    }
 
-    activatePlugin(plugin){
-        if(_.isFunction(plugin.activatePlugin)){
-            plugin.activatePlugin();
+
+    plugin(plugin){
+        this.plugins.push(plugin);
+
+        for(const chart of this.charts){
+            plugin.instance({chart});
         }
 
-        this.emitter.emit('did-activate-plugin', plugin);
+        return new Disposable(() => _.remove(this.plugins, plugin));
     }
 
-    deactivatePlugin(plugin){
-        if(_.isFunction(plugin.deactivatePlugin)){
-            plugin.deactivatePlugin();
-        }
-
-        this.emitter.emit('did-deactivate-plugin', plugin);
+    drawing(plugin){
+        this.drawings.push(plugin);
+        return new Disposable(() => _.remove(this.drawings, plugin));
     }
 
-    deactivateAllPlugins(){
-        for(const plugin of this.plugins.values()){
-            this.deactivatePlugin(plugin);
-        }
+    indicator(plugin){
+        this.indicators.push(plugin);
+        return new Disposable(() => _.remove(this.indicators, plugin));
     }
 
-    updatePluginsOrderMap(name){
-        const orderSettingsKey = `charts.plugins.${name}DecorationsZIndex`;
-        this.pluginsOrderMap[name] = via.config.get(orderSettingsKey);
+    plot(plugin){
+        this.plots.push(plugin);
+        return new Disposable(() => _.remove(this.plots, plugin));
     }
 
-    getPluginsOrder(){
-        return this.pluginsOrderMap;
-    }
 
-    getPlugin(name){
-        return name ? this.plugins.get(name) : null;
-    }
 
-    observePlugins(callback){
-        for(const plugin of this.plugins.values()){
-            callback(plugin);
-        }
 
-        return this.onDidAddPlugin(plugin => callback(plugin));
-    }
 
-    onDidAddPlugin(callback){
-        return this.emitter.on('did-add-plugin', callback);
-    }
 
-    onDidRemovePlugin(callback){
-        return this.emitter.on('did-remove-plugin', callback);
-    }
 
-    onDidActivatePlugin(callback){
-        return this.emitter.on('did-activate-plugin', callback);
-    }
-
-    onDidDeactivatePlugin(callback){
-        return this.emitter.on('did-deactivate-plugin', callback)
-    }
-
-    onDidChangePluginOrder(callback){
-        return this.emitter.on('did-change-plugin-order', callback);
-    }
 
     observeCharts(callback){
         for(const chart of this.getCharts()){
@@ -173,40 +138,6 @@ class ChartPackage {
         }
 
         return this.onDidCreateChart(chart => callback(chart));
-    }
-
-    didAddSeries(chart, series){
-        this.emitter.emit('did-add-series', {chart, series});
-    }
-
-    didRemoveSeries(chart, series){
-        this.emitter.emit('did-remove-series', {chart, series});
-    }
-
-    didModifySeries(chart, series){
-        this.emitter.emit('did-modify-series', {chart, series});
-    }
-
-    observeSeries(callback){
-        for(const chart of this.getCharts()){
-            for(const series of chart.getSeries()){
-                callback({chart, series});
-            }
-        }
-
-        return this.onDidAddSeries(callback);
-    }
-
-    onDidAddSeries(callback){
-        return this.emitter.on('did-add-series', callback);
-    }
-
-    onDidRemoveSeries(callback){
-        return this.emitter.on('did-remove-series', callback);
-    }
-
-    onDidModifySeries(callback){
-        return this.emitter.on('did-modify-series', callback);
     }
 
     onDidCreateChart(callback){

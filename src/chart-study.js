@@ -30,8 +30,7 @@ module.exports = class ChartStudy {
         let plugin = this.chart.plugins.getPlugin(this.type);
 
         if(!plugin){
-            this.chart.addWarning({type: 'error', message: `Could not find plugin ${this.type}.`});
-            return;
+            return via.console.warn(`Could not find plugin chart plugin '${this.type}'.`);
         }
 
         this.plugin = new plugin(this);

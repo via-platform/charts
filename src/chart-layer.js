@@ -5,21 +5,19 @@ module.exports = class ChartLayer {
     static deserialize({chart, panel, state}){
         const plugin = chart.plugins.get(state.plugin.name);
 
-        return new ChartLayer({chart, panel, plugin, isRoot: state.isRoot, pluginState: state.plugin});
+        return new ChartLayer({chart, panel, plugin, pluginState: state.plugin});
     }
 
     serialize(){
         return {
-            isRoot: this.isRoot,
             plugin: this.plugin.serialize()
         };
     }
 
-    constructor({chart, panel, isRoot, plugin, params}){
+    constructor({chart, panel, plugin, params}){
         this.disposables = new CompositeDisposable();
         this.chart = chart;
         this.panel = panel;
-        this.isRoot = isRoot;
         this.selectable = false;
         this.priority = plugin.priority || 1;
 
@@ -39,7 +37,7 @@ module.exports = class ChartLayer {
             this.element = null;
         }
 
-        this.element = this.panel.zoomable.append('g').datum(this.priority).classed('layer', true).classed('root', this.isRoot).classed('selectable', plugin.selectable);
+        this.element = this.panel.zoomable.append('g').datum(this.priority).classed('layer', true).classed('selectable', plugin.selectable);
         this.plugin = plugin.instance({chart: this.chart, panel: this.panel, element: this.element, layer: this, params});
         this.panel.sortLayers();
         this.panel.didModifyLayer(this);
@@ -77,13 +75,11 @@ module.exports = class ChartLayer {
             //TODO Draw the layer instead of recalculating things with the plugin
             // this.plugin.draw();
         }
+
+
     }
 
     remove(){
-        if(this.panel.isCenter && this.isRoot){
-            return;
-        }
-
         if(this.chart.selected === this){
             this.chart.unselect();
         }

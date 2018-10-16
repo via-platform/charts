@@ -3,8 +3,8 @@ module.exports = class Candles {
         this.chart = chart;
         this.panel = panel;
         this.element = element;
-        
-        this.element.classed('heikin-ashi', true);
+
+        this.element.classed('candles', true);
     }
 
     draw(series, properties){
@@ -14,7 +14,7 @@ module.exports = class Candles {
 
         body.enter().append('path').merge(body)
             .attr('d', this.body)
-            .attr('class', d => (d.price_open > d.price_close) ? 'candle wick down' : 'candle wick up');
+            .attr('class', d => (d.price_open > d.price_close) ? 'candle body down' : 'candle body up');
 
         body.exit().remove();
 

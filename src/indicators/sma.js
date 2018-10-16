@@ -4,12 +4,7 @@ module.exports = class SMA {
             name: 'sma',
             type: 'overlay',
             title: 'Simple Moving Average',
-            description: 'An n-period moving average.'
-        }
-    }
-
-    describe(){
-        return {
+            description: 'An n-period moving average.',
             components: {
                 default: 'plot'
             },

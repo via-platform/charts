@@ -3,6 +3,7 @@ module.exports = {
     title: 'Triangle',
     description: 'Draw a triangle on the chart.',
     points: 3,
+    params: {},
     render: ({chart, panel, element, points}) => {
         const [start, middle, end] = points;
 

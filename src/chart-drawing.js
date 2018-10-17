@@ -37,7 +37,7 @@ module.exports = class ChartDrawing {
         this.panel = panel;
         this.plugin = plugin;
         this.points = [];
-        this.params = Object.assign(defaults, this.plugin.params);
+        this.params = _.defaults(this.plugin.params, defaults);
 
         this.element = this.panel.zoomable.append('g')
             .datum(this.params.priority)

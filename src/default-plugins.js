@@ -11,8 +11,8 @@ module.exports = {
         // require('./plots/mountain')
     ],
     drawing: [
-        // require('./drawings/horizontal-line'),
-        // require('./drawings/vertical-line'),
+        require('./drawings/horizontal-line'),
+        require('./drawings/vertical-line'),
         require('./drawings/measure'),
         require('./drawings/date-range'),
         require('./drawings/value-range'),

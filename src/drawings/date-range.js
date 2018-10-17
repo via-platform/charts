@@ -3,6 +3,7 @@ module.exports = {
     title: 'Date Range',
     description: 'Draw a date range.',
     points: 2,
+    params: {},
     render: ({chart, panel, element, points}) => {
         const [start, end] = points;
 

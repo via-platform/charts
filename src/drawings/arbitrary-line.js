@@ -3,6 +3,7 @@ module.exports = {
     title: 'Line',
     description: 'Draw an arbitrary line on the chart.',
     points: 2,
+    params: {},
     render: ({chart, panel, element, points}) => {
         const [start, end] = points;
 

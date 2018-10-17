@@ -6,6 +6,7 @@ module.exports = {
     title: 'Fibonacci Retracement',
     description: 'Draw a Fibonacci Retracement on the chart.',
     points: 2,
+    params: {},
     render: ({chart, panel, element, points}) => {
         const [start, end] = points;
 

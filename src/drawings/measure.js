@@ -1,138 +1,54 @@
-const {CompositeDisposable, Disposable, d3} = require('via');
-const _ = require('underscore-plus');
-const moment = require('moment');
-const etch = require('etch');
-const $ = etch.dom;
-const AXIS_HEIGHT = 22;
-const FLAG_HEIGHT = AXIS_HEIGHT - 3;
+module.exports = {
+    name: 'measure',
+    title: 'Measure',
+    description: 'Measure a date and value range.',
+    points: 3,
+    params: {
+        ephemeral: true
+    },
+    render: ({chart, panel, element, points}) => {
+        const [start, end] = points;
 
-require('moment-duration-format')(moment);
+        const sx = chart.scale(start.x);
+        const ex = chart.scale(end.x);
+        const sy = panel.scale(start.y);
+        const ey = panel.scale(end.y);
 
-class Measure {
-    constructor({chart, element, panel, layer, params}){
-        this.disposables = new CompositeDisposable();
-        this.chart = chart;
-        this.panel = panel;
-        this.layer = layer;
-        this.start = {x: this.chart.scale.invert(event.offsetX), y: this.panel.scale.invert(event.offsetY)};
-        this.end = _.clone(this.start);
-        this.done = false;
+        const mx = (ex + sx) / 2;
+        const my = (ey + sy) / 2;
 
-        this.element = element;
-        this.element.classed('measure', true);
+        const value = (end.y - start.y).toFixed(panel.precision);
+        const percentage = ((end.y - start.y) / start.y * 100).toFixed(2);
+        const bars = (end.x - start.x) / chart.granularity;
+        const duration = via.fn.time.duration(start.x, end.x, 'd[d], h[h], m[m], s[s]', {largest: 2, trim: 'both'});
 
-        this.background = this.element.append('rect').attr('x', 0).attr('y', 0).attr('class', 'background');
-        this.rect = this.element.append('rect').attr('class', 'selection');
-
-        this.text = this.element.append('text')
-            .attr('alignment-baseline', 'hanging')
-            .attr('text-anchor', 'middle');
-
-        this.disposables.add(this.chart.onDidClick(this.click.bind(this)));
-        this.disposables.add(this.chart.onDidMouseMove(this.mousemove.bind(this)));
-        this.disposables.add(this.chart.onDidZoom(this.draw.bind(this)));
-        this.disposables.add(this.chart.onDidCancel(() => this.panel.removeLayer(this.layer)));
-
-        this.range = {
-            x: this.chart.axis.range(),
-            y: this.panel.axis.range()
-        };
-
-        this.range.x.classed('measure-range', true);
-        this.range.y.classed('measure-range', true);
-
-        this.disposables.add(new Disposable(() => {
-            this.range.x.remove();
-            this.range.y.remove();
-        }));
-
-        this.disposables.add(this.panel.onDidDestroy(this.destroy.bind(this)));
-        this.disposables.add(this.panel.onDidResize(this.resize.bind(this)));
-
-        this.resize();
-    }
-
-    resize(){
-        this.background.attr('width', this.panel.width).attr('height', this.panel.height);
-        this.draw();
-    }
-
-    serialize(){
-        return {};
-    }
-
-    mousemove({event, target}){
-        if(target !== this.panel) return;
-        if(this.done) return;
-
-        this.end = {x: this.chart.scale.invert(event.offsetX), y: this.panel.scale.invert(event.offsetY)};
-        this.draw();
-    }
-
-    click({event, target}){
-        //Self-destruct once the user clicks again, regardless of where the user clicks on the chart
-        if(this.done) return this.panel.removeLayer(this.layer);
-        if(target !== this.panel) return;
-
-        this.end = {x: this.chart.scale.invert(event.offsetX), y: this.panel.scale.invert(event.offsetY)};
-        this.done = true;
-        this.draw();
-    }
-
-    draw(){
-        const sd = new Date(Math.round(this.start.x.getTime() / this.chart.granularity) * this.chart.granularity);
-        const ed = new Date(Math.round(this.end.x.getTime() / this.chart.granularity) * this.chart.granularity);
-
-        const sx = this.chart.scale(sd);
-        const ex = this.chart.scale(ed);
-
-        const sy = this.panel.scale(this.start.y);
-        const ey = this.panel.scale(this.end.y);
-
-        const start = {
+        const s = {
             x: Math.min(sx, ex),
             y: Math.min(sy, ey)
         };
 
-        const end = {
+        const e = {
             x: Math.max(sx, ex),
             y: Math.max(sy, ey)
         };
 
-        const value = (this.end.y - this.start.y).toFixed(this.chart.precision);
-        const percentage = ((this.end.y - this.start.y) / this.start.y * 100).toFixed(2);
-        const bars = (ed.getTime() - sd.getTime()) / this.chart.granularity;
-        const duration = moment.duration(ed.getTime() - sd.getTime(), 'milliseconds').format('d[d], h[h], m[m], s[s]', {largest: 2, trim: 'both'});
+        element.selectAll('path').remove();
 
-        this.rect.attr('x', start.x)
-            .attr('y', start.y)
-            .attr('width', end.x - start.x)
-            .attr('height', end.y - start.y);
+        element.append('path').classed('direction', true).attr('d', `M ${mx} ${sy} V ${ey}`);
+        element.append('path').classed('direction', true).attr('d', `M ${sx} ${my} H ${ex}`);
 
-        this.range.x.select('rect')
-            .attr('x', start.x)
-            .attr('width', end.x - start.x);
+        element.append('path').classed('arrow', true).attr('d', (ey < sy ? `M ${mx - 3} ${ey + 8} l 3 -8 l 3 8 Z` : `M ${mx - 3} ${ey - 8} l 3 8 l 3 -8 Z`));
+        element.append('path').classed('arrow', true).attr('d', (ex < sx ? `M ${ex + 8} ${my - 3} l -8 3 l 8 3 Z` : `M ${ex - 8} ${my - 3} l 8 3 l -8 3 Z`));
 
-        this.range.y.select('rect')
-            .attr('y', start.y)
-            .attr('height', end.y - start.y);
+        element.selectAll('rect').remove();
+        element.append('rect').attr('x', s.x).attr('y', s.y).attr('width', e.x - s.x).attr('height', e.y - s.y);
 
-        this.text.attr('x', (end.x + start.x) / 2)
-            .attr('y', end.y + 6)
+        element.selectAll('text').remove();
+        element.append('text')
+            .attr('alignment-baseline', 'hanging')
+            .attr('text-anchor', 'middle')
+            .attr('x', (ex + sx) / 2)
+            .attr('y', e.y + 6)
             .text(`${value} (${percentage}%), ${duration} (${bars} Bars)`);
     }
-
-    destroy(){
-        this.disposables.dispose();
-    }
-}
-
-module.exports = {
-    name: 'measure',
-    type: 'drawing',
-    settings: {},
-    title: 'Measure',
-    description: 'Measure an area on the chart.',
-    selectable: true,
-    instance: params => new Measure(params)
 };

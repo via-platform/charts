@@ -86,6 +86,12 @@ module.exports = class Chart {
             'charts:lock-scale': this.lock.bind(this)
         }));
 
+        this.disposables.add(via.commands.add(this.element, {
+            'core:delete': this.cancel.bind(this),
+            'core:backspace': this.cancel.bind(this),
+            'core:cancel': this.cancel.bind(this)
+        }));
+
         this.initialize(state);
     }
 
@@ -327,6 +333,25 @@ module.exports = class Chart {
         this.emitter.emit('did-change-title');
     }
 
+    draw(plugin){
+        console.log('Drawing plugin', plugin);
+
+        if(this.initiate){
+            this.initiate.dispose();
+        }
+
+        this.initiate = this.emitter.once('did-click', ({event, target}) => {
+            target.draw({plugin, event});
+        });
+    }
+
+    cancel(){
+        if(this.initiate){
+            this.initiate.dispose();
+            this.initiate = null;
+        }
+    }
+
     nearestCandle(date){
         return new Date(Math.floor(date.getTime() / this.granularity) * this.granularity);
     }
@@ -341,6 +366,10 @@ module.exports = class Chart {
 
     center(){
         return this.panels.getCenter();
+    }
+
+    onDidCancel(callback){
+        return this.emitter.on('did-cancel', callback);
     }
 
     onDidChangeGroup(callback){

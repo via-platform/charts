@@ -2,43 +2,11 @@
 
 .chart
 {
-    .chart-axis
-    {
-        .date-value-range
-        {
-            rect
-            {
-                fill: fade(@primary-color, 20%);
-            }
-        }
-
-        .date-value-flag
-        {
-            rect
-            {
-                fill: @primary-color;
-            }
-
-            text
-            {
-                fill: @text-color;
-                font-size: 11px;
-                font-weight: 700;
-                font-family: @font-family-serif;
-            }
-        }
-    }
-
     .panel .layer.date-value-range
     {
-        .selection
+        rect
         {
             fill: fade(@primary-color, 15%);
-        }
-
-        .background
-        {
-            fill: transparent;
         }
 
         text
@@ -48,18 +16,21 @@
             font-weight: 700;
         }
 
-        .handle
+        path
         {
-            display: none;
-            pointer-events: none;
+            stroke-width: 1;
+            stroke: @primary-color;
         }
 
-        &.selected
+        path.direction
         {
-            .handle
-            {
-                display: block;
-            }
+            stroke-dasharray: 5;
+        }
+
+        path.arrow
+        {
+            stroke-width: 0;
+            fill: @primary-color;
         }
     }
 }

@@ -3,11 +3,46 @@ const _ = require('underscore-plus');
 const etch = require('etch');
 const $ = etch.dom;
 
-class VolumeProfile {
-    constructor({chart, state, element, panel}){
+module.exports = class VolumeProfile {
+    static metadata(){
+        return {
+            name: 'volume-profile',
+            type: 'indicator',
+            title: 'Volume Profile',
+            description: 'Displays horizontal bars on the indicating volume bought and sold at each price level.',
+            components: {},
+            params: {
+                location: {
+                    title: 'Location',
+                    type: 'string',
+                    enum: ['left', 'right'],
+                    default: 'right'
+                },
+                buy: {
+                    title: 'Buy Color',
+                    type: 'color',
+                    default: '#00FF00'
+                },
+                sell: {
+                    title: 'Sell Color',
+                    type: 'color',
+                    default: '#FF0000'
+                },
+                width: {
+                    title: 'Width %',
+                    type: 'number',
+                    constraint: x => (x >= 1 && x <= 100),
+                    default: 30
+                }
+            }
+        };
+    }
+
+    constructor({chart, panel, layer, element}){
         this.disposables = new CompositeDisposable();
         this.chart = chart;
         this.panel = panel;
+        this.layer = layer;
         this.element = element;
 
         //We need to create a new horizontal scale, but not a new vertical scale
@@ -18,7 +53,6 @@ class VolumeProfile {
 
         this.disposables.add(this.panel.onDidDestroy(this.destroy.bind(this)));
         this.disposables.add(this.panel.onDidResize(this.resize.bind(this)));
-        this.disposables.add(this.panel.onDidDraw(this.draw.bind(this)));
 
         this.resize();
     }
@@ -28,13 +62,6 @@ class VolumeProfile {
             this.subscription.dispose();
             this.subscription = null;
         }
-    }
-
-    serialize(){
-        return {
-            version: 1,
-            name: 'volume-profile'
-        };
     }
 
     resize(){
@@ -139,16 +166,3 @@ class VolumeProfile {
         this.disposables.dispose();
     }
 }
-
-module.exports = {
-    name: 'volume-profile',
-    type: 'special',
-    priority: 1,
-    settings: {
-        selectable: false,
-        allowedLocations: 'center'
-    },
-    title: 'Volume Profile',
-    description: 'Displays horizontal bars on the indicating volume bought and sold at each price level.',
-    instance: params => new VolumeProfile(params)
-};

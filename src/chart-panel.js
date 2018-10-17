@@ -5,6 +5,8 @@ const ChartPanelAxis = require('./chart-panel-axis');
 const ChartPanelGrid = require('./chart-panel-grid');
 const ChartPanelValues = require('./chart-panel-values');
 
+const ChartDrawing = require('./chart-drawing');
+
 module.exports = class ChartPanel {
 
     serialize(){
@@ -66,12 +68,12 @@ module.exports = class ChartPanel {
 
         // this.disposables.add(this.chart.data.onDidUpdateData(() => {
         //     this.rescale();
-        //     this.draw();
+        //     this.render();
         // }));
 
         this.disposables.add(this.panels.onDidUpdateOffset(offset => {
             this.resize();
-            this.draw();
+            this.render();
             this.emitter.emit('did-update-offset', offset);
         }));
 
@@ -88,22 +90,14 @@ module.exports = class ChartPanel {
         this.sortLayers();
         this.resize();
         this.rescale();
-        this.draw();
-    }
-
-    add(params){
-
-    }
-
-    remove(layer){
-
+        this.render();
     }
 
     addLayer(plugin, params){
         const layer = new ChartLayer({chart: this.chart, panel: this, plugin, params});
         this.layers.push(layer);
         this.emitter.emit('did-add-layer', layer);
-        this.draw();
+        this.render();
 
         return layer;
     }
@@ -117,7 +111,7 @@ module.exports = class ChartPanel {
             this.remove();
         }
 
-        this.draw();
+        this.render();
     }
 
     sortLayers(){
@@ -147,16 +141,35 @@ module.exports = class ChartPanel {
 
         this.emitter.emit('did-resize', {width: this.width, height: this.height, target: this});
 
-        this.draw();
+        this.render();
+    }
+
+    get precision(){
+        return Math.max(...this.layers.filter(layer => (layer instanceof ChartLayer)).map(layer => layer.precision), 2);
     }
 
     get offset(){
         return this.panels.offset;
     }
 
-    draw(){
-        this.layers.forEach(layer => layer.draw());
-        this.emitter.emit('did-draw');
+    draw({plugin, event}){
+        this.add(new ChartDrawing({plugin, event, chart: this.chart, panel: this}));
+    }
+
+    add(layer){
+        this.layers.push(layer);
+        this.emitter.emit('did-add-layer', layer);
+    }
+
+    remove(layer){
+        layer.destroy();
+
+        _.remove(this.layers, layer);
+        this.emitter.emit('did-remove-layer');
+    }
+
+    render(){
+        // this.layers.forEach(layer => layer.render());
     }
 
     unlock(){
@@ -168,7 +181,7 @@ module.exports = class ChartPanel {
 
         this.locked = true;
         this.rescale();
-        this.draw();
+        this.render();
     }
 
     pan(dy){
@@ -179,7 +192,7 @@ module.exports = class ChartPanel {
         this.basis.domain([this.basis.invert(this.basis(start) - dy), this.basis.invert(this.basis(end) - dy)]);
         this.scale.domain(this.basis.domain());
         this.rescale();
-        this.draw();
+        this.render();
     }
 
     zoomed({event, target} = {}){
@@ -188,7 +201,7 @@ module.exports = class ChartPanel {
         }
 
         this.rescale();
-        this.draw();
+        this.render();
     }
 
     zoom(){
@@ -241,7 +254,7 @@ module.exports = class ChartPanel {
 
     rescale(){
         if(this.locked){
-            const domains = _.flatten(this.layers.map(layer => layer.domain())).filter(domain => !_.isUndefined(domain));
+            const domains = _.flatten(this.layers.filter(layer => (layer instanceof ChartLayer)).map(layer => layer.domain())).filter(domain => !_.isUndefined(domain));
 
             if(domains.length){
                 const min = _.min(domains);
@@ -270,10 +283,10 @@ module.exports = class ChartPanel {
             this.panels.didUpdateOffset(this, figures * 6 + 12);
         }
 
-        this.draw();
+        this.render();
     }
 
-    remove(){
+    removePanel(){
         if(this.center){
             return;
         }
@@ -303,6 +316,10 @@ module.exports = class ChartPanel {
 
     onDidDestroy(callback){
         return this.emitter.on('did-destroy', callback);
+    }
+
+    onDidClick(callback){
+        return this.emitter.on('did-click', callback);
     }
 
     onDidMouseOver(callback){

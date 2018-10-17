@@ -70,6 +70,10 @@ module.exports = class ChartLayer {
         return _.isFunction(this.plugin.value) ? this.plugin.value(candle) : '';
     }
 
+    plot(series, options = {}){
+        
+    }
+
     draw(){
         if(this.plugin){
             //TODO Draw the layer instead of recalculating things with the plugin

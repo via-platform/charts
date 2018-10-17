@@ -4,7 +4,21 @@
 
 //This file is also responsible for managing the draw toolbar menu.
 
-const {Disposable, CompositeDisposable, Emitter} = require('via');
+const {Disposable, CompositeDisposable, Emitter, etch} = require('via');
+const $ = etch.dom;
+
+class CoreDrawButton {
+    constructor({select}){
+        this.select = select;
+        etch.initialize(this);
+    }
+
+    render(){
+        return $.div({classList: 'type toolbar-button caret', onClick: this.select}, 'Draw');
+    }
+
+    update(){}
+}
 
 module.exports = class CoreDraw {
     static describe(){
@@ -21,41 +35,32 @@ module.exports = class CoreDraw {
         this.disposables = new CompositeDisposable();
         this.chart = chart;
 
-        this.disposables.add(via.commands.add(this.chart.element, {
-            'core:delete': this.cancel.bind(this),
-            'core:backspace': this.cancel.bind(this),
-            'core:cancel': this.cancel.bind(this)
+        this.disposables.add(this.chart.tools.add({
+            component: $(CoreDrawButton, {select: this.select.bind(this)}),
+            location: 'left',
+            priority: 3
         }));
-
-        console.log('INIT CORE DRAW');
     }
 
-    draw(plugin){
-        this.drawing = this.emitter.once('did-click', ({event, target}) => {
-            const layer = target.addLayer(plugin, event);
-
-            if(this.selected){
-                this.unselect();
-            }
-
-            this.selected = layer;
-            this.emitter.emit('did-select', layer);
+    select(){
+        this.chart.omnibar.search({
+            name: 'Add Chart Drawing',
+            placeholder: 'Search For a Drawing Tool...',
+            didConfirmSelection: option => this.chart.draw(option.plugin),
+            maxResultsPerCategory: 60,
+            items: this.chart.manager.drawings.map(plugin => ({name: plugin.title, plugin}))
         });
     }
 
     cancel(){
-        if(this.drawing){
-            this.drawing.dispose();
-            this.drawing = null;
+        if(this.initiate){
+            this.initiate.dispose();
+            this.initiate = null;
         }
 
-        this.emitter.emit('did-cancel');
-    }
-
-    done(){
-        if(this.drawing){
-            this.drawing.dispose();
-            this.drawing = null;
+        if(this.layer){
+            this.layer.destroy();
+            this.layer = null;
         }
     }
 }

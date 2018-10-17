@@ -1,3 +1,5 @@
+const {sma, prop} = require('via').VS;
+
 module.exports = class SMA {
     static metadata(){
         return {
@@ -25,7 +27,7 @@ module.exports = class SMA {
         };
     }
 
-    calculate(vs){
-        vs.plot(vs.sma(vs.prop(vs.param('property')), vs.param('length')));
+    calculate(layer){
+        layer.plot(sma(prop(layer.param('property')), layer.param('length')));
     }
 }

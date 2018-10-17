@@ -13,14 +13,17 @@ module.exports = {
     drawing: [
         // require('./drawings/horizontal-line'),
         // require('./drawings/vertical-line'),
-        // require('./drawings/measure'),
-        // require('./drawings/date-value-range'),
-        // require('./drawings/ellipse'),
-        // require('./drawings/rectangle'),
-        // require('./drawings/triangle'),
-        // require('./drawings/parallelogram'),
-        // require('./drawings/arbitrary-line'),
-        // require('./drawings/fibonacci-retracement')
+        require('./drawings/measure'),
+        require('./drawings/date-range'),
+        require('./drawings/value-range'),
+        require('./drawings/date-value-range'),
+        require('./drawings/ellipse'),
+        require('./drawings/rectangle'),
+        require('./drawings/triangle'),
+        require('./drawings/parallelogram'),
+        require('./drawings/arbitrary-line'),
+        require('./drawings/polyline'),
+        require('./drawings/fibonacci-retracement')
     ],
     indicator: [
         // require('./indicators/volume'),

@@ -1,0 +1,21 @@
+@import "variables";
+
+.chart
+{
+    .panel .layer.polyline
+    {
+        path
+        {
+            stroke: @primary-color;
+            stroke-width: 1.5;
+        }
+    }
+
+    .panel .layer.polyline.done
+    {
+        path
+        {
+            fill: fade(@primary-color, 15%);
+        }
+    }
+}

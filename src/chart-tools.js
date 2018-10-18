@@ -12,14 +12,11 @@ module.exports = class ChartTools {
     render(){
         return $.div({classList: 'chart-tools toolbar'},
             $.div({classList: 'chart-tools-left'},
-                this.tools.filter(tool => tool.location === 'left').sort((a, b) => a.priority - b.priority).map(tool => {
-                    console.log(tool);
-                    return tool.component;
-                })
+                this.tools.filter(tool => tool.location === 'left').sort((a, b) => a.priority - b.priority).map(tool => tool.component)
             ),
             $.div({classList: 'chart-tools-spacer'}),
             $.div({classList: 'chart-tools-right'},
-                this.tools.filter(tool => tool.location === 'right').sort((a, b) => a.priority - b.priority).map(tool => tool.element)
+                this.tools.filter(tool => tool.location === 'right').sort((a, b) => a.priority - b.priority).map(tool => tool.component)
             )
         );
     }
@@ -29,7 +26,7 @@ module.exports = class ChartTools {
     add(tool){
         this.tools.push(tool);
         etch.update(this);
-        
+
         return new Disposable(() => _.remove(this.tools, tool));
     }
 

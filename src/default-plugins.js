@@ -26,18 +26,19 @@ module.exports = {
         require('./drawings/fibonacci-retracement')
     ],
     indicator: [
-        // require('./indicators/volume'),
+        require('./indicators/volume'),
         // require('./indicators/volume-notional'),
         // require('./indicators/trades'),
         // require('./indicators/rsi'),
         // require('./indicators/macd'),
-        // require('./indicators/sma'),
+        require('./indicators/sma'),
         // require('./indicators/ema'),
         // require('./indicators/bollinger-bands'),
         // require('./indicators/ichimoku-cloud')
     ],
     plugin: [
         require('./core/core-market'),
+        require('./core/core-data'),
         require('./core/core-plot'),
         require('./core/core-indicator'),
         require('./core/core-granularity'),

@@ -2,30 +2,30 @@ const {Disposable, CompositeDisposable, Emitter} = require('via');
 const _ = require('underscore-plus');
 
 module.exports = class ChartLayer {
-    static deserialize({chart, panel, state}){
-        const plugin = chart.plugins.get(state.plugin.name);
-
-        return new ChartLayer({chart, panel, plugin, pluginState: state.plugin});
-    }
-
     serialize(){
         return {
             plugin: this.plugin.serialize()
         };
     }
 
-    constructor({chart, panel, plugin, params}){
-        this.disposables = new CompositeDisposable();
+    constructor({chart, panel, plugin}){
         this.chart = chart;
         this.panel = panel;
-        this.selectable = false;
-        this.priority = plugin.priority || 1;
-
-        this.disposables.add(this.chart.onDidSelect(this.draw.bind(this)));
-        this.disposables.add(this.chart.onDidUnselect(this.draw.bind(this)));
-
-        this.initialize(plugin, params);
+        this.plugin = plugin;
     }
+
+    // constructor({chart, panel, plugin, params}){
+    //     this.disposables = new CompositeDisposable();
+    //     this.chart = chart;
+    //     this.panel = panel;
+    //     this.selectable = false;
+    //     this.priority = plugin.priority || 1;
+    //
+    //     this.disposables.add(this.chart.onDidSelect(this.draw.bind(this)));
+    //     this.disposables.add(this.chart.onDidUnselect(this.draw.bind(this)));
+    //
+    //     this.initialize(plugin, params);
+    // }
 
     initialize(plugin, params){
         if(this.plugin){
@@ -63,15 +63,15 @@ module.exports = class ChartLayer {
     }
 
     title(){
-        return _.isFunction(this.plugin.title) ? this.plugin.title() : '';
+        // return _.isFunction(this.plugin.title) ? this.plugin.title() : '';
     }
 
     value(candle){
-        return _.isFunction(this.plugin.value) ? this.plugin.value(candle) : '';
+        // return _.isFunction(this.plugin.value) ? this.plugin.value(candle) : '';
     }
 
     plot(series, options = {}){
-        
+
     }
 
     draw(){
@@ -81,6 +81,14 @@ module.exports = class ChartLayer {
         }
 
 
+    }
+
+    title(){
+        return '';
+    }
+
+    value(){
+        return '';
     }
 
     remove(){

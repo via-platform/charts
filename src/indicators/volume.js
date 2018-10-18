@@ -1,3 +1,33 @@
+const {sma, prop} = require('via').VS;
+
+module.exports = {
+    name: 'volume',
+    title: 'Trading Volume',
+    description: 'A volume bar for each time period corresponding to the relative number of units traded.',
+    panel: true,
+    params: {
+        property: {
+            title: 'Property',
+            type: 'string',
+            enum: ['open', 'high', 'low', 'close', 'mid', 'average'],
+            default: 'close'
+        },
+        length: {
+            title: 'Length',
+            type: 'number',
+            constraint: x => (x > 1 && x <= 200),
+            default: 15
+        }
+    },
+    calculate: layer => {
+        layer.plot(sma(prop(layer.param('property')), layer.param('length')));
+    }
+}
+
+
+
+
+
 const {CompositeDisposable, Disposable, d3} = require('via');
 const _ = require('underscore-plus');
 const etch = require('etch');
@@ -95,11 +125,11 @@ class Volume {
     }
 }
 
-module.exports = {
-    name: 'volume',
-    type: 'indicator',
-    settings: {},
-    title: 'Trading Volume',
-    description: 'A volume bar for each time period corresponding to the relative number of units traded.',
-    instance: params => new Volume(params)
-};
+// module.exports = {
+//     name: 'volume',
+//     type: 'indicator',
+//     settings: {},
+//     title: 'Trading Volume',
+//     description: 'A volume bar for each time period corresponding to the relative number of units traded.',
+//     instance: params => new Volume(params)
+// };

@@ -40,6 +40,17 @@ module.exports = class ChartPanels {
         }
     }
 
+    create(){
+        const panel = new ChartPanel({chart: this.chart, panels: this});
+        this.panels.push(panel);
+        this.offsets.set(panel, panel.offset);
+        this.element.appendChild(panel.element);
+        this.emitter.emit('did-add-panel', panel);
+        this.resize();
+
+        return panel;
+    }
+
     addPanel(plugin){
         const panel = new ChartPanel({chart: this.chart, panels: this, plugin});
         this.panels.push(panel);

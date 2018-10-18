@@ -1,6 +1,7 @@
 const {CompositeDisposable, Disposable, d3} = require('via');
 const _ = require('underscore-plus');
 const VS = require('./chart-vs');
+const ChartLayer = require('./chart-layer');
 const etch = require('etch');
 const $ = etch.dom;
 
@@ -29,13 +30,11 @@ const defaults = {
 
 //TODO Add an invisible background layer while working to prevent clicks elsewhere
 
-module.exports = class ChartDrawing {
+module.exports = class ChartDrawing extends ChartLayer {
     constructor({chart, state, panel, plugin, event}){
+        super({chart, panel, plugin});
         this.disposables = new CompositeDisposable();
         this.working = new CompositeDisposable();
-        this.chart = chart;
-        this.panel = panel;
-        this.plugin = plugin;
         this.points = [];
         this.params = _.defaults(this.plugin.params, defaults);
 
@@ -109,14 +108,6 @@ module.exports = class ChartDrawing {
         this.working = null;
 
         this.render();
-    }
-
-    title(){
-        return '';
-    }
-
-    value(){
-        return '';
     }
 
     destroy(){

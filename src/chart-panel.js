@@ -5,7 +5,6 @@ const ChartPanelAxis = require('./chart-panel-axis');
 const ChartPanelGrid = require('./chart-panel-grid');
 const ChartPanelValues = require('./chart-panel-values');
 
-const ChartDrawing = require('./chart-drawing');
 
 module.exports = class ChartPanel {
 
@@ -16,7 +15,7 @@ module.exports = class ChartPanel {
         };
     }
 
-    constructor({chart, center, state, plugin, panels}){
+    constructor({chart, center, state, panels}){
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
 
@@ -150,10 +149,6 @@ module.exports = class ChartPanel {
 
     get offset(){
         return this.panels.offset;
-    }
-
-    draw({plugin, event}){
-        this.add(new ChartDrawing({plugin, event, chart: this.chart, panel: this}));
     }
 
     add(layer){

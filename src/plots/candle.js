@@ -7,6 +7,10 @@ module.exports = class Candles {
         this.element.classed('candles', true);
     }
 
+    domain(){
+        
+    }
+
     draw(series, properties){
         //TODO handle properties like color / width
 

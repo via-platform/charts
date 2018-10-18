@@ -21,11 +21,47 @@ module.exports = class CoreData {
         this.chart = chart;
         this.zoomed = _.throttle(this.request.bind(this), 3000);
 
-        this.disposables.add(this.chart.onDidChangeMarket(this.reset.bind(this)));
-        this.disposables.add(this.chart.onDidChangeGranularity(this.reset.bind(this)));
-        this.disposables.add(this.chart.onWillChangeGranularity(this.clear.bind(this)));
+        this.disposables.add(this.chart.onDidChangeMarket(this.connect.bind(this)));
+        this.disposables.add(this.chart.onDidChangeGranularity(this.connect.bind(this)));
         this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
 
         console.log('INIT CORE DATA');
+        this.connect();
+    }
+
+    connect(){
+        if(this.data){
+            this.subscription.dispose();
+            this.subscription = null;
+            this.data = null;
+        }
+
+        if(this.chart.market){
+            this.data = this.chart.market.candles(this.chart.granularity);
+            this.subscription = this.data.subscribe(this.didUpdateData.bind(this));
+            this.request();
+        }
+    }
+
+    request(){
+        const [start, end] = this.chart.scale.domain();
+
+        if(this.data){
+            this.data.request({start, end});
+        }
+    }
+
+    onDidUpdateData(callback){
+        return this.emitter.on('did-update-data', callback);
+    }
+
+    destroy(){
+        if(this.data){
+            this.subscription.dispose();
+            this.subscription = null;
+            this.data = null;
+        }
+
+        this.disposables.dispose();
     }
 }

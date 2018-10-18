@@ -5,20 +5,8 @@
 //This file is also responsible for managing the draw toolbar menu.
 
 const {Disposable, CompositeDisposable, Emitter, etch} = require('via');
+const ChartDrawing = require('../chart-drawing');
 const $ = etch.dom;
-
-class CoreDrawButton {
-    constructor({select}){
-        this.select = select;
-        etch.initialize(this);
-    }
-
-    render(){
-        return $.div({classList: 'type toolbar-button caret', onClick: this.select}, 'Draw');
-    }
-
-    update(){}
-}
 
 module.exports = class CoreDraw {
     static describe(){
@@ -36,9 +24,15 @@ module.exports = class CoreDraw {
         this.chart = chart;
 
         this.disposables.add(this.chart.tools.add({
-            component: $(CoreDrawButton, {select: this.select.bind(this)}),
+            component: $.div({classList: 'type toolbar-button caret', onClick: this.select.bind(this)}, 'Draw'),
             location: 'left',
             priority: 3
+        }));
+
+        this.disposables.add(via.commands.add(via.workspace.getElement(), {
+            'core:delete': this.cancel.bind(this),
+            'core:backspace': this.cancel.bind(this),
+            'core:cancel': this.cancel.bind(this)
         }));
     }
 
@@ -46,9 +40,20 @@ module.exports = class CoreDraw {
         this.chart.omnibar.search({
             name: 'Add Chart Drawing',
             placeholder: 'Search For a Drawing Tool...',
-            didConfirmSelection: option => this.chart.draw(option.plugin),
+            didConfirmSelection: option => this.create(option.plugin),
             maxResultsPerCategory: 60,
             items: this.chart.manager.drawings.map(plugin => ({name: plugin.title, plugin}))
+        });
+    }
+
+    create(plugin){
+        if(this.initiate){
+            this.initiate.dispose();
+        }
+
+        this.initiate = this.chart.onDidClick(({event, target}) => {
+            this.cancel();
+            target.add(new ChartDrawing({plugin, event, chart: this.chart, panel: target}));
         });
     }
 
@@ -57,10 +62,13 @@ module.exports = class CoreDraw {
             this.initiate.dispose();
             this.initiate = null;
         }
+    }
 
-        if(this.layer){
-            this.layer.destroy();
-            this.layer = null;
+    destroy(){
+        if(this.initiate){
+            this.initiate.dispose();
         }
+
+        this.disposables.dispose();
     }
 }

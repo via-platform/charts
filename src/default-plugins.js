@@ -29,7 +29,7 @@ module.exports = {
         require('./indicators/volume'),
         // require('./indicators/volume-notional'),
         // require('./indicators/trades'),
-        // require('./indicators/rsi'),
+        require('./indicators/rsi'),
         // require('./indicators/macd'),
         require('./indicators/sma'),
         // require('./indicators/ema'),

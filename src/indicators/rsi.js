@@ -1,33 +1,43 @@
-const {rsi} = require('via').VS;
+const {rsi, map} = require('via').VS;
 
 module.exports = {
     name: 'rsi',
-    type: 'indicator',
     title: 'Relative Strength Index',
     description: 'A momentum oscillator that measures the speed and change of price movements.',
+    panel: true,
     components: {
         rsi: {
             type: 'plot',
-            default: 'line',
-            stroke: '#0000FF'
+            style: {
+                color: '#0000FF'
+            }
         },
         upper_limit: {
-            type: 'line',
-            style: 'dashed',
-            stroke: '#0000FF'
+            type: 'hl',
+            trackable: false,
+            style: {
+                color: '#0000FF',
+                style: 'dashed'
+            }
         },
         lower_limit: {
-            type: 'line',
-            style: 'dashed',
-            stroke: '#0000FF'
+            type: 'hl',
+            trackable: false,
+            style: {
+                color: '#0000FF',
+                style: 'dashed'
+            }
         },
         limit_range: {
-            type: 'fill',
-            fill: '#0000FF',
-            opacity: 0.5
+            type: 'hr',
+            trackable: false,
+            style: {
+                color: 'rgba(0, 0, 255, 0.5)',
+                style: 'dashed'
+            }
         }
     },
-    params: {
+    parameters: {
         length: {
             title: 'Length',
             type: 'number',
@@ -47,10 +57,10 @@ module.exports = {
             default: 30
         }
     },
-    calculate: ({series, params, plot}) => {
-        plot('limit_range', map(series, [params.lower_limit, params.upper_limit]));
-        plot('upper_limit', params.upper_limit);
-        plot('lower_limit', params.lower_limit);
-        plot('rsi', rsi(series, params.length));
+    calculate: ({series, parameters, draw}) => {
+        draw('limit_range', [parameters.lower_limit, parameters.upper_limit]);
+        draw('upper_limit', parameters.upper_limit);
+        draw('lower_limit', parameters.lower_limit);
+        draw('rsi', rsi(series, parameters.length));
     }
 }

@@ -2,19 +2,20 @@
 
 .chart .panel .layer.rsi
 {
-    path
+    .plot.line path
     {
         stroke: @primary-color;
-
-        &.range
-        {
-            stroke: fade(@primary-color, 40%);
-            stroke-dasharray: 6;
-            stroke-width: 1;
-        }
+        stroke-width: 1.25;
     }
 
-    rect
+    .hl path
+    {
+        stroke: fade(@primary-color, 40%);
+        stroke-dasharray: 6;
+        stroke-width: 1;
+    }
+
+    .hr path
     {
         fill: fade(@primary-color, 5%);
     }

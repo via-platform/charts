@@ -1,70 +1,61 @@
+//This file contains the base functionality shared by all indicators. It extends basic
+//functionality shared by all layers. When a new ChartIndicator is created, it is initialized
+//with a set of ChartPlots and parameters that are defined by the plugin configuration.
+
 const {CompositeDisposable, Disposable, d3} = require('via');
 const _ = require('underscore-plus');
-const VS = require('./chart-vs');
-const etch = require('etch');
 const ChartLayer = require('./chart-layer');
 const ChartPlot = require('./chart-plot');
-const $ = etch.dom;
 
 module.exports = class ChartIndicator extends ChartLayer {
     constructor({chart, state, plugin, panel}){
         super({chart, panel, plugin});
-        this.state = state;
-        this.components = new Map(); //Component ID => Metadata
-        this.plots = new Map(); //Component ID => Plot
-        this.data = [];
+        this.components = new Map(); //Component ID => Plot
+        this.parameters = {}; //Parameter ID => Plugin parameter metadata (e.g. length)
+        this.panel = panel ? panel : plugin.params.panel ? this.chart.panel() : this.chart.center();
         this.element.classed(plugin.name, true);
 
-        //TODO this is going to be wrong because state will only carry actual values
-        //TODO set up an initialization function that checks state values against conditions
-        this.params = state ? _.defaults(state, plugin.params) : plugin.params;
-
-        if(panel){
-            this.panel = panel;
-        }else{
-            this.panel = plugin.params.panel ? this.chart.panel() : this.chart.center();
-        }
-
+        //TODO There is one more thing that may force a recalculation - when the user changes a parameter
         this.disposables.add(this.chart.data.onDidUpdateData(this.calculate.bind(this)));
 
-        for(const [identifier, component] of Object.entries(this.plugin.components)){
-            this.component(identifier, component);
-        }
+        this.initialize(state);
     }
 
-    component(identifier, component){
-        //Initialize a new component
-        if(component.type === 'plot'){
-            this.components.set(identifier, _.defaults(component, {
-                enum: ['line', 'area', 'mountain', 'histogram'],
-                default: 'line',
-                stroke: '#FFF',
-                fill: 'transparent'
+    initialize({components, parameters} = {}){
+        for(const [identifier, definition] of Object.entries(this.plugin.parameters)){
+            this.parameters[identifier] = Object.assign({value: parameters ? parameters[identifier] : definition.default}, definition);
+        }
+
+        for(const [identifier, component] of Object.entries(this.plugin.components)){
+            this.components.set(identifier, new ChartPlot({
+                chart: this.chart,
+                panel: this.panel,
+                layer: this,
+                component,
+                state: components ? components[identifier] : undefined
             }));
         }
     }
 
-    plot(identifier, series){
+    draw(identifier, series, options = {}){
         if(this.components.has(identifier)){
-            const params = this.components.get(identifier);
-            const type = this.type(params);
-
-            if(this.plots.has(identifier)){
-                const plot = this.plots.get(identifier);
-
-                if(plot.type === type){
-                    return void plot.update(series);
-                }else{
-                    plot.destroy();
-                }
-            }
-
-            this.plots.set(identifier, new ChartPlot({chart: this.chart, panel: this.panel, layer: this, type, params, series}));
+            this.components.get(identifier).update(series, options);
+        }else{
+            throw new Error(`Invalid component identifier. '${identifier}' does not match any of the predefined components.`);
         }
     }
 
-    type(component){
-        return component.type === 'plot' ? component.default : component.type;
+    valid(parameter, value){
+        if(parameter.enum){
+            return (typeof _.first(parameter.enum) === 'object') ? parameter.enum.map(v => v.value).includes(value) : parameter.enum.includes(value);
+        }
+
+        if(parameter.constraint){
+            return parameter.constraint(value);
+        }
+
+        //TODO Check the actual type of the value against the type of the parameter
+        return true;
     }
 
     domain(){
@@ -72,26 +63,25 @@ module.exports = class ChartIndicator extends ChartLayer {
     }
 
     calculate(){
-        const params = {};
+        const parameters = {};
 
-        for(const [param, definition] of Object.entries(this.params)){
-            params[param] = definition.value || definition.default;
+        for(const [key, definition] of Object.entries(this.parameters)){
+            parameters[key] = definition.value;
         }
 
-        this.plugin.calculate({chart: this.chart, panel: this.panel, plot: this.plot.bind(this), params, series: this.chart.data.all()});
+        this.plugin.calculate({
+            draw: this.draw.bind(this),
+            parameters,
+            series: this.chart.data.all()
+        });
 
         this.render();
     }
 
     render(){
         //TODO If selected, render the actual points, flags, and ranges
-        for(const plot of this.plots.values()){
+        for(const plot of this.components.values()){
             plot.render();
         }
-    }
-
-    destroy(){
-        // this.element.remove();
-        this.disposables.dispose();
     }
 }

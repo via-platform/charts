@@ -7,11 +7,12 @@ module.exports = {
     components: {
         sma: {
             type: 'plot',
-            default: 'line',
-            stroke: '#0000FF'
+            style: {
+                color: '#0000FF'
+            }
         }
     },
-    params: {
+    parameters: {
         property: {
             title: 'Property',
             type: 'string',
@@ -25,7 +26,7 @@ module.exports = {
             default: 15
         }
     },
-    calculate: ({series, params, plot}) => {
-        plot('sma', sma(prop(series, params.property), params.length));
+    calculate: ({series, parameters, draw}) => {
+        draw('sma', sma(prop(series, parameters.property), parameters.length));
     }
 }

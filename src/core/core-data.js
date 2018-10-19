@@ -3,6 +3,7 @@
 //This plugin may watch statistics in the future.
 
 const {Disposable, CompositeDisposable, Emitter} = require('via');
+const _ = require('underscore-plus');
 
 module.exports = class CoreData {
     static describe(){

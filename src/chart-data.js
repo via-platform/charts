@@ -55,6 +55,10 @@ module.exports = class ChartData {
         return this.data ? this.data.last() : null;
     }
 
+    all(){
+        return this.data ? this.data.all() : [];
+    }
+
     didUpdateData(){
         this.emitter.emit('did-update-data');
     }

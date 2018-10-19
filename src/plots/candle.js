@@ -1,14 +1,14 @@
-module.exports = class Candles {
+module.exports = class Candle {
     constructor({chart, panel, element}){
         this.chart = chart;
         this.panel = panel;
         this.element = element;
 
-        this.element.classed('candles', true);
+        this.element.classed('candle', true);
     }
 
     domain(){
-        
+
     }
 
     draw(series, properties){
@@ -48,5 +48,9 @@ module.exports = class Candles {
         const low = this.panel.scale(d.price_low);
 
         return `M ${x - 0.5} ${high} V ${Math.min(open, close)} M ${x - 0.5} ${Math.max(open, close)} V ${low}`;
+    }
+
+    get type(){
+        return 'candle';
     }
 }

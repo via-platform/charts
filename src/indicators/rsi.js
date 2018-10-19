@@ -48,7 +48,7 @@ module.exports = {
         }
     },
     calculate: ({series, params, plot}) => {
-        plot('limit_range', [params.lower_limit, params.upper_limit]);
+        plot('limit_range', map(series, [params.lower_limit, params.upper_limit]));
         plot('upper_limit', params.upper_limit);
         plot('lower_limit', params.lower_limit);
         plot('rsi', rsi(series, params.length));

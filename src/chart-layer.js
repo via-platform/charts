@@ -12,6 +12,12 @@ module.exports = class ChartLayer {
         this.chart = chart;
         this.panel = panel;
         this.plugin = plugin;
+        this.disposables = new CompositeDisposable();
+        this.element = this.panel.zoomable.append('g').classed('layer', true).classed('selectable', plugin.selectable);
+
+        this.disposables.add(this.panel.onDidResize(this.render.bind(this)));
+        this.disposables.add(this.panel.onDidRescale(this.render.bind(this)));
+        this.disposables.add(this.chart.onDidZoom(this.render.bind(this)));
     }
 
     // constructor({chart, panel, plugin, params}){
@@ -82,6 +88,8 @@ module.exports = class ChartLayer {
 
 
     }
+
+    render(){}
 
     title(){
         return '';

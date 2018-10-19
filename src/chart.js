@@ -1,5 +1,5 @@
 const {Disposable, CompositeDisposable, Emitter, d3} = require('via');
-// const ChartData = require('./chart-data');
+const ChartData = require('./chart-data');
 // const ChartStudy = require('./chart-study');
 const granularities = require('./chart-granularities');
 const ChartPanels = require('./chart-panels');
@@ -53,7 +53,7 @@ module.exports = class Chart {
         this.element.classList.add('chart', 'pane-item', 'focusable-panel');
         this.element.tabIndex = -1;
 
-        // this.data = new ChartData(this);
+        this.data = new ChartData(this);
         this.tools = new ChartTools({chart: this});
         this.panels = new ChartPanels({chart: this, state: state.panels});
         this.axis = new ChartAxis({chart: this});

@@ -15,8 +15,8 @@ module.exports = {
         property: {
             title: 'Property',
             type: 'string',
-            enum: ['open', 'high', 'low', 'close', 'mid', 'average'],
-            default: 'close'
+            enum: ['price_open', 'price_high', 'price_low', 'price_close', 'middle', 'average'],
+            default: 'price_close'
         },
         length: {
             title: 'Length',

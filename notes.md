@@ -37,3 +37,5 @@ Indicator class now holds the domain as well as the decimal precision.
 # Other Notes
 
 * I'll probably eliminate current-value in favor of a more generalized price line solution.
+
+

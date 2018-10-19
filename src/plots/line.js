@@ -1,16 +1,9 @@
-module.exports = class Line {
-    constructor({chart, panel, element}){
-        this.chart = chart;
-        this.panel = panel;
-        this.line = element.append('path').classed('stroke', true);
-    }
+module.exports = ({chart, panel, element, series, properties}) => {
+    //TODO handle properties like color / width
+    element.select('path').remove();
 
-    draw(series, properties){
-        //TODO handle properties like color / width
-        this.line.datum(series.entries()).attr('d', this.stroke.bind(this));
-    }
-
-    stroke(data){
-        return data.length > 1 ? 'M' + data.map(([x, y]) => `${this.chart.scale(x)} ${this.panel.scale(y)}`).join(' L ') : '';
-    }
-}
+    element.append('path')
+        .classed('stroke', true)
+        .datum(series)
+        .attr('d', d => d.length > 1 ? 'M ' + d.map(([x, y]) => `${chart.scale(x)} ${panel.scale(y)}`).join(' L ') : '');
+};

@@ -31,30 +31,7 @@ module.exports = {
             default: true
         }
     },
-    line: {
-        color: {
-            title: 'Color',
-            type: 'color',
-            default: '#0000FF'
-        },
-        visible: {
-            title: 'Visible',
-            type: 'boolean',
-            default: true
-        },
-        width: {
-            title: 'Stroke Width',
-            type: 'number',
-            enum: [1, 1.25, 1.5, 1.75, 2, 2.25, 2.5],
-            default: 1.25
-        },
-        style: {
-            title: 'Stroke Style',
-            type: 'string',
-            enum: ['solid', 'dashed', 'dotted'],
-            default: 'solid'
-        }
-    },
+    line: ,
     hl: {
         color: {
             title: 'Color',

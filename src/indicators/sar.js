@@ -1,49 +1,42 @@
-class SAR {
-    draw(vs){
-        vs.line({
-            value: vs.sma(
-                vs.prop(
-                    vs.param('property')
-                ),
-                vs.param('length')
-            ),
-            color: vs.param('color'),
-            width: vs.param('width'),
-            track: vs.param('track')
-        });
-    }
-}
-
 module.exports = {
     name: 'sar',
     type: 'overlay',
-    settings: {
-        strokeWidth: {
-            title: 'Stroke Width',
-            type: 'number',
-            valid: value => (value > 0 && value <= 5),
-            default: 1.5
-        },
-        strokeStyle: {
-            title: 'Stroke Style',
-            type: 'string',
-            enum: ['solid', 'dotted', 'dashed'],
-            default: 'solid'
-        },
-        strokeColor: {
-            title: 'Stroke Color',
-            type: 'color',
-            default: '#FF0000'
-        },
-        periods: {
-            title: 'Periods',
-            type: 'number',
-            valid: value => (value > 0 && value <= 200),
-            default: 15
-        }
-    },
     title: 'Parabolic SAR',
     abbreviation: 'SAR',
     description: 'An n-period moving average.',
-    instance: params => new SAR()
+    components: {
+        sar: {
+            type: 'plot',
+            title: 'SAR'
+            style: {
+                style: 'cross'
+            }
+        }
+    },
+    parameters: {
+        start: {
+            title: 'Start',
+            type: 'number',
+            constraint: value => (value >= 0 && value <= 1),
+            increment: 0.01,
+            default: 0.02
+        },
+        increment: {
+            title: 'Increment',
+            type: 'number',
+            constraint: value => (value >= 0 && value <= 1),
+            increment: 0.01,
+            default: 0.02
+        },
+        max: {
+            title: 'Max Value',
+            type: 'number',
+            constraint: value => (value > 0 && value <= 10),
+            increment: 0.1,
+            default: 0.2
+        }
+    },
+    calculate: ({series, parameters, draw}) => {
+        draw('sar', );
+    }
 };

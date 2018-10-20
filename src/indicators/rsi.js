@@ -8,12 +8,14 @@ module.exports = {
     components: {
         rsi: {
             type: 'plot',
+            title: 'RSI',
             style: {
                 color: '#0000FF'
             }
         },
         upper_limit: {
-            type: 'hl',
+            type: 'horizontal-line',
+            title: 'Upper Limit',
             trackable: false,
             style: {
                 color: '#0000FF',
@@ -21,7 +23,8 @@ module.exports = {
             }
         },
         lower_limit: {
-            type: 'hl',
+            type: 'horizontal-line',
+            title: 'Lower Limit',
             trackable: false,
             style: {
                 color: '#0000FF',
@@ -29,7 +32,8 @@ module.exports = {
             }
         },
         limit_range: {
-            type: 'hr',
+            type: 'range',
+            title: 'Range',
             trackable: false,
             style: {
                 color: 'rgba(0, 0, 255, 0.5)',

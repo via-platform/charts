@@ -1,6 +1,6 @@
 module.exports = {
-    name: 'line',
-    title: 'Line',
+    name: 'horizontal-line',
+    title: 'Horizontal Line',
     parameters: {
         color: {
             title: 'Color',
@@ -26,9 +26,7 @@ module.exports = {
         }
     },
     render: ({chart, panel, element, data, parameters}) => {
-        // console.log(parameters)
-        //TODO handle properties like color / width
         element.select('path').remove();
-        element.append('path').classed('stroke', true).datum(data).attr('d', d => d.length > 1 ? 'M ' + d.map(([x, y]) => `${chart.scale(x)} ${panel.scale(y)}`).join(' L ') : '');
+        element.append('path').attr('d', `M 0 ${data} h ${panel.width}`);
     }
 };

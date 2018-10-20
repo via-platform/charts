@@ -2,8 +2,8 @@ module.exports = {
     name: 'horizontal-line',
     title: 'Horizontal Line',
     parameters: {
-        color: {
-            title: 'Color',
+        stroke: {
+            title: 'Stroke Color',
             type: 'color',
             default: '#0000FF'
         },
@@ -27,6 +27,11 @@ module.exports = {
     },
     render: ({chart, panel, element, data, parameters}) => {
         element.select('path').remove();
-        element.append('path').attr('d', `M 0 ${data} h ${panel.width}`);
+
+        if(data){
+            element.append('path')
+                .attr('d', `M 0 ${panel.scale(data)} h ${panel.width}`)
+                .attr('stroke', 'green');
+        }
     }
 };

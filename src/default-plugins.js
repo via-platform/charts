@@ -3,12 +3,23 @@
 
 module.exports = {
     plot: [
-        require('./plots/candle')//,
-        // require('./plots/line'),
-        // require('./plots/bar'),
-        // require('./plots/heikin-ashi'),
-        // require('./plots/area'),
-        // require('./plots/mountain')
+        require('./plots/candle'),
+        require('./plots/line'),
+        require('./plots/bar'),
+        require('./plots/heikin-ashi'),
+        require('./plots/area'),
+        require('./plots/mountain'),
+        require('./plots/band'),
+        require('./plots/circle'),
+        require('./plots/column'),
+        require('./plots/cross'),
+        require('./plots/fill'),
+        require('./plots/histogram'),
+        require('./plots/horizontal-line'),
+        require('./plots/vertical-line'),
+        require('./plots/plot'),
+        require('./plots/step'),
+        require('./plots/range')
     ],
     drawing: [
         require('./drawings/horizontal-line'),

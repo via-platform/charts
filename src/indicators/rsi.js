@@ -9,7 +9,7 @@ module.exports = {
         rsi: {
             type: 'plot',
             title: 'RSI',
-            style: {
+            parameters: {
                 color: '#0000FF'
             }
         },
@@ -17,7 +17,7 @@ module.exports = {
             type: 'horizontal-line',
             title: 'Upper Limit',
             trackable: false,
-            style: {
+            parameters: {
                 color: '#0000FF',
                 style: 'dashed'
             }
@@ -26,7 +26,7 @@ module.exports = {
             type: 'horizontal-line',
             title: 'Lower Limit',
             trackable: false,
-            style: {
+            parameters: {
                 color: '#0000FF',
                 style: 'dashed'
             }
@@ -35,7 +35,7 @@ module.exports = {
             type: 'range',
             title: 'Range',
             trackable: false,
-            style: {
+            parameters: {
                 color: 'rgba(0, 0, 255, 0.5)',
                 style: 'dashed'
             }

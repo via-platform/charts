@@ -27,6 +27,9 @@ module.exports = {
     },
     render: ({chart, panel, element, data, parameters}) => {
         element.select('path').remove();
-        element.append('path').attr('d', `M ${data} 0 v ${panel.height}`);
+
+        if(data){
+            element.append('path').attr('d', `M ${data} 0 v ${panel.height}`);
+        }
     }
 };

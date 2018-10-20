@@ -1,24 +1,4 @@
 const _ = require('underscore-plus');
-const ChartStyles = require('./chart-styles');
-
-const Plots = {
-    'plot': require('./plots/plot'),
-    'hl': require('./plots/hl'),
-    'vl': require('./plots/vl'),
-    'hr': require('./plots/hr'),
-    'vr': require('./plots/vr'),
-    'candle': require('./plots/candle'),
-    'line': require('./plots/line'),
-    'bar': require('./plots/bar'),
-    'area': require('./plots/area'),
-    'mountain': require('./plots/mountain'),
-    'heikin-ashi': require('./plots/heikin-ashi'),
-    'histogram': require('./plots/histogram'),
-    'step': require('./plots/step'),
-    'cross': require('./plots/cross'),
-    'column': require('./plots/column'),
-    'circle': require('./plots/circle')
-};
 
 module.exports = class ChartPlot {
     constructor({chart, panel, layer, component, state}){
@@ -26,18 +6,25 @@ module.exports = class ChartPlot {
         this.panel = panel;
         this.layer = layer;
         this.component = component;
-        this.parameters = {}; //Parameter ID => Plot Style Metadata
         this.element = this.layer.element.append('g').attr('class', this.component.type);
-        this.plot = Plots[this.component.type];
+        this.plot = this.chart.manager.plots.find(plot => plot.name === this.component.type);
 
         this.initialize(state);
     }
 
     initialize(state = {}){
-        //TODO this is going to be wrong because state will only carry actual values
-        //TODO set up an initialization function that checks state values against conditions
-        for(const [identifier, definition] of Object.entries(ChartStyles[this.component.type])){
-            this.parameters[identifier] = Object.assign({value: _.isUndefined(state[identifier]) ? definition.default : state[identifier]}, definition);
+        this.parameters = {};
+
+        for(const [identifier, value] of Object.entries(this.component.parameters)){
+            if(this.plot.parameters.hasOwnProperty(identifier) && this.valid(this.plot.parameters[identifier], value)){
+                this.parameters[identifier] = value;
+            }
+        }
+
+        for(const [identifier, value] of Object.entries(state)){
+            if(this.plot.parameters.hasOwnProperty(identifier) && this.valid(this.plot.parameters[identifier], value)){
+                this.parameters[identifier] = value;
+            }
         }
     }
 
@@ -56,7 +43,7 @@ module.exports = class ChartPlot {
 
     render(){
         //TODO If selected, render the actual points, flags, and ranges
-        this.plot({
+        this.plot.render({
             chart: this.chart,
             panel: this.panel,
             element: this.element,
@@ -68,8 +55,8 @@ module.exports = class ChartPlot {
         });
     }
 
-    update(series, options = {}){
-        this.data = Array.from(series);
+    update(data, options = {}){
+        this.data = data;
         this.options = options;
     }
 

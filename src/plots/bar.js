@@ -1,4 +1,4 @@
-module.exports = {
+const Bar = {
     name: 'bar',
     title: 'Bar',
     parameters: {
@@ -14,35 +14,30 @@ module.exports = {
         }
     },
     render: ({chart, panel, element, data, parameters}) => {
-        const bands = element.selectAll('rect').data(data);
+        const bars = element.selectAll('path').data(data);
 
-        bands.enter()
-            .append('rect')
-            .merge(bands)
-                .attr('x', ([x]) => chart.scale(x))
-                .attr('y', 0)
-                .attr('width', chart.bandwidth)
-                .attr('height', panel.height);
+        bars.enter()
+            .append('path')
+            .merge(bars)
+                .attr('d', Bar.body)
+                .attr('fill', '#FFF');
 
-        bands.exit().remove();
+        bars.exit().remove();
     },
-    body: (d) => {
-        let w = Math.max((this.chart.bandwidth - (2 * this.padding)) / 3, 1),
-            x = this.chart.scale(d.time_period_start),
-            open = this.panel.scale(d.price_open),
-            close = this.panel.scale(d.price_close),
-            high = this.panel.scale(d.price_high),
-            low = this.panel.scale(d.price_low),
-            oc = Math.max(low + w / 2, Math.min(high - w / 2, open)),
-            cc = Math.max(low + w / 2, Math.min(high - w / 2, close));
+    body: ([x, candle]) => {
+        const w = Math.max(Math.floor(chart.bandwidth * 0.8 / 3), 1);
+        const open = panel.scale(candle.price_open);
+        const close = panel.scale(candle.price_close);
+        const high = panel.scale(candle.price_high);
+        const low = panel.scale(candle.price_low);
 
-        return `M ${x - w / 2} ${high - w / 2}
+        return `M ${chart.scale(x) - (w / 2)} ${high - (w / 2)}
                 h ${w}
                 v ${close - high}
                 h ${w}
                 v ${w}
                 h ${-w}
-                V ${low + w / 2}
+                V ${low + (w / 2)}
                 h ${-w}
                 v ${open - low}
                 h ${-w}
@@ -51,3 +46,5 @@ module.exports = {
                 Z`;
     }
 };
+
+module.exports = Bar;

@@ -22,18 +22,23 @@ module.exports = class CoreDraw {
     constructor({chart}){
         this.disposables = new CompositeDisposable();
         this.chart = chart;
+        etch.initialize(this);
 
-        this.disposables.add(this.chart.tools.add({
-            component: $.div({classList: 'type toolbar-button caret', onClick: this.select.bind(this)}, 'Draw'),
-            location: 'left',
-            priority: 3
-        }));
+        this.disposables.add(this.chart.tools.add({element: this.element, location: 'left', priority: 5}));
+        this.disposables.add(via.tooltips.add(this.element, {title: 'Add Indicator', placement: 'bottom', keyBindingCommand: 'charts:add-drawing'}));
+        this.disposables.add(via.commands.add(this.chart.element, 'charts:add-drawing', this.select.bind(this)));
 
         this.disposables.add(via.commands.add(via.workspace.getElement(), {
             'core:delete': this.cancel.bind(this),
             'core:backspace': this.cancel.bind(this),
             'core:cancel': this.cancel.bind(this)
         }));
+    }
+
+    update(){}
+
+    render(){
+        return $.div({classList: 'type toolbar-button caret', onClick: this.select.bind(this)}, 'Draw');
     }
 
     select(){

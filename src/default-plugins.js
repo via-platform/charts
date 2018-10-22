@@ -49,7 +49,6 @@ module.exports = {
     ],
     plugin: [
         require('./core/core-market'),
-        // require('./core/core-data'),
         require('./core/core-plot'),
         require('./core/core-indicator'),
         require('./core/core-granularity'),

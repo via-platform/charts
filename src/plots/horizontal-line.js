@@ -1,4 +1,4 @@
-module.exports = {
+const HorizontalLine = {
     name: 'horizontal-line',
     title: 'Horizontal Line',
     parameters: {
@@ -30,8 +30,10 @@ module.exports = {
 
         if(data){
             element.append('path')
-                .attr('d', `M 0 ${panel.scale(data)} h ${panel.width}`)
+                .attr('d', `M 0 ${Math.round(panel.scale(data)) - 0.5} h ${panel.width}`)
                 .attr('stroke', 'green');
         }
     }
 };
+
+module.exports = HorizontalLine;

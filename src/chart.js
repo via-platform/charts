@@ -5,6 +5,7 @@ const granularities = require('./chart-granularities');
 const ChartPanels = require('./chart-panels');
 const ChartTools = require('./chart-tools');
 const ChartAxis = require('./chart-axis');
+const ChartRoot = require('./chart-root');
 const _ = require('underscore-plus');
 const ChartDefaults = {end: 0, start: Date.now() - 864e5};
 const base = 'via://charts';
@@ -57,6 +58,7 @@ module.exports = class Chart {
         this.tools = new ChartTools({chart: this});
         this.panels = new ChartPanels({chart: this, state: state.panels});
         this.axis = new ChartAxis({chart: this});
+        this.root = new ChartRoot({chart: this, panel: this.center(), state: state.root});
 
         this.element.appendChild(this.tools.element);
         this.element.appendChild(this.panels.element);
@@ -335,10 +337,6 @@ module.exports = class Chart {
         return this.element.offsetParent === null;
     }
 
-    root(){
-        return this.center().getRoot();
-    }
-
     center(){
         return this.panels.getCenter();
     }
@@ -361,10 +359,6 @@ module.exports = class Chart {
 
     onDidChangeData(callback){
         return this.emitter.on('did-change-data', callback);
-    }
-
-    onDidChangeType(callback){
-        return this.emitter.on('did-change-type', callback);
     }
 
     onDidChangeTitle(callback){

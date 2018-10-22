@@ -28,14 +28,14 @@ module.exports = class ChartPanels {
 
     initialize(state){
         if(state){
-            for(let panel of state){
+            for(const panel of state){
                 this.panels.push(new ChartPanel({chart: this.chart, panels: this, state: panel}));
             }
         }else{
             this.panels.push(new ChartPanel({chart: this.chart, panels: this, center: true}));
         }
 
-        for(let panel of this.panels){
+        for(const panel of this.panels){
             this.element.appendChild(panel.element);
         }
     }

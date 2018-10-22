@@ -22,12 +22,17 @@ module.exports = class CoreIndicator {
     constructor({chart}){
         this.chart = chart;
         this.disposables = new CompositeDisposable();
+        etch.initialize(this);
 
-        this.disposables.add(this.chart.tools.add({
-            component: $.div({classList: 'type toolbar-button caret', onClick: this.select.bind(this)}, 'Indicators'),
-            location: 'left',
-            priority: 2
-        }));
+        this.disposables.add(this.chart.tools.add({element: this.element, location: 'left', priority: 4}));
+        this.disposables.add(via.tooltips.add(this.element, {title: 'Add Indicator', placement: 'bottom', keyBindingCommand: 'charts:add-indicator'}));
+        this.disposables.add(via.commands.add(this.chart.element, 'charts:add-indicator', this.select.bind(this)));
+    }
+
+    update(){}
+
+    render(){
+        return $.div({classList: 'type toolbar-button caret', onClick: this.select.bind(this)}, 'Indicators');
     }
 
     select(){

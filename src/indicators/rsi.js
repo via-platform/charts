@@ -10,7 +10,8 @@ module.exports = {
             type: 'plot',
             title: 'RSI',
             parameters: {
-                color: '#0000FF'
+                color: '#0000FF',
+                style: 'line'
             }
         },
         upper_limit: {

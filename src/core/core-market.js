@@ -14,33 +14,26 @@ module.exports = class CoreMarket {
         return new CoreMarket(params);
     }
 
-    constructor({chart, tools}){
-        this.disposables = new CompositeDisposable();
+    constructor({chart}){
         this.chart = chart;
-        this.tools = tools;
-
-        console.log('INIT CORE MARKET');
-        return;
-
+        this.disposables = new CompositeDisposable();
         etch.initialize(this);
 
-        this.disposables.add(this.tools.onDidDestroy(this.destroy.bind(this)));
-        this.disposables.add(this.chart.onDidChangeMarket(this.changed.bind(this)));
+        this.disposables.add(this.chart.tools.add({element: this.element, location: 'left', priority: 1}));
+        this.disposables.add(this.chart.onDidChangeMarket(() => etch.update(this)));
         this.disposables.add(via.tooltips.add(this.element, {title: 'Change Market', placement: 'bottom', keyBindingCommand: 'charts:change-market'}));
-        this.disposables.add(via.commands.add(this.chart.element, 'charts:change-market', this.change.bind(this)));
+        this.disposables.add(via.commands.add(this.chart.element, 'charts:change-market', this.select.bind(this)));
     }
 
     update(){}
 
     render(){
-        return $.div({classList: 'market toolbar-button', onClick: this.change.bind(this)},
+        return $.div({classList: 'market toolbar-button', onClick: this.select.bind(this)},
             this.chart.market ? this.chart.market.title : 'Select Market'
         );
     }
 
-    change(){
-        if(!this.chart.omnibar) return;
-
+    select(){
         this.chart.omnibar.search({
             name: 'Change Chart Market',
             placeholder: 'Search For a Market to Display on the Chart...',
@@ -50,8 +43,9 @@ module.exports = class CoreMarket {
         });
     }
 
-    changed(){
-        etch.update(this);
+    create(plugin){
+        const panel = plugin.panel ? this.chart.panels.create() : this.chart.center();
+        panel.add(new ChartIndicator({plugin, chart: this.chart, panel}));
     }
 
     destroy(){

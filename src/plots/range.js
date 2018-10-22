@@ -1,4 +1,4 @@
-module.exports = {
+const Range = {
     name: 'range',
     title: 'Range',
     parameters: {
@@ -20,8 +20,10 @@ module.exports = {
             const [start, end] = data;
 
             element.append('path')
-                .attr('d', `M 0 ${panel.scale(start)} h ${panel.width} V ${panel.scale(end)} h ${-1 * panel.width} Z`)
+                .attr('d', `M 0 ${Math.round(panel.scale(start)) - 0.5} h ${panel.width} V ${Math.round(panel.scale(end)) - 0.5} h ${-1 * panel.width} Z`)
                 .attr('fill', 'rgba(0, 255, 0, 0.1)');
         }
     }
 };
+
+module.exports = Range;

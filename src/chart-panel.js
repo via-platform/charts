@@ -7,7 +7,6 @@ const ChartPanelValues = require('./chart-panel-values');
 
 
 module.exports = class ChartPanel {
-
     serialize(){
         return {
             center: this.center,
@@ -203,7 +202,7 @@ module.exports = class ChartPanel {
         const _this = this;
 
         return function(d, i){
-            if(!_this.locked && d3.event.sourceEvent.movementY){
+            if(!_this.locked && d3.event.sourceEvent && d3.event.sourceEvent.movementY){
                 _this.pan(d3.event.sourceEvent.movementY);
             }
 

@@ -1,4 +1,4 @@
-module.exports = {
+const Line = {
     name: 'line',
     title: 'Line',
     parameters: {
@@ -29,12 +29,14 @@ module.exports = {
         element.select('path').remove();
 
         if(data){
-            const points = data.map(([x, y]) => `${chart.scale(x)} ${panel.scale(y)}`).join(' L ');
+            const points = data.array().map(([x, y]) => `${chart.scale(x)} ${panel.scale(y)}`).join(' L ');
 
             element.append('path')
                 .classed('stroke', true)
                 .attr('d', `M ${points}`)
-                .attr('stroke', 'green');
+                .attr('stroke', '#00FF00');
         }
     }
 };
+
+module.exports = Line;

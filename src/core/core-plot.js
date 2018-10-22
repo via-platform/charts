@@ -9,6 +9,9 @@
 //special logic involved, depending on the market type.
 
 const {CompositeDisposable} = require('via');
+const _ = require('underscore-plus');
+const etch = require('etch');
+const $ = etch.dom;
 
 module.exports = class CorePlot {
     static describe(){
@@ -21,23 +24,32 @@ module.exports = class CorePlot {
         return new CorePlot(params);
     }
 
-    constructor({chart, state}){
+    constructor({chart}){
         this.chart = chart;
         this.disposables = new CompositeDisposable();
-        this.type = via.config.get('charts.defaultChartType');
-        console.log('INIT CORE PLOT');
 
-        this.disposables.add(this.chart.onDidDestroy(this.destroy.bind(this)));
+        etch.initialize(this);
 
-
+        this.disposables.add(this.chart.root.onDidChangePlot(() => etch.update(this)));
+        this.disposables.add(this.chart.tools.add({element: this.element, location: 'left', priority: 2}));
+        this.disposables.add(via.tooltips.add(this.element, {title: 'Change Plot Type', placement: 'bottom', keyBindingCommand: 'charts:change-type'}));
+        this.disposables.add(via.commands.add(this.chart.element, 'charts:change-type', this.select.bind(this)));
     }
 
-    changeType(type){
-        if(this.type !== type){
-            const plugin = this.plugins.get(type);
-            this.type = type;
-            this.root().initialize(plugin);
-        }
+    update(){}
+
+    render(){
+        return $.div({classList: 'market toolbar-button', onClick: this.select.bind(this)}, 'Chart Type');
+    }
+
+    select(){
+        this.chart.omnibar.search({
+            name: 'Change Chart Type',
+            placeholder: 'Select a Chart Type...',
+            didConfirmSelection: option => this.chart.root.change(option.value),
+            maxResultsPerCategory: 60,
+            items: this.chart.manager.indicators.map(plugin => ({name: plugin.title, plugin}))
+        });
     }
 
     draw(){

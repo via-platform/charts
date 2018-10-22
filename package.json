@@ -27,15 +27,15 @@
   "configSchema": {
     "defaultChartType": {
       "type": "string",
-      "default": "candlestick",
+      "default": "candle",
       "description": "The default chart type when a new chart window is opened.",
       "enum": [
         {
-          "value": "candlestick",
+          "value": "candle",
           "description": "Candlestick"
         },
         {
-          "value": "ohlc",
+          "value": "bar",
           "description": "OHLC Bars"
         },
         {
@@ -45,6 +45,10 @@
         {
           "value": "area",
           "description": "Area Chart"
+        },
+        {
+          "value": "mountain",
+          "description": "Mountain Chart"
         },
         {
           "value": "heikin-ashi",

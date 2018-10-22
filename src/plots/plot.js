@@ -10,7 +10,6 @@ const Plot = {
                 {title: 'Area', value: 'area'},
                 {title: 'Histogram', value: 'histogram'},
                 {title: 'Column', value: 'column'},
-                {title: 'Mountain', value: 'mountain'},
                 {title: 'Cross', value: 'cross'},
                 {title: 'Circle', value: 'circle'},
                 {title: 'Step Line', value: 'step'},
@@ -34,11 +33,16 @@ const Plot = {
         }
     },
     render: configuration => {
-        if(!configuration.element.classed(configuration.parameters.style.value)){
-            configuration.element.attr('class', `plot ${configuration.parameters.style.value}`).selectAll('*').remove();
+        const style = configuration.parameters.style || Plot.parameters.style.default;
+        const plot = configuration.chart.manager.plots.find(plot => plot.name === style);
+
+        if(!configuration.element.classed(style)){
+            configuration.element.attr('class', `plot ${style}`).selectAll('*').remove();
         }
 
-        chart.manager.plots.[configuration.parameters.style.value](configuration);
+        if(configuration.data){
+            plot.render(configuration);
+        }
     }
 };
 

@@ -21,8 +21,8 @@ module.exports = class ChartPanelGrid {
         };
 
         this.disposables.add(this.panel.onDidDestroy(this.destroy.bind(this)));
-        this.disposables.add(this.panel.onDidResize(this.resize.bind(this)));
-        this.disposables.add(this.panel.onDidDraw(this.draw.bind(this)));
+        this.disposables.add(this.panel.onDidRescale(this.draw.bind(this)));
+        this.disposables.add(this.chart.onDidZoom(this.draw.bind(this)));
     }
 
     resize(){
@@ -34,7 +34,12 @@ module.exports = class ChartPanelGrid {
         this.grid.x.call(this.basis.x);
         this.grid.y.call(this.basis.y);
 
-        this.grid.y.selectAll('.tick').filter(d => this.panel.scale(d) < 5).remove();
+        this.grid.y.selectAll('.tick')
+            .attr('transform', d => `translate(0, ${Math.round(this.panel.scale(d)) + 0.5})`)
+            .filter(d => this.panel.scale(d) < 5).remove();
+
+        this.grid.x.selectAll('.tick')
+            .attr('transform', d => `translate(${Math.round(this.chart.scale(d), 0) + 0.5})`);
     }
 
     destroy(){

@@ -40,7 +40,7 @@ module.exports = class CoreType {
 
     render(){
         return $.div({classList: 'type toolbar-button caret', onClick: this.select.bind(this)},
-            this.chart.root.plugin ? this.chart.root.plugin.title : 'Select Chart Type'
+            this.chart.root.type ? this.chart.root.type.title : 'Select Chart Type'
         );
     }
 

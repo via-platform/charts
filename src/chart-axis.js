@@ -23,7 +23,7 @@ module.exports = class ChartAxis {
         this.axis = this.svg.append('g').attr('class', 'x axis');
 
         this.zoomable.call(d3.zoom().on('zoom', this.zoom()));
-        this.disposables.add(this.chart.panels.onDidUpdateOffset(this.resize.bind(this)));
+        this.disposables.add(this.chart.onDidUpdateOffset(this.resize.bind(this)));
         this.disposables.add(this.chart.onDidResize(this.resize.bind(this)));
         this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
 
@@ -74,10 +74,13 @@ module.exports = class ChartAxis {
 
     draw(){
         this.axis.call(this.basis);
+        this.axis.selectAll('.tick').attr('transform', d => `translate(${Math.round(this.chart.scale(d), 0) + 0.5})`);
     }
 
     resize(){
-        const width = Math.max(50, this.chart.width - this.chart.panels.offset);
+        const width = Math.max(0, this.chart.width - this.chart.offset);
+
+        console.log('width', this.chart.width, this.chart.offset)
 
         this.svg.attr('width', width);
         this.zoomable.attr('width', width);

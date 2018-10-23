@@ -5,7 +5,6 @@ const ChartPanelAxis = require('./chart-panel-axis');
 const ChartPanelGrid = require('./chart-panel-grid');
 const ChartPanelValues = require('./chart-panel-values');
 
-
 module.exports = class ChartPanel {
     serialize(){
         return {
@@ -63,17 +62,8 @@ module.exports = class ChartPanel {
 
         this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
         this.disposables.add(this.chart.onDidDestroy(this.destroy.bind(this)));
-
-        // this.disposables.add(this.chart.data.onDidUpdateData(() => {
-        //     this.rescale();
-        //     this.render();
-        // }));
-
-        this.disposables.add(this.panels.onDidUpdateOffset(offset => {
-            this.resize();
-            this.render();
-            this.emitter.emit('did-update-offset', offset);
-        }));
+        // this.disposables.add(this.chart.data.onDidUpdateData(this.rescale.bind(this)));
+        // this.disposables.add(this.chart.onDidUpdateOffset(this.resize.bind(this)));
 
         this.disposables.add(via.commands.add(this.element, {
             'charts:remove-panel': () => this.remove()
@@ -86,16 +76,12 @@ module.exports = class ChartPanel {
         }
 
         this.sortLayers();
-        this.resize();
-        this.rescale();
-        this.render();
     }
 
     addLayer(plugin, params){
         const layer = new ChartLayer({chart: this.chart, panel: this, plugin, params});
         this.layers.push(layer);
         this.emitter.emit('did-add-layer', layer);
-        this.render();
 
         return layer;
     }
@@ -108,8 +94,6 @@ module.exports = class ChartPanel {
         if(!this.layers.length && !this.center){
             this.remove();
         }
-
-        this.render();
     }
 
     sortLayers(){
@@ -127,6 +111,7 @@ module.exports = class ChartPanel {
     resize(){
         this.width = this.center.clientWidth;
         this.height = this.center.clientHeight;
+
         this.basis.range([0, this.height]);
         this.scale.range([0, this.height]);
 
@@ -137,22 +122,14 @@ module.exports = class ChartPanel {
             d3.zoom().transform(this.zoomable, this.chart.transform);
         }
 
-        this.emitter.emit('did-resize', {width: this.width, height: this.height, target: this});
-
-        this.render();
-    }
-
-    get precision(){
-        return Math.max(...this.layers.filter(layer => (layer instanceof ChartLayer)).map(layer => layer.precision), 2);
-    }
-
-    get offset(){
-        return this.panels.offset;
+        this.axis.resize();
+        this.grid.resize();
     }
 
     add(layer){
         this.layers.push(layer);
         this.emitter.emit('did-add-layer', layer);
+        this.chart.rescale();
     }
 
     remove(layer){
@@ -160,10 +137,7 @@ module.exports = class ChartPanel {
 
         _.remove(this.layers, layer);
         this.emitter.emit('did-remove-layer');
-    }
-
-    render(){
-        // this.layers.forEach(layer => layer.render());
+        this.chart.rescale();
     }
 
     unlock(){
@@ -174,19 +148,19 @@ module.exports = class ChartPanel {
         if(this.locked) return;
 
         this.locked = true;
-        this.rescale();
-        this.render();
+        // this.rescale();
     }
 
     pan(dy){
-        if(this.locked) return;
+        if(this.locked){
+            return;
+        }
 
         const [start, end] = this.basis.domain();
 
         this.basis.domain([this.basis.invert(this.basis(start) - dy), this.basis.invert(this.basis(end) - dy)]);
         this.scale.domain(this.basis.domain());
-        this.rescale();
-        this.render();
+        // this.rescale();
     }
 
     zoomed({event, target} = {}){
@@ -194,8 +168,7 @@ module.exports = class ChartPanel {
             d3.zoom().transform(this.zoomable, this.chart.transform);
         }
 
-        this.rescale();
-        this.render();
+        // this.rescale();
     }
 
     zoom(){
@@ -246,9 +219,22 @@ module.exports = class ChartPanel {
         };
     }
 
-    rescale(){
+    recalculate(){
+        for(const layer of this.layers){
+            layer.recalculate();
+        }
+    }
+
+    rescale(domain){
+        for(const layer of this.layers){
+            layer.rescale();
+        }
+
         if(this.locked){
-            const domains = _.flatten(this.layers.filter(layer => (layer instanceof ChartLayer)).map(layer => layer.domain())).filter(domain => !_.isUndefined(domain));
+            console.log(this.layers.map(layer => layer.domain))
+            // const domains = ;
+
+            const domains = [];//_.flatten(this.layers.filter(layer => (layer instanceof ChartLayer)).map(layer => layer.domain())).filter(domain => !_.isUndefined(domain));
 
             if(domains.length){
                 const min = _.min(domains);
@@ -267,17 +253,19 @@ module.exports = class ChartPanel {
                 this.emitter.emit('did-rescale', this.scale);
             }
         }else{
+
             //Apply the transformation to the domain instead
             this.emitter.emit('did-rescale', this.scale);
         }
+    }
 
-        if(this.center){
-            //TODO figure out how to make this work for indicator panels as well
-            const figures = this.basis.domain()[0].toFixed(this.chart.precision).length;
-            this.panels.didUpdateOffset(this, figures * 6 + 12);
-        }
+    get decimals(){
+        return Math.max(...this.layers.map(layer => layer.decimals));
+    }
 
-        this.render();
+    get offset(){
+        //The number of significant digits is now based on the scale, not the layer domains
+        return this.scale.domain()[1].toFixed(this.decimals).length * 6 + 12;
     }
 
     removePanel(){
@@ -288,16 +276,19 @@ module.exports = class ChartPanel {
         this.chart.panels.removePanel(this);
     }
 
+    render(){
+        this.axis.render();
+        this.grid.render();
+
+        this.layers.forEach(layer => layer.render());
+    }
+
     destroy(){
         this.axis.destroy();
         this.values.destroy();
         this.element.parentElement.removeChild(this.element);
         this.disposables.dispose();
         this.emitter.emit('did-destroy');
-    }
-
-    onDidDraw(callback){
-        return this.emitter.on('did-draw', callback);
     }
 
     onDidResize(callback){
@@ -338,9 +329,5 @@ module.exports = class ChartPanel {
 
     onDidModifyLayer(callback){
         return this.emitter.on('did-modify-layer', callback);
-    }
-
-    onDidUpdateOffset(callback){
-        return this.emitter.on('did-update-offset', callback);
     }
 }

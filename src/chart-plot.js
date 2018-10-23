@@ -1,4 +1,5 @@
 const _ = require('underscore-plus');
+const {is_series} = require('via').VS;
 
 module.exports = class ChartPlot {
     constructor({chart, panel, layer, component, state}){
@@ -48,27 +49,49 @@ module.exports = class ChartPlot {
             return parameter.constraint(value);
         }
 
+        //TODO Coerce color types for validity
         //TODO Check the actual type of the value against the type of the parameter
         return true;
     }
 
-    render(){
-        //TODO If selected, render the actual points, flags, and ranges
-        this.plot.render({
-            chart: this.chart,
-            panel: this.panel,
-            element: this.element,
-            data: this.data,
-            options: this.options,
-            selected: this.layer.selected,
-            component: this.component,
-            parameters: this.parameters
-        });
-    }
-
-    update(data, options = {}){
+    update(data, options){
         this.data = data;
         this.options = options;
+    }
+
+    render(){
+        if(this.plot){
+            const [start, end] = this.chart.scale.domain();
+
+            this.plot.render({
+                chart: this.chart,
+                panel: this.panel,
+                element: this.element,
+                data: this.data.range(start, end),
+                options: this.options,
+                selected: this.layer.selected,
+                component: this.component,
+                parameters: this.parameters
+            });
+        }
+    }
+
+    domain(){
+        if(this.data){
+            const [start, end] = this.chart.scale.domain();
+
+            if(is_series(this.data)){
+                const range = this.data.range(start, end);
+
+                if(range.length){
+                    return [range.min(), range.max()];
+                }
+            }else{
+                return [data, data];
+            }
+        }
+
+        return [];
     }
 
     destroy(){

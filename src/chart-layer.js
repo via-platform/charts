@@ -9,10 +9,14 @@ module.exports = class ChartLayer {
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
         this.element = this.panel.zoomable.append('g').classed('layer', true);
+    }
 
-        this.disposables.add(this.panel.onDidResize(this.render.bind(this)));
-        this.disposables.add(this.panel.onDidRescale(this.render.bind(this)));
-        this.disposables.add(this.chart.onDidZoom(this.render.bind(this)));
+    get domain(){
+        return [];
+    }
+
+    get decimals(){
+        return 0;
     }
 
     select(){
@@ -23,11 +27,6 @@ module.exports = class ChartLayer {
         return this.chart.selected === this;
     }
 
-    domain(){
-        return [];
-        // return (this.plugin && _.isFunction(this.plugin.domain)) ? this.plugin.domain() : [];
-    }
-
     title(){
         // return _.isFunction(this.plugin.title) ? this.plugin.title() : '';
     }
@@ -35,6 +34,8 @@ module.exports = class ChartLayer {
     value(candle){
         // return _.isFunction(this.plugin.value) ? this.plugin.value(candle) : '';
     }
+
+    calculate(){}
 
     render(){}
 

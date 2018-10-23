@@ -11,8 +11,6 @@ module.exports = class ChartPanels {
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
         this.panels = [];
-        this.offset = 0;
-        this.offsets = new Map();
 
         this.element = document.createElement('div');
         this.element.classList.add('chart-panels');
@@ -43,7 +41,6 @@ module.exports = class ChartPanels {
     create(){
         const panel = new ChartPanel({chart: this.chart, panels: this});
         this.panels.push(panel);
-        this.offsets.set(panel, panel.offset);
         this.element.appendChild(panel.element);
         this.emitter.emit('did-add-panel', panel);
         this.resize();
@@ -54,7 +51,6 @@ module.exports = class ChartPanels {
     addPanel(plugin){
         const panel = new ChartPanel({chart: this.chart, panels: this, plugin});
         this.panels.push(panel);
-        this.offsets.set(panel, panel.offset);
         this.element.appendChild(panel.element);
         this.emitter.emit('did-add-panel', panel);
         this.resize();
@@ -62,21 +58,9 @@ module.exports = class ChartPanels {
 
     removePanel(panel){
         this.panels.splice(this.panels.indexOf(panel), 1);
-        this.offsets.delete(panel);
         this.emitter.emit('did-remove-panel', panel);
         panel.destroy();
         this.resize();
-    }
-
-    didUpdateOffset(panel, offset){
-        this.offsets.set(panel, offset);
-
-        const max = Math.max(50, d3.max(Array.from(this.offsets.values())));
-
-        if(max !== this.offset){
-            this.offset = max;
-            this.emitter.emit('did-update-offset', this.offset);
-        }
     }
 
     observePanels(callback){
@@ -103,12 +87,7 @@ module.exports = class ChartPanels {
         return this.emitter.on('did-remove-panel', callback);
     }
 
-    onDidUpdateOffset(callback){
-        return this.emitter.on('did-update-offset', callback);
-    }
-
     destroy(){
-        this.offsets.clear();
         this.disposables.dispose();
     }
 }

@@ -39,3 +39,32 @@ Indicator class now holds the domain as well as the decimal precision.
 * I'll probably eliminate current-value in favor of a more generalized price line solution.
 
 
+# Draw Cycle
+
+* Update data
+* Recalculate data for each layer
+
+---or---
+
+* Update chart domain (by panning or zooming)
+
+---or---
+
+* Update triggered by plugin (who may be using another data source)
+
+* Recalculate the visible domain for each layer
+* Recalculate the number of significant digits for each layer
+* Update the chart offset (sig figs) if necessary
+* Update the panel scale if the domain has changed
+* Render the layers
+
+
+Four concepts:
+
+* Recalculate - Reacting to changes in data, recalculating entire series' worth of data points
+* Rescale - Determining the sizes and domains of the components with the new data
+* Resize - Resizing of the axes / panels if the chart offset has changed, or a panel has been added / remove, or the axis type has changed
+* Render - The actual drawing of the axes and plots
+
+On new data: recalculate, rescale, redraw, render
+On zoom: rescale, redraw, render

@@ -17,80 +17,93 @@ module.exports = class ChartIndicator extends ChartLayer {
 
         //TODO There is one more thing that may force a recalculation - when the user changes a parameter
         this.disposables.add(this.chart.data.onDidUpdateData(this.calculate.bind(this)));
+        // this.disposables.add(this.chart.onDidZoom(this.rescale.bind(this)));
 
         this.initialize(state);
     }
 
-    initialize({components, parameters} = {}){
-        this.parameters = {}; //Parameter ID => Plugin parameter metadata (e.g. length)
-        this.components = new Map(); //Component ID => Plot
+    initialize(state = {}){
+        this.parameters = {}; //Parameter ID => Value
+        this.components = {};
 
         for(const [identifier, definition] of Object.entries(this.plugin.parameters)){
-            this.parameters[identifier] = Object.assign({value: parameters ? parameters[identifier] : definition.default}, definition);
+            //First set this parameter to the default value.
+            this.parameters[identifier] = definition.default;
+
+            //Then override the defaults with the user's saved state.
+            if(state.parameters && state.parameters[identifier] && this.valid(definition, state.parameters[identifier])){
+                this.parameters[identifier] = state.parameters[identifier];
+            }
         }
 
         for(const [identifier, component] of Object.entries(this.plugin.components)){
-            this.components.set(identifier, new ChartPlot({
+            this.components[identifier] = new ChartPlot({
                 chart: this.chart,
                 panel: this.panel,
                 layer: this,
                 component,
-                state: components ? components[identifier] : undefined
-            }));
+                state: state.components ? state.components[identifier] : undefined
+            });
         }
     }
 
     serialize(){
-        return {
-            plugin: this.plugin.serialize()
-        };
+        const components = {};
+
+        for(const [identifier, component] of Object.entries(this.components)){
+            components[identifier] = component.plot.parameters;
+        }
+
+        return {parameters: this.parameters, components};
     }
 
-    draw(identifier, series, options = {}){
-        if(this.components.has(identifier)){
-            this.components.get(identifier).update(series, options);
+    rescale(){
+        const min = [];
+        const max = [];
+
+        for(const plot of Object.values(this.components)){
+            const domain = plot.domain();
+
+            if(domain.length){
+                min.push(domain[0]);
+                max.push(domain[1]);
+            }
+        }
+
+        if(min.length){
+            const low = Math.min(...min);
+            const high = Math.max(...max);
+
+            console.log(low, high)
+
+            this.domain = [low, high];
+            // this.decimals = high.toFixed(this.plugin.decimals ? this.plugin.decimals(this.chart) : 0).length;
+        }else{
+            this.domain = [];
+            // this.decimals = 0;
+        }
+    }
+
+    get decimals(){
+        return this.plugin.decimals ? this.plugin.decimals(this.chart) : 0;
+    }
+
+    draw(identifier, data, options = {}){
+        if(this.components.hasOwnProperty(identifier)){
+            this.components[identifier].update(data, options);
         }else{
             throw new Error(`Invalid component identifier. '${identifier}' does not match any of the predefined components.`);
         }
     }
 
-    valid(parameter, value){
-        if(parameter.enum){
-            return (typeof _.first(parameter.enum) === 'object') ? parameter.enum.map(v => v.value).includes(value) : parameter.enum.includes(value);
-        }
-
-        if(parameter.constraint){
-            return parameter.constraint(value);
-        }
-
-        //TODO Check the actual type of the value against the type of the parameter
-        return true;
-    }
-
-    domain(){
-        // return _.max(Array.from(this.components.values()).map(component => component.domain()));
-    }
-
-    calculate(){
-        const parameters = {};
-
-        for(const [key, definition] of Object.entries(this.parameters)){
-            parameters[key] = definition.value;
-        }
-
-        this.plugin.calculate({
-            draw: this.draw.bind(this),
-            parameters,
-            series: this.chart.data.all()
-        });
-
-        this.render();
+    recalculate(){
+        this.plugin.calculate({draw: this.draw.bind(this), parameters: this.parameters, series: this.chart.data.all()});
     }
 
     render(){
         //TODO If selected, render the actual points, flags, and ranges
-        for(const plot of this.components.values()){
-            plot.render();
+        for(const {plot, data} of Object.values(this.components)){
+            plot.render(data);
         }
     }
 }

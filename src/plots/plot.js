@@ -42,22 +42,22 @@ module.exports = {
         const style = configuration.parameters.style;
         const plot = configuration.chart.manager.plots.find(plot => plot.name === style);
 
-        configuration.parameters = {
+        const parameters = {
             visible: configuration.parameters.visible,
             track: configuration.parameters.track,
             width: configuration.parameters.width
         };
 
         if(['line', 'step'].includes(style)){
-            configuration.parameters.style = 'solid';
+            parameters.style = 'solid';
         }
 
         if(['line', 'area', 'step'].includes(style)){
-            configuration.parameters.stroke = configuration.parameters.color;
+            parameters.stroke = configuration.parameters.color;
         }
 
         if(['area', 'histogram', 'column', 'cross', 'circle'].includes(style)){
-            configuration.parameters.fill = configuration.parameters.color;
+            parameters.fill = configuration.parameters.color;
         }
 
         if(!configuration.element.classed(style)){
@@ -65,7 +65,7 @@ module.exports = {
         }
 
         if(configuration.data){
-            plot.render(configuration);
+            plot.render(Object.assign({}, configuration, {parameters}));
         }
     }
 };

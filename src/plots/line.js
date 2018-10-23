@@ -40,6 +40,7 @@ const Line = {
                 .classed('stroke', true)
                 .attr('d', `M ${points}`)
                 .attr('stroke', parameters.stroke)
+                .attr('stroke-width', parameters.width)
                 .attr('stroke-dasharray', parameters.style === 'solid' ? '' : (parameters.style === 'dashed' ? '5' : '2'));
         }
     }

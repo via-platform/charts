@@ -45,6 +45,7 @@ module.exports = class Chart {
         this.bandwidth = 10;
         this.granularity = state.granularity || via.config.get('charts.defaultChartGranularity');
         this.selected = null;
+        this.offset = 0;
 
         this.basis = d3.scaleTime().domain([new Date(Date.now() - this.granularity * 144), new Date()]);
         this.scale = this.basis.copy();
@@ -62,8 +63,6 @@ module.exports = class Chart {
         this.element.appendChild(this.tools.element);
         this.element.appendChild(this.panels.element);
         this.element.appendChild(this.axis.element);
-
-        this.disposables.add(this.panels.onDidUpdateOffset(this.resize.bind(this)));
 
         this.resizeObserver = new ResizeObserver(this.resize.bind(this));
         this.resizeObserver.observe(this.element);
@@ -140,8 +139,8 @@ module.exports = class Chart {
         }
 
         this.scale.domain(this.transform.rescaleX(this.basis).domain());
-        this.updateBandwidth();
         this.emitter.emit('did-zoom', {event, target});
+        this.rescale();
     }
 
     mouseover(params){
@@ -177,34 +176,54 @@ module.exports = class Chart {
         }
     }
 
-    resize(){
-        //NOTE This is almost certainly what is causing the bug where the chart does not draw immediately - only after you move the chart
-        if(this.isHidden()){
-            return;
+    recalculate(){
+        for(const panel of this.panels.all()){
+            panel.recalculate();
         }
+
+        this.rescale();
+    }
+
+    rescale(){
+        for(const panel of this.panels.all()){
+            panel.rescale();
+        }
+
+        const decimals = Math.max(this.panels.all().map(panel => panel.decimals));
+        const offset = Math.max(decimals * 6 + 12, 50);
+
+        if(this.offset === offset){
+            //The axis has not changed, we can just render now.
+            this.render();
+        }else{
+            this.offset = offset;
+
+            //After changing the axis offset, we have to resize the axis before we can render it.
+            this.resize();
+        }
+    }
+
+    resize(){
+        const [start, end] = this.scale.domain();
 
         if(this.transform && this.element.clientWidth && this.width){
             //We have to subtract out the axis width (since it is fixed at `this.panels.offset`)
             //If we don't, the ratio of the old-width to new-width is incorrect
-            this.transform.x = this.transform.x * ((this.element.clientWidth - this.panels.offset) / (this.width - this.panels.offset));
+            this.transform.x = this.transform.x * ((this.element.clientWidth - this.offset) / (this.width - this.offset));
         }
 
         this.width = this.element.clientWidth;
         this.height = this.element.clientHeight;
+        this.bandwidth = (this.width - this.offset) / Math.ceil((end - start) / this.granularity);
 
-        this.basis.range([0, this.width - this.panels.offset]);
-        this.scale.range([0, this.width - this.panels.offset]);
+        this.basis.range([0, this.width - this.offset]);
+        this.scale.range([0, this.width - this.offset]);
 
-        this.updateBandwidth();
+        for(const panel of this.panels.all()){
+            panel.resize();
+        }
 
-        this.emitter.emit('did-resize', {width: this.width, height: this.height});
-    }
-
-    updateBandwidth(){
-        const [start, end] = this.scale.domain();
-        const total = Math.ceil((end - start) / this.granularity);
-        this.bandwidth = (this.width - this.panels.offset) / total;
-        this.emitter.emit('did-update-bandwidth', this.bandwidth);
+        this.render();
     }
 
     consumeActionBar(actionBar){
@@ -317,11 +336,8 @@ module.exports = class Chart {
             this.basis.domain([new Date(Date.now() - (this.granularity || 3e5) * 144), new Date()]);
             this.transform = d3.zoomIdentity;
             this.zoomed();
-        }else{
-            this.updateBandwidth();
         }
 
-        this.updateBandwidth();
         this.setNextBandTimeout(false);
 
         this.emitter.emit('did-change-granularity', granularity);
@@ -338,6 +354,10 @@ module.exports = class Chart {
 
     center(){
         return this.panels.getCenter();
+    }
+
+    onDidUpdateOffset(callback){
+        return this.emitter.on('did-update-offset', callback);
     }
 
     onDidCancel(callback){
@@ -374,6 +394,10 @@ module.exports = class Chart {
 
     onDidResize(callback){
         return this.emitter.on('did-resize', callback);
+    }
+
+    onDidRescale(callback){
+        return this.emitter.on('did-rescale', callback);
     }
 
     onDidDraw(callback){

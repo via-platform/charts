@@ -30,7 +30,7 @@ module.exports = class ChartData {
         }
 
         this.data = this.chart.market.candles(this.chart.granularity);
-        this.subscription = this.data.subscribe(this.didUpdateData.bind(this));
+        this.subscription = this.data.subscribe(this.update.bind(this));
 
         this.request();
     }
@@ -59,8 +59,9 @@ module.exports = class ChartData {
         return this.data ? this.data.all() : [];
     }
 
-    didUpdateData(){
+    update(){
         this.emitter.emit('did-update-data');
+        this.chart.rescale();
     }
 
     onDidUpdateData(callback){

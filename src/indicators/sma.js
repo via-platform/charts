@@ -4,11 +4,12 @@ module.exports = {
     name: 'sma',
     title: 'Simple Moving Average',
     description: 'An n-period moving average.',
+    decimals: chart => chart.market ? chart.market.precision.price : 0,
     components: {
         sma: {
             type: 'plot',
             parameters: {
-                color: '#0000FF',
+                color: '#FFF',
                 style: 'line'
             }
         }

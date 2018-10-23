@@ -16,7 +16,7 @@ module.exports = class ChartRoot extends ChartLayer {
         super({chart, panel, plugin: {selectable: true}});
 
         //TODO There is one more thing that may force a recalculation - when the user changes a parameter
-        this.disposables.add(this.chart.data.onDidUpdateData(this.calculate.bind(this)));
+        // this.disposables.add(this.chart.data.onDidUpdateData(this.calculate.bind(this)));
 
         this.initialize(state);
     }
@@ -58,6 +58,8 @@ module.exports = class ChartRoot extends ChartLayer {
         this.type = type;
         this.element.attr('class', `layer ${type.name}`).selectAll('*').remove();
         this.calculate();
+
+        this.emitter.emit('did-change-type', this.type);
     }
 
     valid(parameter, value){
@@ -77,22 +79,17 @@ module.exports = class ChartRoot extends ChartLayer {
         return true;
     }
 
-    domain(){
-        // return _.max(Array.from(this.components.values()).map(component => component.domain()));
-    }
-
     calculate(){
         this.data = this.chart.data.all();
 
         if(this.type.calculate){
             this.data = this.type.calculate({series: this.data, parameters: this.parameters[this.type.name]});
         }
-
-        this.render();
     }
 
     render(){
         //TODO If selected, render the actual points, flags, and ranges
+        //TODO Trim this.data to only render the visible datapoints
         if(this.type){
             this.type.render({
                 chart: this.chart,
@@ -103,6 +100,10 @@ module.exports = class ChartRoot extends ChartLayer {
                 parameters: this.parameters[this.type.name]
             });
         }
+    }
+
+    get decimals(){
+        return this.chart.market ? this.chart.market.precision.price : 0;
     }
 
     onDidChangeType(callback){

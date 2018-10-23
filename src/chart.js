@@ -10,7 +10,6 @@ const _ = require('underscore-plus');
 const ChartDefaults = {end: 0, start: Date.now() - 864e5};
 const base = 'via://charts';
 
-
 module.exports = class Chart {
     static deserialize({manager, plugins, omnibar}, state){
         return new Chart({manager, plugins, omnibar}, state);

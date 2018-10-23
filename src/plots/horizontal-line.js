@@ -1,4 +1,4 @@
-const HorizontalLine = {
+module.exports = {
     name: 'horizontal-line',
     title: 'Horizontal Line',
     parameters: {
@@ -31,9 +31,8 @@ const HorizontalLine = {
         if(data){
             element.append('path')
                 .attr('d', `M 0 ${Math.round(panel.scale(data)) - 0.5} h ${panel.width}`)
-                .attr('stroke', 'green');
+                .attr('stroke', parameters.stroke)
+                .attr('stroke-dasharray', parameters.style === 'solid' ? '' : (parameters.style === 'dashed' ? '5' : '2'));
         }
     }
 };
-
-module.exports = HorizontalLine;

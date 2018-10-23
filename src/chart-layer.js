@@ -2,20 +2,13 @@ const {Disposable, CompositeDisposable, Emitter} = require('via');
 const _ = require('underscore-plus');
 
 module.exports = class ChartLayer {
-    serialize(){
-        return {
-            plugin: this.plugin.serialize()
-        };
-    }
-
-    constructor({chart, panel, plugin}){
+    constructor({chart, panel}){
         this.chart = chart;
         this.panel = panel;
-        this.plugin = plugin;
         this.params = {};
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
-        this.element = this.panel.zoomable.append('g').classed('layer', true).classed('selectable', plugin.selectable);
+        this.element = this.panel.zoomable.append('g').classed('layer', true);
 
         this.disposables.add(this.panel.onDidResize(this.render.bind(this)));
         this.disposables.add(this.panel.onDidRescale(this.render.bind(this)));
@@ -31,7 +24,8 @@ module.exports = class ChartLayer {
     }
 
     domain(){
-        return (this.plugin && _.isFunction(this.plugin.domain)) ? this.plugin.domain() : [];
+        return [];
+        // return (this.plugin && _.isFunction(this.plugin.domain)) ? this.plugin.domain() : [];
     }
 
     title(){
@@ -40,19 +34,6 @@ module.exports = class ChartLayer {
 
     value(candle){
         // return _.isFunction(this.plugin.value) ? this.plugin.value(candle) : '';
-    }
-
-    plot(series, options = {}){
-
-    }
-
-    draw(){
-        if(this.plugin){
-            //TODO Draw the layer instead of recalculating things with the plugin
-            // this.plugin.draw();
-        }
-
-
     }
 
     render(){}

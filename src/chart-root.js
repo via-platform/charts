@@ -1,41 +1,70 @@
 //This file contains the base functionality for the root plot.
 
-const {CompositeDisposable, Disposable, d3} = require('via');
+const {CompositeDisposable, Disposable, d3, VS} = require('via');
 const _ = require('underscore-plus');
 const ChartLayer = require('./chart-layer');
-const ChartPlot = require('./chart-plot');
 
 module.exports = class ChartRoot extends ChartLayer {
     serialize(){
         return {
-            type: this.type
+            type: this.type,
+            parameters: this.parameters
         };
     }
 
     constructor({chart, panel, state}){
         super({chart, panel, plugin: {selectable: true}});
 
-        this.parameters = {};
-        this.type = '';
-
-        this.change(state ? state.plot : via.config.get('charts.defaultChartType'));
-
         //TODO There is one more thing that may force a recalculation - when the user changes a parameter
-        this.disposables.add(this.chart.data.onDidUpdateData(this.render.bind(this)));
+        this.disposables.add(this.chart.data.onDidUpdateData(this.calculate.bind(this)));
+
+        this.initialize(state);
+    }
+
+    initialize(state = {}){
+        this.parameters = {};
+
+        //We need to store information about the user's parameters for each chart type.
+        //This way, if they switch from line to area and back, their line preferences are retained.
+        for(const type of this.chart.manager.types){
+            this.parameters[type.name] = {};
+
+            //First set the defaults for each chart type.
+            for(const [identifier, definition] of Object.entries(type.parameters)){
+                this.parameters[type.name][identifier] = definition.default;
+            }
+
+            //Then override the defaults with the user's saved state.
+            if(state.parameters && state.parameters[type.name]){
+                for(const [parameter, value] of Object.entries(state.parameters[type.name])){
+                    if(this.valid(type.parameters[parameter], value)){
+                        this.parameters[type.name][parameter] = value;
+                    }
+                }
+            }
+        }
+
+        const type = state.type ? state.type : via.config.get('charts.defaultChartType');
+        const plugin = this.chart.manager.types.find(plugin => plugin.name === type);
+
+        this.change(plugin);
     }
 
     change(type){
         if(this.type === type){
-            return void via.console.log(`Did not change chart type. You are already looking at a ${type} chart.`);
+            return void via.console.log(`Did not change chart type. You are already looking at a ${type.title.toLowerCase()} chart.`);
         }
 
         this.type = type;
-        this.element.classed(type, true).selectAll('*').remove();
-        this.plot = this.chart.manager.plots.find(plot => plot.name === type);
-        this.render();
+        this.element.attr('class', `layer ${type.name}`).selectAll('*').remove();
+        this.calculate();
     }
 
     valid(parameter, value){
+        if(!parameter){
+            return false;
+        }
+
         if(parameter.enum){
             return (typeof _.first(parameter.enum) === 'object') ? parameter.enum.map(v => v.value).includes(value) : parameter.enum.includes(value);
         }
@@ -52,25 +81,31 @@ module.exports = class ChartRoot extends ChartLayer {
         // return _.max(Array.from(this.components.values()).map(component => component.domain()));
     }
 
+    calculate(){
+        this.data = this.chart.data.all();
+
+        if(this.type.calculate){
+            this.data = this.type.calculate({series: this.data, parameters: this.parameters[this.type.name]});
+        }
+
+        this.render();
+    }
+
     render(){
         //TODO If selected, render the actual points, flags, and ranges
-        console.log('Rendering core', this.plot)
-
-        if(this.plot){
-            this.plot.render({
+        if(this.type){
+            this.type.render({
                 chart: this.chart,
                 panel: this.panel,
                 element: this.element,
-                data: this.chart.data.all(),
-                options: this.options,
+                data: this.data,
                 selected: this.selected,
-                component: this.component,
-                parameters: this.parameters
+                parameters: this.parameters[this.type.name]
             });
         }
     }
 
-    onDidChangePlot(callback){
-        return this.emitter.on('did-change-plot', callback);
+    onDidChangeType(callback){
+        return this.emitter.on('did-change-type', callback);
     }
 }

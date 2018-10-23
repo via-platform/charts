@@ -2,18 +2,24 @@
 // require('./plugins/other/reference-market'),
 
 module.exports = {
+    type: [
+        require('./types/candle'),
+        require('./types/line'),
+        require('./types/bar'),
+        require('./types/heikin-ashi'),
+        require('./types/area'),
+        require('./types/mountain')//,
+        // require('./types/hollow-candle'),
+        // require('./types/baseline')
+    ],
     plot: [
-        require('./plots/candle'),
-        require('./plots/line'),
-        require('./plots/bar'),
-        require('./plots/heikin-ashi'),
         require('./plots/area'),
         require('./plots/mountain'),
+        require('./plots/line'),
         require('./plots/band'),
         require('./plots/circle'),
         require('./plots/column'),
         require('./plots/cross'),
-        require('./plots/fill'),
         require('./plots/histogram'),
         require('./plots/horizontal-line'),
         require('./plots/vertical-line'),
@@ -49,7 +55,7 @@ module.exports = {
     ],
     plugin: [
         require('./core/core-market'),
-        require('./core/core-plot'),
+        require('./core/core-type'),
         require('./core/core-indicator'),
         require('./core/core-granularity'),
         require('./core/core-draw')//,

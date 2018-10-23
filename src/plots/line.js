@@ -2,8 +2,8 @@ const Line = {
     name: 'line',
     title: 'Line',
     parameters: {
-        color: {
-            title: 'Color',
+        stroke: {
+            title: 'Stroke Color',
             type: 'color',
             default: '#0000FF'
         },
@@ -11,6 +11,11 @@ const Line = {
             title: 'Visible',
             type: 'boolean',
             default: true
+        },
+        track: {
+            title: 'Track Value',
+            type: 'boolean',
+            default: false
         },
         width: {
             title: 'Stroke Width',
@@ -34,7 +39,8 @@ const Line = {
             element.append('path')
                 .classed('stroke', true)
                 .attr('d', `M ${points}`)
-                .attr('stroke', '#00FF00');
+                .attr('stroke', parameters.stroke)
+                .attr('stroke-dasharray', parameters.style === 'solid' ? '' : (parameters.style === 'dashed' ? '5' : '2'));
         }
     }
 };

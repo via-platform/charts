@@ -20,6 +20,7 @@ class ChartPackage {
         this.drawings = [];
         this.indicators = [];
         this.plots = [];
+        this.types = [];
         this.omnibar = null;
 
         this.disposables.add(via.commands.add('via-workspace, .symbol-explorer .market, .watchlist .market', 'charts:create-chart', this.create.bind(this)));
@@ -123,6 +124,12 @@ class ChartPackage {
     plot(plugin){
         this.plots.push(plugin);
         return new Disposable(() => _.remove(this.plots, plugin));
+    }
+
+    //TODO Eventually, we are going to want this to emit an event so that it can be picked up by chart-root.js
+    type(plugin){
+        this.types.push(plugin);
+        return new Disposable(() => _.remove(this.types, plugin));
     }
 
 

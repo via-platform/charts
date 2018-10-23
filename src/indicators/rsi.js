@@ -19,7 +19,7 @@ module.exports = {
             title: 'Upper Limit',
             trackable: false,
             parameters: {
-                color: '#0000FF',
+                stroke: '#0000FF',
                 style: 'dashed'
             }
         },
@@ -28,7 +28,7 @@ module.exports = {
             title: 'Lower Limit',
             trackable: false,
             parameters: {
-                color: '#0000FF',
+                stroke: '#0000FF',
                 style: 'dashed'
             }
         },
@@ -37,7 +37,7 @@ module.exports = {
             title: 'Range',
             trackable: false,
             parameters: {
-                color: 'rgba(0, 0, 255, 0.5)',
+                fill: 'rgba(0, 0, 255, 0.2)',
                 style: 'dashed'
             }
         }

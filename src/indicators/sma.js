@@ -7,8 +7,9 @@ module.exports = {
     components: {
         sma: {
             type: 'plot',
-            style: {
-                color: '#0000FF'
+            parameters: {
+                color: '#0000FF',
+                style: 'line'
             }
         }
     },
@@ -16,14 +17,21 @@ module.exports = {
         property: {
             title: 'Property',
             type: 'string',
-            enum: ['price_open', 'price_high', 'price_low', 'price_close', 'middle', 'average'],
+            enum: [
+                {title: 'Open', value: 'price_open'},
+                {title: 'High', value: 'price_high'},
+                {title: 'Low', value: 'price_low'},
+                {title: 'Close', value: 'price_close'},
+                {title: 'HL Midpoint', value: 'middle'},
+                {title: 'OHLC Average', value: 'average'}
+            ],
             default: 'price_close'
         },
         length: {
             title: 'Length',
             type: 'number',
             constraint: x => (x > 1 && x <= 200),
-            default: 15
+            default: 9
         }
     },
     calculate: ({series, parameters, draw}) => {

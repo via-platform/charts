@@ -29,7 +29,7 @@ module.exports = class CoreMarket {
 
     render(){
         return $.div({classList: 'market toolbar-button', onClick: this.select.bind(this)},
-            this.chart.market ? this.chart.market.title : 'Select Market'
+            this.chart.market ? this.chart.market.name : 'Select Market'
         );
     }
 

@@ -9,11 +9,11 @@ const ChartPlot = require('./chart-plot');
 
 module.exports = class ChartIndicator extends ChartLayer {
     constructor({chart, state, plugin, panel}){
-        super({chart, panel, plugin});
-        this.components = new Map(); //Component ID => Plot
-        this.parameters = {}; //Parameter ID => Plugin parameter metadata (e.g. length)
+        super({chart, panel});
+
+        this.plugin = plugin;
         this.panel = panel ? panel : plugin.params.panel ? this.chart.panel() : this.chart.center();
-        this.element.classed(plugin.name, true);
+        this.element.classed(plugin.name, true).classed('selectable', plugin.selectable);
 
         //TODO There is one more thing that may force a recalculation - when the user changes a parameter
         this.disposables.add(this.chart.data.onDidUpdateData(this.calculate.bind(this)));
@@ -22,6 +22,9 @@ module.exports = class ChartIndicator extends ChartLayer {
     }
 
     initialize({components, parameters} = {}){
+        this.parameters = {}; //Parameter ID => Plugin parameter metadata (e.g. length)
+        this.components = new Map(); //Component ID => Plot
+
         for(const [identifier, definition] of Object.entries(this.plugin.parameters)){
             this.parameters[identifier] = Object.assign({value: parameters ? parameters[identifier] : definition.default}, definition);
         }
@@ -35,6 +38,12 @@ module.exports = class ChartIndicator extends ChartLayer {
                 state: components ? components[identifier] : undefined
             }));
         }
+    }
+
+    serialize(){
+        return {
+            plugin: this.plugin.serialize()
+        };
     }
 
     draw(identifier, series, options = {}){

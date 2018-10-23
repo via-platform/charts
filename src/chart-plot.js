@@ -15,12 +15,23 @@ module.exports = class ChartPlot {
     initialize(state = {}){
         this.parameters = {};
 
-        for(const [identifier, value] of Object.entries(this.component.parameters)){
-            if(this.plot.parameters.hasOwnProperty(identifier) && this.valid(this.plot.parameters[identifier], value)){
-                this.parameters[identifier] = value;
+        //First we initialize the plot defaults
+        for(const [identifier, value] of Object.entries(this.plot.parameters)){
+            this.parameters[identifier] = value.default;
+        }
+
+        //Then we override them with the component defaults
+        if(this.component.parameters){
+            for(const [identifier, value] of Object.entries(this.component.parameters)){
+                if(this.plot.parameters.hasOwnProperty(identifier) && this.valid(this.plot.parameters[identifier], value)){
+                    this.parameters[identifier] = value;
+                }
             }
         }
 
+        //Then we override them further with the saved state params
+        //We also have to check and make sure that the state param is (still) valid for the plot, in case
+        //of a bad state save, or a change in the plot definition.
         for(const [identifier, value] of Object.entries(state)){
             if(this.plot.parameters.hasOwnProperty(identifier) && this.valid(this.plot.parameters[identifier], value)){
                 this.parameters[identifier] = value;

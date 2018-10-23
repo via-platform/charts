@@ -1,4 +1,4 @@
-const Plot = {
+module.exports = {
     name: 'plot',
     title: 'Plot',
     parameters: {
@@ -15,6 +15,12 @@ const Plot = {
                 {title: 'Step Line', value: 'step'},
             ],
             default: 'line'
+        },
+        width: {
+            title: 'Width',
+            type: 'number',
+            enum: [1, 1.5, 2, 2.5],
+            default: 1.5
         },
         color: {
             title: 'Color',
@@ -33,8 +39,26 @@ const Plot = {
         }
     },
     render: configuration => {
-        const style = configuration.parameters.style || Plot.parameters.style.default;
+        const style = configuration.parameters.style;
         const plot = configuration.chart.manager.plots.find(plot => plot.name === style);
+
+        configuration.parameters = {
+            visible: configuration.parameters.visible,
+            track: configuration.parameters.track,
+            width: configuration.parameters.width
+        };
+
+        if(['line', 'step'].includes(style)){
+            configuration.parameters.style = 'solid';
+        }
+
+        if(['line', 'area', 'step'].includes(style)){
+            configuration.parameters.stroke = configuration.parameters.color;
+        }
+
+        if(['area', 'histogram', 'column', 'cross', 'circle'].includes(style)){
+            configuration.parameters.fill = configuration.parameters.color;
+        }
 
         if(!configuration.element.classed(style)){
             configuration.element.attr('class', `plot ${style}`).selectAll('*').remove();
@@ -45,5 +69,3 @@ const Plot = {
         }
     }
 };
-
-module.exports = Plot;

@@ -5,18 +5,18 @@
 //This file also manages the chart tool that allows users to select an indicator to add.
 
 const {Disposable, CompositeDisposable, Emitter, etch} = require('via');
-const ChartIndicator = require('../chart-indicator');
+const ChartIndicator = require('../../chart-indicator');
 const $ = etch.dom;
 
-module.exports = class CoreIndicator {
+module.exports = class Indicator {
     static describe(){
         return {
-            name: 'core-indicator'
+            name: 'indicator'
         };
     }
 
     static instance(params){
-        return new CoreIndicator(params);
+        return new Indicator(params);
     }
 
     constructor({chart}){

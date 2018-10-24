@@ -2,19 +2,19 @@
 
 const {CompositeDisposable, Disposable} = require('via');
 const _ = require('underscore-plus');
-const granularities = require('../chart-granularities');
+const granularities = require('../../chart-granularities');
 const etch = require('etch');
 const $ = etch.dom;
 
-module.exports = class CoreGranularity {
+module.exports = class Granularity {
     static describe(){
         return {
-            name: 'core-granularity'
+            name: 'granularity'
         };
     }
 
     static instance(params){
-        return new CoreGranularity(params);
+        return new Granularity(params);
     }
 
     constructor({chart}){

@@ -13,15 +13,15 @@ const _ = require('underscore-plus');
 const etch = require('etch');
 const $ = etch.dom;
 
-module.exports = class CoreType {
+module.exports = class Type {
     static describe(){
         return {
-            name: 'core-type'
+            name: 'type'
         };
     }
 
     static instance(params){
-        return new CoreType(params);
+        return new Type(params);
     }
 
     constructor({chart}){

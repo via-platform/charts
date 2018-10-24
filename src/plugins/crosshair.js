@@ -6,7 +6,19 @@ const AXIS_HEIGHT = 22;
 const FLAG_HEIGHT = AXIS_HEIGHT - 3;
 const X_FLAG_WIDTH = 114;
 
-class Crosshair {
+module.exports = class Crosshair {
+    static describe(){
+        return {
+            name: 'crosshair',
+            title: 'Crosshair',
+            description: 'Shows vertical and horizontal crosshairs on the chart.'
+        };
+    }
+
+    static instance(params){
+        return new Crosshair(params);
+    }
+
     constructor({chart}){
         this.disposables = new CompositeDisposable();
         this.chart = chart;
@@ -112,12 +124,3 @@ class Crosshair {
         this.disposables.dispose();
     }
 }
-
-module.exports = {
-    name: 'crosshair',
-    type: 'other',
-    settings: {},
-    title: 'Crosshair',
-    description: 'Chart crosshair.',
-    instance: params => new Crosshair(params)
-};

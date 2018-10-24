@@ -5,18 +5,18 @@
 //This file is also responsible for managing the draw toolbar menu.
 
 const {Disposable, CompositeDisposable, Emitter, etch} = require('via');
-const ChartDrawing = require('../chart-drawing');
+const ChartDrawing = require('../../chart-drawing');
 const $ = etch.dom;
 
-module.exports = class CoreDraw {
+module.exports = class Draw {
     static describe(){
         return {
-            name: 'core-draw'
+            name: 'draw'
         };
     }
 
     static instance(params){
-        return new CoreDraw(params);
+        return new Draw(params);
     }
 
     constructor({chart}){

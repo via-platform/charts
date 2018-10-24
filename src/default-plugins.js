@@ -54,11 +54,11 @@ module.exports = {
         // require('./indicators/ichimoku-cloud')
     ],
     plugin: [
-        require('./core/core-market'),
-        require('./core/core-type'),
-        require('./core/core-indicator'),
-        require('./core/core-granularity'),
-        require('./core/core-draw')//,
+        require('./plugins/core/market'),
+        require('./plugins/core/type'),
+        require('./plugins/core/indicator'),
+        require('./plugins/core/granularity'),
+        require('./plugins/core/draw')//,
         // require('./plugins/crosshair'),
         // require('./plugins/bid-ask'),
         // require('./plugins/local-high-low'),

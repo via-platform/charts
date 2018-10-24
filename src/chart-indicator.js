@@ -57,16 +57,20 @@ module.exports = class ChartIndicator extends ChartLayer {
         return {parameters: this.parameters, components};
     }
 
-    rescale(){
+    get decimals(){
+        return this.plugin.decimals ? this.plugin.decimals(this.chart) : 0;
+    }
+
+    get domain(){
         const min = [];
         const max = [];
 
         for(const plot of Object.values(this.components)){
-            const domain = plot.domain();
+            const [low, high] = plot.domain;
 
-            if(domain.length){
-                min.push(domain[0]);
-                max.push(domain[1]);
+            if(low){
+                min.push(low);
+                max.push(high);
             }
         }
 
@@ -74,18 +78,10 @@ module.exports = class ChartIndicator extends ChartLayer {
             const low = Math.min(...min);
             const high = Math.max(...max);
 
-            console.log(low, high)
-
-            this.domain = [low, high];
-            // this.decimals = high.toFixed(this.plugin.decimals ? this.plugin.decimals(this.chart) : 0).length;
+            return [low, high];
         }else{
-            this.domain = [];
-            // this.decimals = 0;
+            return [];
         }
-    }
-
-    get decimals(){
-        return this.plugin.decimals ? this.plugin.decimals(this.chart) : 0;
     }
 
     draw(identifier, data, options = {}){

@@ -88,6 +88,10 @@ module.exports = class ChartPanels {
     }
 
     destroy(){
+        for(const panel of this.panels){
+            panel.destroy();
+        }
+
         this.disposables.dispose();
     }
 }

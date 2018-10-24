@@ -35,7 +35,7 @@ module.exports = class ChartLayer {
         // return _.isFunction(this.plugin.value) ? this.plugin.value(candle) : '';
     }
 
-    calculate(){}
+    recalculate(){}
 
     render(){}
 

@@ -71,8 +71,6 @@ module.exports = class ChartPanel {
 
         if(state && state.layers){
             this.layers = state.layers.map(layer => ChartLayer.deserialize({chart: this.chart, panel: this, state: layer}));
-        }else{
-            // this.layers.push(new ChartLayer({chart: this.chart, panel: this, plugin}));
         }
 
         this.sortLayers();
@@ -102,28 +100,6 @@ module.exports = class ChartPanel {
 
     didModifyLayer(layer){
         this.emitter.emit('did-modify-layer', layer);
-    }
-
-    getRoot(){
-        return this.layers.find(layer => layer.isRoot);
-    }
-
-    resize(){
-        this.width = this.center.clientWidth;
-        this.height = this.center.clientHeight;
-
-        this.basis.range([0, this.height]);
-        this.scale.range([0, this.height]);
-
-        this.svg.attr('height', this.height).attr('width', this.width);
-        this.background.attr('width', this.width).attr('height', this.height);
-
-        if(this.chart.transform){
-            d3.zoom().transform(this.zoomable, this.chart.transform);
-        }
-
-        this.axis.resize();
-        this.grid.resize();
     }
 
     add(layer){
@@ -160,15 +136,12 @@ module.exports = class ChartPanel {
 
         this.basis.domain([this.basis.invert(this.basis(start) - dy), this.basis.invert(this.basis(end) - dy)]);
         this.scale.domain(this.basis.domain());
-        // this.rescale();
     }
 
     zoomed({event, target} = {}){
         if(target !== this){
             d3.zoom().transform(this.zoomable, this.chart.transform);
         }
-
-        // this.rescale();
     }
 
     zoom(){
@@ -225,47 +198,59 @@ module.exports = class ChartPanel {
         }
     }
 
-    rescale(domain){
-        for(const layer of this.layers){
-            layer.rescale();
-        }
-
+    rescale(){
         if(this.locked){
-            console.log(this.layers.map(layer => layer.domain))
-            // const domains = ;
+            const min = [];
+            const max = [];
 
-            const domains = [];//_.flatten(this.layers.filter(layer => (layer instanceof ChartLayer)).map(layer => layer.domain())).filter(domain => !_.isUndefined(domain));
+            for(const layer of this.layers){
+                const [low, high] = layer.domain;
 
-            if(domains.length){
-                const min = _.min(domains);
-                const max = _.max(domains);
-                const range = max - min;
-                const extra = range * this.padding;
-
-                if(!_.isUndefined(min) && !_.isUndefined(max)){
-                    this.basis.domain([max + extra, min - extra]);
-                    this.scale.domain([max + extra, min - extra]);
-                    this.emitter.emit('did-rescale', this.scale);
+                if(low){
+                    min.push(low);
+                    max.push(high);
                 }
+            }
+
+            if(min.length){
+                const low = Math.min(...min);
+                const high = Math.max(...max);
+                const range = high - low;
+                const extra = (range > 0) ? range * this.padding : high * this.padding;
+
+                this.basis.domain([max + extra, min - extra]);
+                this.scale.domain([max + extra, min - extra]);
             }else{
                 this.basis.domain([100, 0]);
                 this.scale.domain([100, 0]);
-                this.emitter.emit('did-rescale', this.scale);
             }
-        }else{
-
-            //Apply the transformation to the domain instead
-            this.emitter.emit('did-rescale', this.scale);
         }
     }
 
-    get decimals(){
-        return Math.max(...this.layers.map(layer => layer.decimals));
+    resize(){
+        this.width = this.center.clientWidth;
+        this.height = this.center.clientHeight;
+
+        this.basis.range([0, this.height]);
+        this.scale.range([0, this.height]);
+
+        this.svg.attr('height', this.height).attr('width', this.width);
+        this.background.attr('width', this.width).attr('height', this.height);
+
+        if(this.chart.transform){
+            d3.zoom().transform(this.zoomable, this.chart.transform);
+        }
+
+        this.axis.resize();
+        this.grid.resize();
     }
 
     get offset(){
+        const decimals = Math.max(...this.layers.map(layer => layer.decimals));
+        const [low, high] = this.scale.domain();
+
         //The number of significant digits is now based on the scale, not the layer domains
-        return this.scale.domain()[1].toFixed(this.decimals).length * 6 + 12;
+        return high.toFixed(decimals).length * 6 + 12;
     }
 
     removePanel(){
@@ -280,12 +265,16 @@ module.exports = class ChartPanel {
         this.axis.render();
         this.grid.render();
 
-        this.layers.forEach(layer => layer.render());
+        for(const layer of this.layers){
+            layer.render();
+        }
     }
 
     destroy(){
         this.axis.destroy();
+        this.grid.destroy();
         this.values.destroy();
+
         this.element.parentElement.removeChild(this.element);
         this.disposables.dispose();
         this.emitter.emit('did-destroy');

@@ -16,7 +16,6 @@ module.exports = class ChartRoot extends ChartLayer {
         super({chart, panel, plugin: {selectable: true}});
 
         //TODO There is one more thing that may force a recalculation - when the user changes a parameter
-        // this.disposables.add(this.chart.data.onDidUpdateData(this.calculate.bind(this)));
 
         this.initialize(state);
     }
@@ -79,7 +78,7 @@ module.exports = class ChartRoot extends ChartLayer {
         return true;
     }
 
-    calculate(){
+    recalculate(){
         this.data = this.chart.data.all();
 
         if(this.type.calculate){

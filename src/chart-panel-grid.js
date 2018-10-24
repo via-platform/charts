@@ -20,9 +20,9 @@ module.exports = class ChartPanelGrid {
             y: d3.axisLeft(this.panel.scale).ticks(DEFAULT_TICKS).tickSize(-this.panel.width).tickFormat('').tickSizeOuter(0)
         };
 
-        this.disposables.add(this.panel.onDidDestroy(this.destroy.bind(this)));
-        this.disposables.add(this.panel.onDidRescale(this.draw.bind(this)));
-        this.disposables.add(this.chart.onDidZoom(this.draw.bind(this)));
+        // this.disposables.add(this.panel.onDidDestroy(this.destroy.bind(this)));
+        // this.disposables.add(this.panel.onDidRescale(this.render.bind(this)));
+        // this.disposables.add(this.chart.onDidZoom(this.render.bind(this)));
     }
 
     resize(){
@@ -30,7 +30,7 @@ module.exports = class ChartPanelGrid {
         this.basis.y.tickSize(-this.panel.width).ticks(Math.floor(this.panel.height / TICK_SPACING)).tickSizeOuter(0);
     }
 
-    draw(){
+    render(){
         this.grid.x.call(this.basis.x);
         this.grid.y.call(this.basis.y);
 

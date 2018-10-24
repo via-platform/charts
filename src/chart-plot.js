@@ -76,7 +76,7 @@ module.exports = class ChartPlot {
         }
     }
 
-    domain(){
+    get domain(){
         if(this.data){
             const [start, end] = this.chart.scale.domain();
 

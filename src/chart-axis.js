@@ -23,9 +23,9 @@ module.exports = class ChartAxis {
         this.axis = this.svg.append('g').attr('class', 'x axis');
 
         this.zoomable.call(d3.zoom().on('zoom', this.zoom()));
-        this.disposables.add(this.chart.onDidUpdateOffset(this.resize.bind(this)));
-        this.disposables.add(this.chart.onDidResize(this.resize.bind(this)));
-        this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
+        // this.disposables.add(this.chart.onDidUpdateOffset(this.resize.bind(this)));
+        // this.disposables.add(this.chart.onDidResize(this.resize.bind(this)));
+        // this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
 
         this.resize({width: 0});
     }
@@ -68,11 +68,9 @@ module.exports = class ChartAxis {
         if(target !== this){
             d3.zoom().transform(this.zoomable, this.chart.transform);
         }
-
-        this.draw();
     }
 
-    draw(){
+    render(){
         this.axis.call(this.basis);
         this.axis.selectAll('.tick').attr('transform', d => `translate(${Math.round(this.chart.scale(d), 0) + 0.5})`);
     }
@@ -84,8 +82,6 @@ module.exports = class ChartAxis {
 
         this.svg.attr('width', width);
         this.zoomable.attr('width', width);
-
-        this.draw();
     }
 
     destroy(){

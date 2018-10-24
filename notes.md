@@ -66,5 +66,6 @@ Four concepts:
 * Resize - Resizing of the axes / panels if the chart offset has changed, or a panel has been added / remove, or the axis type has changed
 * Render - The actual drawing of the axes and plots
 
-On new data: recalculate, rescale, redraw, render
-On zoom: rescale, redraw, render
+On new data: recalculate, rescale, resize, render
+On zoom: rescale, resize, render
+Physical resizing: resize, render

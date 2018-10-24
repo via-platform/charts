@@ -13,11 +13,11 @@ module.exports = class ChartPanelValues {
 
         etch.initialize(this);
 
-        this.disposables.add(this.panel.onDidDestroy(this.destroy.bind(this)));
+        // this.disposables.add(this.panel.onDidDestroy(this.destroy.bind(this)));
         // this.disposables.add(this.panel.onDidDraw(() => this.update()));
-        this.disposables.add(this.panel.onDidAddLayer(() => this.update()));
-        this.disposables.add(this.panel.onDidRemoveLayer(() => this.update()));
-        this.disposables.add(this.panel.onDidModifyLayer(() => this.update()));
+        // this.disposables.add(this.panel.onDidAddLayer(() => this.update()));
+        // this.disposables.add(this.panel.onDidRemoveLayer(() => this.update()));
+        // this.disposables.add(this.panel.onDidModifyLayer(() => this.update()));
 
         this.disposables.add(this.chart.onDidMouseMove(this.mousemove.bind(this)));
         this.disposables.add(this.chart.onDidMouseOut(this.mouseout.bind(this)));

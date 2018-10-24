@@ -189,11 +189,10 @@ module.exports = class Chart {
             panel.rescale();
         }
 
-        const decimals = Math.max(this.panels.all().map(panel => panel.decimals));
-        const offset = Math.max(decimals * 6 + 12, 50);
+        const offset = Math.max(20, ...this.panels.all().map(panel => panel.offset));
 
         if(this.offset === offset){
-            //The axis has not changed, we can just render now.
+            //The axes have not changed, we can just skip resizing for now.
             this.render();
         }else{
             this.offset = offset;
@@ -224,6 +223,14 @@ module.exports = class Chart {
         }
 
         this.render();
+    }
+
+    render(){
+        this.axis.render();
+
+        for(const panel of this.panels.all()){
+            panel.render();
+        }
     }
 
     consumeActionBar(actionBar){

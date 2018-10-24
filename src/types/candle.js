@@ -5,18 +5,21 @@ module.exports = {
         up: {
             title: 'Up Candle Color',
             type: 'color',
-            default: '#0000FF'
+            default: '#0bd691'
         },
         down: {
             title: 'Down Candle Color',
             type: 'color',
-            default: '#0000FF'
+            default: 'rgb(255, 59, 48)'
         },
         stroke: {
             title: 'Stroke Color',
             type: 'color',
             default: 'rgba(0, 0, 0, 0)'
         }
+    },
+    domain: series => {
+        return series.length ? [series.prop('price_low').min(), series.prop('price_high').max()] : [];
     },
     render: ({chart, panel, element, data, parameters}) => {
         if(data){
@@ -40,7 +43,7 @@ module.exports = {
                         return `M ${start} ${open} h ${width} V ${(open === close) ? close - 1 : close} h ${-1 * width} Z`;
                     })
                     .attr('class', 'body')
-                    .attr('fill', '#FFF');
+                    .attr('fill', ([x, candle]) => (candle.price_open <= candle.price_close) ? parameters.up : parameters.down);
 
             wick.enter()
                     .append('path')
@@ -55,7 +58,7 @@ module.exports = {
                         return `M ${start} ${high} V ${Math.min(open, close)} M ${start} ${Math.max(open, close)} V ${low}`;
                     })
                     .attr('class', 'wick')
-                    .attr('stroke', '#FFF')
+                    .attr('stroke', ([x, candle]) => (candle.price_open <= candle.price_close) ? parameters.up : parameters.down)
                     .attr('stroke-width', '1');
 
             body.exit().remove();

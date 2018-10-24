@@ -105,7 +105,9 @@ module.exports = class ChartPanel {
     add(layer){
         this.layers.push(layer);
         this.emitter.emit('did-add-layer', layer);
+        layer.recalculate();
         this.chart.rescale();
+        return layer;
     }
 
     remove(layer){
@@ -121,10 +123,12 @@ module.exports = class ChartPanel {
     }
 
     lock(){
-        if(this.locked) return;
+        if(this.locked){
+            return;
+        }
 
         this.locked = true;
-        // this.rescale();
+        this.chart.rescale();
     }
 
     pan(dy){
@@ -196,6 +200,8 @@ module.exports = class ChartPanel {
         for(const layer of this.layers){
             layer.recalculate();
         }
+
+        this.emitter.emit('did-recalculate', {target: this});
     }
 
     rescale(){
@@ -206,7 +212,7 @@ module.exports = class ChartPanel {
             for(const layer of this.layers){
                 const [low, high] = layer.domain;
 
-                if(low){
+                if(_.isNumber(low)){
                     min.push(low);
                     max.push(high);
                 }
@@ -218,17 +224,19 @@ module.exports = class ChartPanel {
                 const range = high - low;
                 const extra = (range > 0) ? range * this.padding : high * this.padding;
 
-                this.basis.domain([max + extra, min - extra]);
-                this.scale.domain([max + extra, min - extra]);
+                this.basis.domain([high + extra, low - extra]);
+                this.scale.domain([high + extra, low - extra]);
             }else{
                 this.basis.domain([100, 0]);
                 this.scale.domain([100, 0]);
             }
         }
+
+        this.emitter.emit('did-rescale', {target: this});
     }
 
     resize(){
-        this.width = this.center.clientWidth;
+        this.width = Math.max(this.chart.width - this.chart.offset, 0);
         this.height = this.center.clientHeight;
 
         this.basis.range([0, this.height]);
@@ -243,14 +251,18 @@ module.exports = class ChartPanel {
 
         this.axis.resize();
         this.grid.resize();
+        this.emitter.emit('did-resize', {target: this});
+    }
+
+    get decimals(){
+        return Math.max(...this.layers.map(layer => layer.decimals), 0);
     }
 
     get offset(){
-        const decimals = Math.max(...this.layers.map(layer => layer.decimals));
         const [low, high] = this.scale.domain();
 
         //The number of significant digits is now based on the scale, not the layer domains
-        return high.toFixed(decimals).length * 6 + 12;
+        return high.toFixed(this.decimals).length * 6 + 12;
     }
 
     removePanel(){
@@ -268,6 +280,8 @@ module.exports = class ChartPanel {
         for(const layer of this.layers){
             layer.render();
         }
+
+        this.emitter.emit('did-render', {target: this});
     }
 
     destroy(){

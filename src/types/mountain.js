@@ -38,6 +38,9 @@ module.exports = {
     calculate: ({series, parameters}) => {
         return VS.prop(series, parameters.property);
     },
+    domain: series => {
+        return series.length ? [series.min(), series.max()] : [];
+    },
     render: ({chart, panel, element, data, parameters}) => {
         element.selectAll('path').remove();
         element.selectAll('linearGradient').remove();

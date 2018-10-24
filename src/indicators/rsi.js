@@ -10,8 +10,9 @@ module.exports = {
             type: 'plot',
             title: 'RSI',
             parameters: {
-                color: '#0000FF',
-                style: 'line'
+                color: '#4594eb',
+                style: 'line',
+                width: 1.5
             }
         },
         upper_limit: {
@@ -19,7 +20,7 @@ module.exports = {
             title: 'Upper Limit',
             trackable: false,
             parameters: {
-                stroke: '#0000FF',
+                stroke: 'rgba(69, 148, 235, 0.5)',
                 style: 'dashed'
             }
         },
@@ -28,7 +29,7 @@ module.exports = {
             title: 'Lower Limit',
             trackable: false,
             parameters: {
-                stroke: '#0000FF',
+                stroke: 'rgba(69, 148, 235, 0.5)',
                 style: 'dashed'
             }
         },
@@ -37,8 +38,7 @@ module.exports = {
             title: 'Range',
             trackable: false,
             parameters: {
-                fill: 'rgba(0, 0, 255, 0.2)',
-                style: 'dashed'
+                fill: 'rgba(69, 148, 235, 0.1)'
             }
         }
     },
@@ -62,6 +62,7 @@ module.exports = {
             default: 30
         }
     },
+    decimals: () => 4,
     calculate: ({series, parameters, draw}) => {
         draw('limit_range', [parameters.lower_limit, parameters.upper_limit]);
         draw('upper_limit', parameters.upper_limit);

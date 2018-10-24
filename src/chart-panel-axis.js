@@ -69,7 +69,10 @@ module.exports = class ChartPanelAxis {
 
             _this.panel.basis.domain([_this.panel.basis.invert(_this.panel.basis(start) - dy), _this.panel.basis.invert(_this.panel.basis(end) + dy)]);
             _this.panel.scale.domain(_this.panel.basis.domain());
-            _this.panel.rescale();
+
+            //We rescale the chart because it's possible that we've entered into a new level of decimal precision
+            //by dragging this axes. The axis may be wider or narrower to accomodate.
+            _this.chart.rescale();
         };
     }
 

@@ -3,7 +3,7 @@ module.exports = {
     title: 'Measure',
     description: 'Measure a date and value range.',
     points: 3,
-    params: {
+    parameters: {
         ephemeral: true
     },
     render: ({chart, panel, element, points}) => {

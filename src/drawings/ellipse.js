@@ -3,7 +3,7 @@ module.exports = {
     title: 'Ellipse',
     description: 'Draw a ellipse on the chart.',
     points: 3,
-    params: {},
+    parameters: {},
     render: ({chart, panel, element, points}) => {
         const [start, middle, end] = points;
 

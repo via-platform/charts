@@ -78,8 +78,6 @@ module.exports = class ChartAxis {
     resize(){
         const width = Math.max(0, this.chart.width - this.chart.offset);
 
-        console.log('width', this.chart.width, this.chart.offset)
-
         this.svg.attr('width', width);
         this.zoomable.attr('width', width);
     }

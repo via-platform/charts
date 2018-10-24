@@ -70,7 +70,7 @@ module.exports = class Crosshair {
         //Move the flag on the bottom
         const date = this.chart.scale.invert(event.offsetX);
         const candle = new Date(Math.round(date.getTime() / this.chart.granularity) * this.chart.granularity);
-        const position = Math.min(Math.max(Math.floor(this.chart.scale(candle)) - (X_FLAG_WIDTH / 2), 0), this.chart.width - this.chart.panels.offset - X_FLAG_WIDTH);
+        const position = Math.min(Math.max(Math.floor(this.chart.scale(candle)) - (X_FLAG_WIDTH / 2), 0), this.chart.width - this.chart.offset - X_FLAG_WIDTH);
         this.flag.attr('transform', `translate(${position}, 0)`).select('text').text(moment(candle).format('YYYY-MM-DD HH:mm:ss'));
 
         //Figure out which panel was the target and move the y hair and flag on that panel
@@ -78,7 +78,7 @@ module.exports = class Crosshair {
 
         if(panel){
             const value = target.scale.invert(event.offsetY); //TODO properly format this number
-            panel.flag.attr('transform', `translate(0, ${event.offsetY - Math.ceil(FLAG_HEIGHT / 2)})`).select('text').text(value.toFixed(this.chart.precision));
+            panel.flag.attr('transform', `translate(0, ${event.offsetY - Math.ceil(FLAG_HEIGHT / 2)})`).select('text').text(value.toFixed(target.decimals));
             panel.crosshairs.y.attr('transform', `translate(0, ${event.offsetY - 0.5})`);
         }
 
@@ -90,7 +90,7 @@ module.exports = class Crosshair {
         this.last = {event, target};
     }
 
-    mouseover({event, target} = {}){
+    mouseover({target} = {}){
         this.chart.element.classList.add('crosshair-active');
 
         if(target){
@@ -98,7 +98,7 @@ module.exports = class Crosshair {
         }
     }
 
-    mouseout({event, target} = {}){
+    mouseout({target} = {}){
         this.chart.element.classList.remove('crosshair-active');
 
         if(target){
@@ -106,7 +106,7 @@ module.exports = class Crosshair {
         }
     }
 
-    resize({event, target}){
+    resize({target} = {}){
         //Properly transform the flags and numbers as well
         const panel = this.panels.get(target);
 

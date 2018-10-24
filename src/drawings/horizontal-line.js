@@ -3,7 +3,7 @@ module.exports = {
     title: 'Horizontal Line',
     description: 'Draw a horizontal line on the chart.',
     points: 1,
-    params: {
+    parameters: {
         fixed: 'x'
     },
     render: ({chart, panel, element, points}) => {

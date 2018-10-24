@@ -3,7 +3,7 @@ module.exports = {
     title: 'Rectangle',
     description: 'Draw a rectangle on the chart.',
     points: 2,
-    params: {},
+    parameters: {},
     render: ({chart, panel, element, points}) => {
         const [start, end] = points;
 

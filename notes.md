@@ -63,7 +63,7 @@ Four concepts:
 
 * Recalculate - Reacting to changes in data, recalculating entire series' worth of data points
 * Rescale - Determining the sizes and domains of the components with the new data
-* Resize - Resizing of the axes / panels if the chart offset has changed, or a panel has been added / remove, or the axis type has changed
+* Resize - Resizing of the axes / panels if the chart offset has changed, or a panel has been added / removed, or the axis type has changed
 * Render - The actual drawing of the axes and plots
 
 On new data: recalculate, rescale, resize, render

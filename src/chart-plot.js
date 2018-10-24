@@ -1,5 +1,5 @@
 const _ = require('underscore-plus');
-const {is_series} = require('via').VS;
+const {is_series, is_array} = require('via').VS;
 
 module.exports = class ChartPlot {
     constructor({chart, panel, layer, component, state}){
@@ -67,7 +67,7 @@ module.exports = class ChartPlot {
                 chart: this.chart,
                 panel: this.panel,
                 element: this.element,
-                data: this.data.range(start, end),
+                data: is_series(this.data) ? this.data.range(start, end, this.chart.granularity) : this.data,
                 options: this.options,
                 selected: this.layer.selected,
                 component: this.component,
@@ -86,8 +86,10 @@ module.exports = class ChartPlot {
                 if(range.length){
                     return [range.min(), range.max()];
                 }
+            }else if(is_array(this.data)){
+                return [Math.min(...this.data), Math.max(...this.data)];
             }else{
-                return [data, data];
+                return [this.data, this.data];
             }
         }
 

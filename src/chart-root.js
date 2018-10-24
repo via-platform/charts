@@ -56,7 +56,7 @@ module.exports = class ChartRoot extends ChartLayer {
 
         this.type = type;
         this.element.attr('class', `layer ${type.name}`).selectAll('*').remove();
-        this.calculate();
+        this.chart.recalculate();
 
         this.emitter.emit('did-change-type', this.type);
     }
@@ -88,13 +88,14 @@ module.exports = class ChartRoot extends ChartLayer {
 
     render(){
         //TODO If selected, render the actual points, flags, and ranges
-        //TODO Trim this.data to only render the visible datapoints
+        const [start, end] = this.chart.scale.domain();
+
         if(this.type){
             this.type.render({
                 chart: this.chart,
                 panel: this.panel,
                 element: this.element,
-                data: this.data,
+                data: this.data.range(start, end, this.chart.granularity),
                 selected: this.selected,
                 parameters: this.parameters[this.type.name]
             });
@@ -103,6 +104,20 @@ module.exports = class ChartRoot extends ChartLayer {
 
     get decimals(){
         return this.chart.market ? this.chart.market.precision.price : 0;
+    }
+
+    get domain(){
+        if(this.data){
+            const [start, end] = this.chart.scale.domain();
+            const range = this.data.range(start, end);
+            return this.type.domain(range);
+        }else{
+            return [];
+        }
+    }
+
+    title(){
+        return this.type ? this.type.title : 'No Plot';
     }
 
     onDidChangeType(callback){

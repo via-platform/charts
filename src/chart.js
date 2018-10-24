@@ -1,13 +1,11 @@
 const {Disposable, CompositeDisposable, Emitter, d3} = require('via');
 const ChartData = require('./chart-data');
-// const ChartStudy = require('./chart-study');
 const granularities = require('./chart-granularities');
 const ChartPanels = require('./chart-panels');
 const ChartTools = require('./chart-tools');
 const ChartAxis = require('./chart-axis');
 const ChartRoot = require('./chart-root');
 const _ = require('underscore-plus');
-const ChartDefaults = {end: 0, start: Date.now() - 864e5};
 const base = 'via://charts';
 
 module.exports = class Chart {
@@ -59,6 +57,8 @@ module.exports = class Chart {
         this.panels = new ChartPanels({chart: this, state: state.panels});
         this.axis = new ChartAxis({chart: this});
         this.root = new ChartRoot({chart: this, panel: this.center(), state: state.root});
+
+        this.center().add(this.root);
 
         this.element.appendChild(this.tools.element);
         this.element.appendChild(this.panels.element);
@@ -189,7 +189,7 @@ module.exports = class Chart {
             panel.rescale();
         }
 
-        const offset = Math.max(20, ...this.panels.all().map(panel => panel.offset));
+        const offset = Math.max(30, ...this.panels.all().map(panel => panel.offset));
 
         if(this.offset === offset){
             //The axes have not changed, we can just skip resizing for now.
@@ -203,17 +203,14 @@ module.exports = class Chart {
     }
 
     resize(){
-        const [start, end] = this.scale.domain();
-
         if(this.transform && this.element.clientWidth && this.width){
-            //We have to subtract out the axis width (since it is fixed at `this.panels.offset`)
+            //We have to subtract out the axis width (since it is fixed at `this.offset`)
             //If we don't, the ratio of the old-width to new-width is incorrect
             this.transform.x = this.transform.x * ((this.element.clientWidth - this.offset) / (this.width - this.offset));
         }
 
         this.width = this.element.clientWidth;
         this.height = this.element.clientHeight;
-        this.bandwidth = (this.width - this.offset) / Math.ceil((end - start) / this.granularity);
 
         this.basis.range([0, this.width - this.offset]);
         this.scale.range([0, this.width - this.offset]);
@@ -222,10 +219,13 @@ module.exports = class Chart {
             panel.resize();
         }
 
+        this.axis.resize();
         this.render();
     }
 
     render(){
+        const [start, end] = this.scale.domain();
+        this.bandwidth = Math.max(1, (this.width - this.offset) / Math.ceil((end - start) / this.granularity));
         this.axis.render();
 
         for(const panel of this.panels.all()){
@@ -270,7 +270,7 @@ module.exports = class Chart {
     }
 
     getTitle(){
-        return this.market ? `${this.market.title}, ${granularities[this.granularity].abbreviation}` : 'Chart';
+        return this.market ? `${this.market.title}, ${this.root.title()}, ${granularities[this.granularity].abbreviation}` : 'Chart';
     }
 
     getMarket(){

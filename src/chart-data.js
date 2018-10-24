@@ -1,4 +1,4 @@
-const {Disposable, CompositeDisposable, Emitter} = require('via');
+const {Disposable, CompositeDisposable, Emitter, Series} = require('via');
 const _ = require('underscore-plus');
 
 module.exports = class ChartData {
@@ -56,12 +56,12 @@ module.exports = class ChartData {
     }
 
     all(){
-        return this.data ? this.data.all() : [];
+        return this.data ? this.data.all() : new Series();
     }
 
     update(){
         this.emitter.emit('did-update-data');
-        this.chart.rescale();
+        this.chart.recalculate();
     }
 
     onDidUpdateData(callback){

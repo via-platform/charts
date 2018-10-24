@@ -58,6 +58,7 @@ module.exports = class Draw {
 
         this.initiate = this.chart.onDidClick(({event, target}) => {
             this.cancel();
+            console.log('NEW DRAW', plugin)
             target.add(new ChartDrawing({plugin, event, chart: this.chart, panel: target}));
         });
     }

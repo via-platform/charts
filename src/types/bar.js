@@ -2,61 +2,61 @@ const Bar = {
     name: 'bar',
     title: 'Bars',
     parameters: {
-        fill: {
-            title: 'Fill Color',
+        up: {
+            title: 'Up Bar Color',
             type: 'color',
-            default: '#0000FF'
+            default: '#0bd691'
+        },
+        down: {
+            title: 'Down Bar Color',
+            type: 'color',
+            default: 'rgb(255, 59, 48)'
         }
     },
+    domain: series => {
+        return series.length ? [series.prop('price_low').min(), series.prop('price_high').max()] : [];
+    },
     render: ({chart, panel, element, data, parameters}) => {
-        const bars = element.selectAll('path').data(data);
+        if(data){
+            let width = Math.max(Math.floor(chart.bandwidth * 0.8 / 3), 1);
 
-        bars.enter()
-            .append('path')
-            .merge(bars)
-                .attr('d', ([x, candle]) => {
-                    const start = Math.round(chart.scale(x));
+            if(width % 2 === 0){
+                width -= 1;
+            }
 
-                    let open = Math.ceil(panel.scale(candle.price_open));
-                    let close = Math.floor(panel.scale(candle.price_close));
-                    let high = Math.ceil(panel.scale(candle.price_high));
-                    let low = Math.floor(panel.scale(candle.price_low));
-                    let width = Math.max(Math.floor(chart.bandwidth * 0.8 / 3), 1);
+            const half = (width + 1) / 2;
+            const bars = element.selectAll('path').data(data);
 
-                    if(width % 2 === 0){
-                        width -= 1;
-                    }
+            bars.enter()
+                .append('path')
+                .merge(bars)
+                    .attr('d', ([x, candle]) => {
+                        const start = Math.round(chart.scale(x));
+                        const open = Math.round(panel.scale(candle.price_open));
+                        const close = Math.round(panel.scale(candle.price_close));
+                        const high = Math.round(panel.scale(candle.price_high));
+                        const low = Math.round(panel.scale(candle.price_low));
 
-                    if(high - low < width){
-                        high += ((width + 1) / 2);
-                        low += ((width + 1) / 2);
-                    }
+                        return `M ${start - half} ${high - half}
+                                h ${width}
+                                V ${close - half}
+                                h ${width}
+                                v ${width}
+                                h ${-1 * width}
+                                V ${low + half}
+                                h ${-1 * width}
+                                V ${open + half}
+                                h ${-1 * width}
+                                v ${-1 * width}
+                                h ${width}
+                                Z`;
+                    })
+                    .attr('fill', ([x, candle]) => (candle.price_open <= candle.price_close) ? parameters.up : parameters.down);
 
-                    if(open + (width + 1 / 2) > high){
-                        open = high + ((width + 1) / 2);
-                    }
-
-                    if(close - (width + 1 / 2) < low){
-                        close = low - ((width + 1) / 2);
-                    }
-
-                    return `M ${start - ((width + 1) / 2)} ${high}
-                            h ${width}
-                            v ${close - high + ((width + 1) / 2)}
-                            h ${width}
-                            v ${width}
-                            h ${-width}
-                            V ${low + ((width + 1) / 2)}
-                            h ${-width}
-                            v ${open - low + ((width + 1) / 2)}
-                            h ${-width}
-                            v ${-width},
-                            h ${width}
-                            Z`;
-                })
-                .attr('fill', '#FFF');
-
-        bars.exit().remove();
+            bars.exit().remove();
+        }else{
+            element.selectAll('rect').remove();
+        }
     }
 };
 

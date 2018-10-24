@@ -1,6 +1,5 @@
 const {CompositeDisposable, Disposable, d3} = require('via');
 const _ = require('underscore-plus');
-const VS = require('./chart-vs');
 const ChartLayer = require('./chart-layer');
 const etch = require('etch');
 const $ = etch.dom;
@@ -36,13 +35,14 @@ module.exports = class ChartDrawing extends ChartLayer {
         this.disposables = new CompositeDisposable();
         this.working = new CompositeDisposable();
         this.points = [];
-        this.params = _.defaults(this.plugin.params, defaults);
+        this.plugin = plugin;
+        this.parameters = _.defaults(this.plugin.parameters, defaults);
 
         this.element = this.panel.zoomable.append('g')
-            .datum(this.params.priority)
+            .datum(this.parameters.priority)
             .classed('layer', true)
             .classed(this.plugin.name, true)
-            .classed('selectable', this.params.selectable);
+            .classed('selectable', this.parameters.selectable);
 
         this.working.add(this.panel.onDidClick(this.click.bind(this)));
         this.working.add(this.panel.onDidMouseMove(this.move.bind(this)));
@@ -92,18 +92,18 @@ module.exports = class ChartDrawing extends ChartLayer {
 
     render(){
         //TODO If selected, render the actual points, flags, and ranges
-        this.element.classed('working', this.params.working).classed('done', this.params.done);
-        this.plugin.render({chart: this.chart, panel: this.panel, points: this.points, element: this.element, params: this.params});
+        this.element.classed('working', this.parameters.working).classed('done', this.parameters.done);
+        this.plugin.render({chart: this.chart, panel: this.panel, points: this.points, element: this.element, parameters: this.parameters});
     }
 
     done(){
-        console.log('DONE DRAWING PLUGIN', this.points.length, this.params);
-        if(this.params.ephemeral){
+        console.log('DONE DRAWING PLUGIN', this.points.length, this.parameters);
+        if(this.parameters.ephemeral){
             return this.panel.remove(this);
         }
 
-        this.params.working = false;
-        this.params.done = true;
+        this.parameters.working = false;
+        this.parameters.done = true;
         this.working.dispose();
         this.working = null;
 

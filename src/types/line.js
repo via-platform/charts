@@ -32,6 +32,9 @@ module.exports = {
     calculate: ({series, parameters}) => {
         return prop(series, parameters.property);
     },
+    domain: series => {
+        return series.length ? [series.min(), series.max()] : [];
+    },
     render: ({chart, panel, element, data, parameters}) => {
         element.selectAll('path').remove();
 

@@ -1,6 +1,7 @@
 module.exports = {
     name: 'plot',
     title: 'Plot',
+    trackable: true,
     parameters: {
         style: {
             title: 'Plot Style',

@@ -51,7 +51,7 @@ class ChartPackage {
         const chart = Chart.deserialize({manager: this, omnibar: this.omnibar}, state);
 
         for(const plugin of this.plugins){
-            plugin.instance({chart, manager: this});
+            plugin.instance({chart, manager: this, state: state[plugin.name]});
         }
 
         this.charts.push(chart);

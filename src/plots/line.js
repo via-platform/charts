@@ -1,6 +1,7 @@
 const Line = {
     name: 'line',
     title: 'Line',
+    trackable: true,
     parameters: {
         stroke: {
             title: 'Stroke Color',

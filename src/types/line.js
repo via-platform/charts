@@ -35,7 +35,7 @@ module.exports = {
     domain: series => {
         return series.length ? [series.min(), series.max()] : [];
     },
-    render: ({chart, panel, element, data, parameters}) => {
+    render: ({chart, panel, element, data, parameters, selected}) => {
         element.selectAll('path').remove();
 
         if(data){

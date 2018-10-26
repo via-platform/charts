@@ -44,7 +44,7 @@ module.exports = class Market {
     }
 
     create(plugin){
-        const panel = plugin.panel ? this.chart.panels.create() : this.chart.center();
+        const panel = plugin.panel ? this.chart.panels.add() : this.chart.center();
         panel.add(new ChartIndicator({plugin, chart: this.chart, panel}));
     }
 

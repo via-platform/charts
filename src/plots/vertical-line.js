@@ -1,6 +1,7 @@
 module.exports = {
     name: 'vertical-line',
     title: 'Vertical Line',
+    trackable: false,
     parameters: {
         color: {
             title: 'Color',

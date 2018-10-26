@@ -1,16 +1,29 @@
 const {CompositeDisposable, Disposable, d3} = require('via');
 const _ = require('underscore-plus');
+const ChartLayer = require('../chart-layer');
 const etch = require('etch');
 const $ = etch.dom;
 const AXIS_HEIGHT = 22;
 const FLAG_HEIGHT = AXIS_HEIGHT - 3;
 
-class BidAsk {
-    constructor({chart, state, element, panel}){
-        this.disposables = new CompositeDisposable();
-        this.chart = chart;
-        this.panel = panel;
-        this.element = element;
+module.exports = class BidAsk extends ChartLayer {
+    static describe(){
+        return {
+            name: 'bid-ask',
+            title: 'Bid & Ask Price',
+            description: 'Displays lines on the chart center indicating the current bid and ask price of the market.',
+            parameters: {}
+        };
+    }
+
+    static instance(params){
+        return new BidAsk(params);
+    }
+
+    constructor({chart, state}){
+        super({chart, panel: chart.center()});
+
+        this.chart.special.push(Object.assign({action: this.toggle.bind(this)}, BidAsk.describe()));
 
         this.element.classed('bid-ask', true).classed('hide', true);
 
@@ -23,29 +36,43 @@ class BidAsk {
         this.ask.append('path');
         this.ask.append('text').attr('alignment-baseline', 'baseline').attr('text-anchor', 'end').attr('y', -6).text('Hello World');
 
-        this.disposables.add(this.panel.onDidDestroy(this.destroy.bind(this)));
         this.disposables.add(this.panel.onDidResize(this.resize.bind(this)));
-        this.disposables.add(this.panel.onDidDraw(this.draw.bind(this)));
+        this.disposables.add(this.panel.onDidRender(this.render.bind(this)));
+        this.disposables.add(this.chart.onDidChangeMarket(this.subscribe.bind(this)));
 
-        this.resize();
+        this.panel.add(this);
     }
 
     subscribe(){
-        if(this.subscription){
-            this.subscription.dispose();
-            this.subscription = null;
-        }
+        if(this.visible){
+            if(this.subscription){
+                this.subscription.dispose();
+                this.subscription = null;
+            }
 
-        if(this.chart.market){
-            this.subscription = market.quotes.subscribe(this.draw.bind(this));
+            if(this.chart.market){
+                this.subscription = this.chart.market.quotes.subscribe(this.render.bind(this));
+            }
         }
     }
 
     serialize(){
         return {
-            version: 1,
-            name: 'bid-ask'
+            name: 'bid-ask',
+            visible: this.visible
         };
+    }
+
+    toggle(){
+        this.visible = !this.visible;
+        this.panel.render();
+
+        if(this.visible){
+            this.subscribe();
+        }else if(this.subscription){
+            this.subscription.dispose();
+            this.subscription = null;
+        }
     }
 
     resize(){
@@ -54,7 +81,7 @@ class BidAsk {
     }
 
     title(){
-        return `Bid & Ask`;
+        return this.visible ? `Bid & Ask` : '';
     }
 
     value(){
@@ -62,30 +89,38 @@ class BidAsk {
             const {bid, ask} = this.chart.market.quotes.last();
 
             return $.div({classList: 'value'},
-                $.span({classList: 'first up'}, bid.price.toFixed(this.chart.precision)),
-                $.span({classList: 'down'}, ask.price.toFixed(this.chart.precision))
+                $.span({classList: 'first up'}, via.fn.number.formatPrice(bid.price, this.chart.market)),
+                $.span({classList: 'down'}, via.fn.number.formatPrice(ask.price, this.chart.market))
             );
         }
 
         return $.div({classList: 'value'}, $.span({classList: 'first unavailable'}, '-'), $.span({classList: 'unavailable'}, '-'));
     }
 
-    draw(){
-        this.panel.values.update();
+    render(){
+        if(this.visible){
+            this.panel.values.update();
 
-        if(!this.chart.market){
-            return this.element.classed('hide', true);
+            if(!this.chart.market){
+                return this.element.classed('hide', true);
+            }
+
+            const {bid, ask} = this.chart.market.quotes.last();
+            const precision = this.chart.market.precision.price;
+
+            this.element.classed('hide', false);
+            this.bid.attr('transform', `translate(0, ${Math.round(this.panel.scale(bid.price)) - 0.5})`);
+            this.ask.attr('transform', `translate(0, ${Math.round(this.panel.scale(ask.price)) - 0.5})`);
+
+            this.bid.select('text').text(bid.price.toFixed(precision));
+            this.ask.select('text').text(ask.price.toFixed(precision));
+        }else{
+            this.element.classed('hide', true);
         }
+    }
 
-        const {bid, ask} = this.chart.market.quotes.last();
-        const precision = this.chart.market.precision.price;
-
-        this.element.classed('hide', false);
-        this.bid.attr('transform', `translate(0, ${Math.round(this.panel.scale(bid.price)) - 0.5})`);
-        this.ask.attr('transform', `translate(0, ${Math.round(this.panel.scale(ask.price)) - 0.5})`);
-
-        this.bid.select('text').text(bid.price.toFixed(precision));
-        this.ask.select('text').text(ask.price.toFixed(precision));
+    remove(){
+        this.toggle();
     }
 
     destroy(){
@@ -96,16 +131,3 @@ class BidAsk {
         this.disposables.dispose();
     }
 }
-
-module.exports = {
-    name: 'bid-ask',
-    type: 'overlay',
-    settings: {
-        selectable: true,
-        allowedLocations: 'center',
-        defaultPriority: 10
-    },
-    title: 'Bid & Ask Price',
-    description: 'Displays lines on the chart center indicating the current bid and ask price of the market.',
-    instance: params => new BidAsk(params)
-};

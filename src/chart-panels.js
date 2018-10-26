@@ -15,8 +15,6 @@ module.exports = class ChartPanels {
         this.element = document.createElement('div');
         this.element.classList.add('chart-panels');
 
-        this.disposables.add(this.chart.onDidResize(this.resize.bind(this)));
-
         this.initialize(state);
     }
 
@@ -30,7 +28,7 @@ module.exports = class ChartPanels {
                 this.panels.push(new ChartPanel({chart: this.chart, panels: this, state: panel}));
             }
         }else{
-            this.panels.push(new ChartPanel({chart: this.chart, panels: this, center: true}));
+            this.panels.push(new ChartPanel({chart: this.chart, panels: this, root: true}));
         }
 
         for(const panel of this.panels){
@@ -38,29 +36,29 @@ module.exports = class ChartPanels {
         }
     }
 
-    create(){
+    add(){
         const panel = new ChartPanel({chart: this.chart, panels: this});
         this.panels.push(panel);
         this.element.appendChild(panel.element);
         this.emitter.emit('did-add-panel', panel);
-        this.resize();
+        this.chart.resize();
 
         return panel;
     }
 
-    addPanel(plugin){
-        const panel = new ChartPanel({chart: this.chart, panels: this, plugin});
-        this.panels.push(panel);
-        this.element.appendChild(panel.element);
-        this.emitter.emit('did-add-panel', panel);
-        this.resize();
-    }
+    remove(panel){
+        if(panel.root){
+            return void via.console.warn('You cannot remove the center panel.');
+        }
 
-    removePanel(panel){
         this.panels.splice(this.panels.indexOf(panel), 1);
         this.emitter.emit('did-remove-panel', panel);
         panel.destroy();
-        this.resize();
+        this.chart.resize();
+    }
+
+    center(){
+        return this.panels.find(panel => panel.root);
     }
 
     observePanels(callback){
@@ -69,14 +67,6 @@ module.exports = class ChartPanels {
         }
 
         return this.onDidAddPanel(callback);
-    }
-
-    resize(){
-        this.panels.forEach(panel => panel.resize());
-    }
-
-    getCenter(){
-        return this.panels.find(panel => panel.center);
     }
 
     onDidAddPanel(callback){

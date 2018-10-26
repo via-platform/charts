@@ -3,6 +3,7 @@ module.exports = {
     title: 'Measure',
     description: 'Measure a date and value range.',
     points: 3,
+    selectable: false,
     parameters: {
         ephemeral: true
     },

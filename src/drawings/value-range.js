@@ -3,6 +3,7 @@ module.exports = {
     title: 'Value Range',
     description: 'Draw a value range.',
     points: 2,
+    selectable: true,
     parameters: {},
     render: ({chart, panel, element, points}) => {
         const [start, end] = points;

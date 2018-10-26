@@ -1,6 +1,7 @@
 module.exports = {
     name: 'band',
     title: 'Vertical Bands',
+    trackable: false,
     parameters: {
         fill: {
             title: 'Fill Color',

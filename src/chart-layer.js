@@ -6,6 +6,8 @@ module.exports = class ChartLayer {
         this.chart = chart;
         this.panel = panel;
         this.params = {};
+        this.selectable = true;
+        this.removable = true;
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
         this.element = this.panel.zoomable.append('g').classed('layer', true);
@@ -19,12 +21,12 @@ module.exports = class ChartLayer {
         return 0;
     }
 
-    select(){
-        this.chart.select(this);
+    get selected(){
+        return this.chart.selected === this;
     }
 
-    isSelected(){
-        return this.chart.selected === this;
+    select(){
+        this.chart.select(this);
     }
 
     title(){
@@ -32,7 +34,7 @@ module.exports = class ChartLayer {
     }
 
     value(candle){
-        // return _.isFunction(this.plugin.value) ? this.plugin.value(candle) : '';
+        return '';
     }
 
     recalculate(){}
@@ -48,11 +50,11 @@ module.exports = class ChartLayer {
     }
 
     remove(){
-        if(this.chart.selected === this){
+        if(this.selected){
             this.chart.unselect();
         }
 
-        this.panel.removeLayer(this);
+        this.panel.remove(this);
     }
 
     async customize(){

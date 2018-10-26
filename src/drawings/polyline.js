@@ -3,6 +3,7 @@ module.exports = {
     title: 'Polyline',
     description: 'Draw a polyline on the chart.',
     points: 0,
+    selectable: true,
     parameters: {},
     render: ({chart, panel, element, points, parameters}) => {
         const polyline = points.map(({x, y}) => `${chart.scale(x)} ${panel.scale(y)}`).join('L');

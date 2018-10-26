@@ -3,6 +3,7 @@ module.exports = {
     title: 'Parallelogram',
     description: 'Draw a parallelogram on the chart.',
     points: 3,
+    selectable: true,
     parameters: {},
     render: ({chart, panel, element, points}) => {
         const [start, middle, end] = points;

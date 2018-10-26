@@ -68,11 +68,34 @@
             pointer-events: all;
         }
 
+        &.working.selectable
+        {
+            pointer-events: none;
+        }
+
         circle.handle
         {
-            fill: #FFF;
             stroke: @chart-panel-background-color;
-            stroke-width: 2px;
+            stroke-width: 1.5px;
+            display: none;
+        }
+
+        &:hover
+        {
+            circle.handle
+            {
+                display: block;
+                fill: #AAA;
+            }
+        }
+
+        &.selected
+        {
+            circle.handle
+            {
+                display: block;
+                fill: #FFF;
+            }
         }
     }
 

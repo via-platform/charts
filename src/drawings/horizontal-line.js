@@ -3,6 +3,7 @@ module.exports = {
     title: 'Horizontal Line',
     description: 'Draw a horizontal line on the chart.',
     points: 1,
+    selectable: true,
     parameters: {
         fixed: 'x'
     },

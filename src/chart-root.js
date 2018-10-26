@@ -1,8 +1,9 @@
 //This file contains the base functionality for the root plot.
 
-const {CompositeDisposable, Disposable, d3, VS} = require('via');
+const {CompositeDisposable, Disposable, d3, VS, etch} = require('via');
 const _ = require('underscore-plus');
 const ChartLayer = require('./chart-layer');
+const $ = etch.dom;
 
 module.exports = class ChartRoot extends ChartLayer {
     serialize(){
@@ -13,15 +14,13 @@ module.exports = class ChartRoot extends ChartLayer {
     }
 
     constructor({chart, panel, state}){
-        super({chart, panel, plugin: {selectable: true}});
-
-        //TODO There is one more thing that may force a recalculation - when the user changes a parameter
-
+        super({chart, panel});
         this.initialize(state);
     }
 
     initialize(state = {}){
         this.parameters = {};
+        this.removable = false;
 
         //We need to store information about the user's parameters for each chart type.
         //This way, if they switch from line to area and back, their line preferences are retained.
@@ -90,15 +89,44 @@ module.exports = class ChartRoot extends ChartLayer {
         //TODO If selected, render the actual points, flags, and ranges
         const [start, end] = this.chart.scale.domain();
 
+        this.element.classed('selected', this.selected);
+
         if(this.type){
+            const data = this.data.range(start, end, this.chart.granularity);
+
             this.type.render({
                 chart: this.chart,
                 panel: this.panel,
                 element: this.element,
-                data: this.data.range(start, end, this.chart.granularity),
+                data,
                 selected: this.selected,
                 parameters: this.parameters[this.type.name]
             });
+
+            if(this.selected){
+                const handle_points = data.filter(([x]) => (x.getTime() / this.chart.granularity) % 10 === 0);
+
+                let formatted_data = null;
+
+                if(['line', 'area', 'mountain'].includes(this.type.name)){
+                    formatted_data = handle_points;
+                }else{
+                    formatted_data = handle_points.prop('middle');
+                }
+
+                const handles = this.element.selectAll('circle').data(formatted_data);
+
+                handles.enter()
+                        .append('circle')
+                    .merge(handles)
+                        .raise()
+                        .attr('class', 'handle')
+                        .attr('cx', ([x]) => this.chart.scale(x))
+                        .attr('cy', ([x, y]) => this.panel.scale(y))
+                        .attr('r', 5);
+
+                handles.exit().remove();
+            }
         }
     }
 
@@ -118,6 +146,35 @@ module.exports = class ChartRoot extends ChartLayer {
 
     title(){
         return this.type ? this.type.title : 'No Plot';
+    }
+
+    value(band){
+        //The reason for this is that we want to show OHLC for the main root but this.data will only contain
+        //plot data for several types (e.g. line). Heikin-Ashi is special because it contains its own calculated
+        //OHLC data points.
+        
+        const data = (this.type.name === 'heikin-ashi') ? this.data : this.chart.data.all();
+
+        if(this.chart.market){
+            for(const [key, value] of data){
+                if(key.getTime() === band.getTime()){
+                    const direction = (value.price_open <= value.price_close) ? 'up' : 'down';
+
+                    return $.div({classList: 'value'},
+                        'O', $.span({classList: direction}, via.fn.number.formatPrice(value.price_open, this.chart.market)),
+                        'H', $.span({classList: direction}, via.fn.number.formatPrice(value.price_high, this.chart.market)),
+                        'L', $.span({classList: direction}, via.fn.number.formatPrice(value.price_low, this.chart.market)),
+                        'C', $.span({classList: direction}, via.fn.number.formatPrice(value.price_close, this.chart.market))
+                    );
+                }
+            }
+        }
+
+        return '';
+    }
+
+    remove(){
+        via.console.warn('You cannot remove this layer.');
     }
 
     onDidChangeType(callback){

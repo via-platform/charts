@@ -5,6 +5,7 @@ const ChartPanels = require('./chart-panels');
 const ChartTools = require('./chart-tools');
 const ChartAxis = require('./chart-axis');
 const ChartRoot = require('./chart-root');
+const ChartDrawing = require('./chart-drawing');
 const _ = require('underscore-plus');
 const base = 'via://charts';
 
@@ -34,6 +35,7 @@ module.exports = class Chart {
         this.panels = null;
         this.uri = state.uri;
         this.initialized = false;
+        this.special = [];
 
         this.width = 0;
         this.height = 0;
@@ -58,6 +60,8 @@ module.exports = class Chart {
         this.axis = new ChartAxis({chart: this});
         this.root = new ChartRoot({chart: this, panel: this.center(), state: state.root});
 
+        this.drawing = null;
+
         this.center().add(this.root);
 
         this.element.appendChild(this.tools.element);
@@ -80,10 +84,25 @@ module.exports = class Chart {
             'charts:zoom-out': () => this.zoom(0.5),
             'core:move-left': () => this.translate(100),
             'core:move-right': () => this.translate(-100),
-            'core:delete': this.delete.bind(this),
-            'core:backspace': this.delete.bind(this),
-            'core:cancel': this.unselect.bind(this),
-            'charts:lock-scale': this.lock.bind(this)
+            'charts:lock-scale': this.lock.bind(this),
+            'core:delete': () => {
+                this.cancel();
+
+                if(this.selected){
+                    this.selected.remove();
+                }
+            },
+            'core:backspace': () => {
+                this.cancel();
+
+                if(this.selected){
+                    this.selected.remove();
+                }
+            },
+            'core:cancel': () => {
+                this.cancel();
+                this.unselect();
+            }
         }));
 
         this.initialize(state);
@@ -156,8 +175,35 @@ module.exports = class Chart {
     }
 
     click(params){
-        this.unselect();
+        if(!this.drawing){
+            this.unselect();
+        }
+
         this.emitter.emit('did-click', params);
+    }
+
+    draw(plugin){
+        this.cancel();
+
+        this.drawing = this.emitter.once('did-click', ({event, target}) => {
+            this.select(target.add(new ChartDrawing({plugin, event, chart: this, panel: target})));
+        });
+    }
+
+    cancel(){
+        if(this.drawing){
+            this.drawing.dispose();
+            this.drawing = null;
+        }
+
+        this.emitter.emit('did-cancel');
+    }
+
+    done(){
+        if(this.drawing){
+            this.drawing.dispose();
+            this.drawing = null;
+        }
     }
 
     select(layer){
@@ -167,12 +213,16 @@ module.exports = class Chart {
 
         this.selected = layer;
         this.emitter.emit('did-select', layer);
+
+        layer.render();
     }
 
     unselect(){
         if(this.selected){
+            const layer = this.selected;
             this.selected = null;
             this.emitter.emit('did-unselect');
+            layer.render();
         }
     }
 
@@ -200,6 +250,8 @@ module.exports = class Chart {
             //After changing the axis offset, we have to resize the axis before we can render it.
             this.resize();
         }
+
+        this.emitter.emit('did-rescale');
     }
 
     resize(){
@@ -221,6 +273,8 @@ module.exports = class Chart {
 
         this.axis.resize();
         this.render();
+
+        this.emitter.emit('did-resize');
     }
 
     render(){
@@ -231,6 +285,8 @@ module.exports = class Chart {
         for(const panel of this.panels.all()){
             panel.render();
         }
+
+        this.emitter.emit('did-render');
     }
 
     consumeActionBar(actionBar){
@@ -360,15 +416,11 @@ module.exports = class Chart {
     }
 
     center(){
-        return this.panels.getCenter();
+        return this.panels.center();
     }
 
     onDidUpdateOffset(callback){
         return this.emitter.on('did-update-offset', callback);
-    }
-
-    onDidCancel(callback){
-        return this.emitter.on('did-cancel', callback);
     }
 
     onDidChangeGroup(callback){
@@ -407,8 +459,8 @@ module.exports = class Chart {
         return this.emitter.on('did-rescale', callback);
     }
 
-    onDidDraw(callback){
-        return this.emitter.on('did-draw', callback);
+    onDidRender(callback){
+        return this.emitter.on('did-render', callback);
     }
 
     onDidZoom(callback){

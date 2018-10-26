@@ -3,7 +3,28 @@ module.exports = {
     title: 'Ellipse',
     description: 'Draw a ellipse on the chart.',
     points: 3,
+    selectable: true,
     parameters: {},
+    handles: points => {
+        const [start, middle, end] = points;
+
+        if(end){
+            const cx = (start.x + middle.x) / 2
+            const cy = (start.y + middle.y) / 2;
+
+            const dx = (middle.x / start.x);
+            const dy = (middle.y - start.y);
+
+            const u = ((end.x - start.x) * dx + (end.y - start.y) * dy) / (Math.pow(dx, 2) + Math.pow(dy, 2));
+
+            console.log(u);
+            console.log({x: new Date(start.x.getTime() + u * dx), y: start.y + u * dy});
+
+            return [start, middle, {x: new Date(start.x.getTime() + u * dx), y: start.y + u * dy}];
+        }
+
+        return [start, middle];
+    },
     render: ({chart, panel, element, points}) => {
         const [start, middle, end] = points;
 

@@ -9,15 +9,14 @@ module.exports = class ChartPanelValues {
         this.emitter = new Emitter();
         this.panel = panel;
         this.chart = chart;
+        this.last = new Date(0);
         this.candle = new Date(Math.floor(Date.now() / this.chart.granularity) * this.chart.granularity);
 
         etch.initialize(this);
 
-        // this.disposables.add(this.panel.onDidDestroy(this.destroy.bind(this)));
-        // this.disposables.add(this.panel.onDidDraw(() => this.update()));
-        // this.disposables.add(this.panel.onDidAddLayer(() => this.update()));
-        // this.disposables.add(this.panel.onDidRemoveLayer(() => this.update()));
-        // this.disposables.add(this.panel.onDidModifyLayer(() => this.update()));
+        this.disposables.add(this.panel.onDidRender(() => this.update()));
+        this.disposables.add(this.panel.onDidAddLayer(() => this.update()));
+        this.disposables.add(this.panel.onDidRemoveLayer(() => this.update()));
 
         this.disposables.add(this.chart.onDidMouseMove(this.mousemove.bind(this)));
         this.disposables.add(this.chart.onDidMouseOut(this.mouseout.bind(this)));
@@ -44,7 +43,12 @@ module.exports = class ChartPanelValues {
             }
 
             this.candle = new Date(Math.round(date.getTime() / this.chart.granularity) * this.chart.granularity);
-            this.update();
+
+            //TODO Only update etch if we've moved into a new candle
+            if(this.candle.getTime() !== this.last.getTime()){
+                this.last = this.candle;
+                this.update();
+            }
         }
     }
 
@@ -72,6 +76,7 @@ class ChartPanelValue {
 
         this.disposables.add(via.commands.add(this.element, {
             'charts:remove-layer': () => this.layer.remove(),
+            'charts:select-layer': () => this.layer.selectable ? this.layer.select() : null,
             'charts:customize-layer': () => this.layer.customize(),
         }));
     }

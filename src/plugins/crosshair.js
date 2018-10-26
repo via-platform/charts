@@ -84,7 +84,7 @@ module.exports = class Crosshair {
 
         //Move the x hairs on all panels
         for(const [pan, structure] of this.panels.entries()){
-            structure.crosshairs.x.attr('transform', `translate(${Math.floor(this.chart.scale(candle)) - 0.5}, 0)`);
+            structure.crosshairs.x.attr('transform', `translate(${Math.floor(this.chart.scale(candle)) + 0.5}, 0)`);
         }
 
         this.last = {event, target};

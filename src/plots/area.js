@@ -3,6 +3,7 @@ const _ = require('underscore-plus');
 module.exports = {
     name: 'area',
     title: 'Area',
+    trackable: true,
     parameters: {
         stroke: {
             title: 'Stroke Color',

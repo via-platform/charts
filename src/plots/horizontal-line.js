@@ -1,6 +1,7 @@
 module.exports = {
     name: 'horizontal-line',
     title: 'Horizontal Line',
+    trackable: false,
     parameters: {
         stroke: {
             title: 'Stroke Color',

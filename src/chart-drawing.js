@@ -42,10 +42,12 @@ module.exports = class ChartDrawing extends ChartLayer {
             .datum(this.parameters.priority)
             .classed('layer', true)
             .classed(this.plugin.name, true)
-            .classed('selectable', this.parameters.selectable);
+            .classed('selectable', this.parameters.selectable)
+            .on('click', this.select());
 
         this.working.add(this.panel.onDidClick(this.click.bind(this)));
         this.working.add(this.panel.onDidMouseMove(this.move.bind(this)));
+        this.working.add(this.chart.onDidCancel(this.destroy.bind(this)));
 
         if(state){
             this.points = state;
@@ -59,6 +61,21 @@ module.exports = class ChartDrawing extends ChartLayer {
                 this.point(event);
             }
         }
+    }
+
+    select(){
+        const _this = this;
+
+        return function(d, i){
+            d3.event.stopPropagation();
+            d3.event.preventDefault();
+
+            if(_this.working){
+                return;
+            }
+
+            _this.chart.select(_this);
+        };
     }
 
     move({event}){
@@ -92,12 +109,26 @@ module.exports = class ChartDrawing extends ChartLayer {
 
     render(){
         //TODO If selected, render the actual points, flags, and ranges
-        this.element.classed('working', this.parameters.working).classed('done', this.parameters.done);
+        this.element.classed('working', this.parameters.working).classed('selected', this.selected).classed('done', this.parameters.done);
         this.plugin.render({chart: this.chart, panel: this.panel, points: this.points, element: this.element, parameters: this.parameters});
+
+        if(this.plugin.selectable){
+            const handles = this.element.selectAll('circle').data(this.plugin.handles ? this.plugin.handles(this.points) : this.points);
+
+            handles.enter()
+                    .append('circle')
+                .merge(handles)
+                    .raise()
+                    .attr('class', 'handle')
+                    .attr('cx', ({x}) => this.chart.scale(x))
+                    .attr('cy', ({y}) => this.panel.scale(y))
+                    .attr('r', 6);
+
+            handles.exit().remove();
+        }
     }
 
     done(){
-        console.log('DONE DRAWING PLUGIN', this.points.length, this.parameters);
         if(this.parameters.ephemeral){
             return this.panel.remove(this);
         }
@@ -107,12 +138,17 @@ module.exports = class ChartDrawing extends ChartLayer {
         this.working.dispose();
         this.working = null;
 
-        this.render();
+        this.chart.done();
+        this.chart.select(this);
     }
 
     destroy(){
         if(this.working){
             this.working.dispose();
+        }
+
+        if(this.selected){
+            this.chart.unselect();
         }
 
         this.element.remove();

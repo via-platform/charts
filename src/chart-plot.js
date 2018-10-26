@@ -1,5 +1,7 @@
 const _ = require('underscore-plus');
+const {etch} = require('via');
 const {is_series, is_array} = require('via').VS;
+const $ = etch.dom;
 
 module.exports = class ChartPlot {
     constructor({chart, panel, layer, component, state}){
@@ -73,6 +75,24 @@ module.exports = class ChartPlot {
                 component: this.component,
                 parameters: this.parameters
             });
+
+            if(this.plot.trackable){
+                if(this.layer.selected){
+                    const handle_points = this.data.filter(([x]) => (x.getTime() / this.chart.granularity) % 10 === 0);
+                    const handles = this.element.selectAll('circle').data(handle_points);
+
+                    handles.enter()
+                            .append('circle')
+                        .merge(handles)
+                            .raise()
+                            .attr('class', 'handle')
+                            .attr('cx', ([x]) => this.chart.scale(x))
+                            .attr('cy', ([x, y]) => this.panel.scale(y))
+                            .attr('r', 5);
+
+                    handles.exit().remove();
+                }
+            }
         }
     }
 
@@ -94,6 +114,16 @@ module.exports = class ChartPlot {
         }
 
         return [];
+    }
+
+    value(band){
+        if(this.plot.trackable){
+            for(const [key, value] of this.data){
+                if(key.getTime() === band.getTime()){
+                    return value;
+                }
+            }
+        }
     }
 
     destroy(){

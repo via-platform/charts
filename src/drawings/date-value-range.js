@@ -3,6 +3,7 @@ module.exports = {
     title: 'Date & Value Range',
     description: 'Draw a date and value range.',
     points: 2,
+    selectable: true,
     parameters: {},
     render: ({chart, panel, element, points}) => {
         const [start, end] = points;

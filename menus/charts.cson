@@ -12,6 +12,7 @@
 
 'context-menu':
   '.chart .panel-values .panel-value': [
+    {label: 'Select Layer', command: 'charts:select-layer'}
     {label: 'Customize Layer', command: 'charts:customize-layer'}
     {label: 'Remove Layer', command: 'charts:remove-layer'}
   ]

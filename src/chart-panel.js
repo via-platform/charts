@@ -8,18 +8,18 @@ const ChartPanelValues = require('./chart-panel-values');
 module.exports = class ChartPanel {
     serialize(){
         return {
-            center: this.center,
+            root: this.root,
             layers: this.layers.map(object => object.serialize())
         };
     }
 
-    constructor({chart, center, state, panels}){
+    constructor({chart, root, state, panels}){
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
 
         this.panels = panels;
         this.chart = chart;
-        this.center = center;
+        this.root = root;
         this.layers = [];
         this.locked = true;
 
@@ -31,7 +31,7 @@ module.exports = class ChartPanel {
         this.scale = this.basis.copy();
 
         this.element = document.createElement('div');
-        this.element.classList.add('panel', this.center ? 'center' : 'accessory');
+        this.element.classList.add('panel', this.root ? 'center' : 'accessory');
 
         this.center = document.createElement('div');
         this.center.classList.add('panel-center');
@@ -66,40 +66,18 @@ module.exports = class ChartPanel {
         // this.disposables.add(this.chart.onDidUpdateOffset(this.resize.bind(this)));
 
         this.disposables.add(via.commands.add(this.element, {
-            'charts:remove-panel': () => this.remove()
+            'charts:remove-panel': () => this.panels.remove(this)
         }));
 
         if(state && state.layers){
             this.layers = state.layers.map(layer => ChartLayer.deserialize({chart: this.chart, panel: this, state: layer}));
         }
 
-        this.sortLayers();
+        this.sort();
     }
 
-    addLayer(plugin, params){
-        const layer = new ChartLayer({chart: this.chart, panel: this, plugin, params});
-        this.layers.push(layer);
-        this.emitter.emit('did-add-layer', layer);
-
-        return layer;
-    }
-
-    removeLayer(layer){
-        _.remove(this.layers, layer);
-        this.emitter.emit('did-remove-layer', layer);
-        layer.destroy();
-
-        if(!this.layers.length && !this.center){
-            this.remove();
-        }
-    }
-
-    sortLayers(){
+    sort(){
         this.zoomable.selectAll('.layer').sort();
-    }
-
-    didModifyLayer(layer){
-        this.emitter.emit('did-modify-layer', layer);
     }
 
     add(layer){
@@ -112,10 +90,14 @@ module.exports = class ChartPanel {
 
     remove(layer){
         layer.destroy();
+        this.layers.splice(this.layers.indexOf(layer), 1);
+        this.emitter.emit('did-remove-layer', layer);
 
-        _.remove(this.layers, layer);
-        this.emitter.emit('did-remove-layer');
-        this.chart.rescale();
+        if(this.layers.length || this.root){
+            return;
+        }
+
+        this.panels.remove(this);
     }
 
     unlock(){
@@ -265,14 +247,6 @@ module.exports = class ChartPanel {
         return high.toFixed(this.decimals).length * 6 + 12;
     }
 
-    removePanel(){
-        if(this.center){
-            return;
-        }
-
-        this.chart.panels.removePanel(this);
-    }
-
     render(){
         this.axis.render();
         this.grid.render();
@@ -288,6 +262,10 @@ module.exports = class ChartPanel {
         this.axis.destroy();
         this.grid.destroy();
         this.values.destroy();
+
+        for(const layer of this.layers){
+            this.remove(layer);
+        }
 
         this.element.parentElement.removeChild(this.element);
         this.disposables.dispose();
@@ -330,7 +308,7 @@ module.exports = class ChartPanel {
         return this.emitter.on('did-remove-layer', callback);
     }
 
-    onDidModifyLayer(callback){
-        return this.emitter.on('did-modify-layer', callback);
+    onDidRender(callback){
+        return this.emitter.on('did-render', callback);
     }
 }

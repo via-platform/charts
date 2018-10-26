@@ -2,10 +2,11 @@
 //functionality shared by all layers. When a new ChartIndicator is created, it is initialized
 //with a set of ChartPlots and parameters that are defined by the plugin configuration.
 
-const {CompositeDisposable, Disposable, d3} = require('via');
+const {CompositeDisposable, Disposable, d3, etch} = require('via');
 const _ = require('underscore-plus');
 const ChartLayer = require('./chart-layer');
 const ChartPlot = require('./chart-plot');
+const $ = etch.dom;
 
 module.exports = class ChartIndicator extends ChartLayer {
     constructor({chart, state, plugin, panel}){
@@ -98,12 +99,31 @@ module.exports = class ChartIndicator extends ChartLayer {
 
     render(){
         //TODO If selected, render the actual points, flags, and ranges
+        this.element.classed('selected', this.selected);
+        
         for(const plot of Object.values(this.components)){
             plot.render();
         }
     }
 
     title(){
+        //TODO Use the abbreviation where available
+        //TODO Show the parameter values for this indicator (e.g. number of periods)
         return this.plugin.title;
+    }
+
+    value(band){
+        //TODO generate this etch object based on the plots for this indicator
+        const values = [];
+
+        for(const plot of Object.values(this.components)){
+            const value = plot.value(band);
+
+            if(value){
+                values.push(via.fn.number.formatString(value.toFixed(this.decimals)));
+            }
+        }
+
+        return values.length ? $.div({}, values) : '';
     }
 }

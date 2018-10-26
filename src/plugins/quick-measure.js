@@ -1,12 +1,27 @@
 const {CompositeDisposable, Disposable} = require('via');
+const ChartDrawing = require('../chart-drawing');
 const _ = require('underscore-plus');
 
-class QuickMeasure {
-    constructor({chart}){
-        this.disposables = new CompositeDisposable();
-        this.chart = chart;
+module.exports = class QuickMeasure {
+    static describe(){
+        return {
+            name: 'quick-measure',
+            title: 'Quick Measure',
+            description: 'Quickly select the measurement tool by shift-clicking on the chart.',
+        };
+    }
 
-        this.disposables.add(this.chart.onDidClick(this.click.bind(this)));
+    static instance(params){
+        return new QuickMeasure(params);
+    }
+
+    constructor({chart}){
+        this.chart = chart;
+        this.plugin = this.chart.manager.drawings.find(tool => tool.name === 'measure');
+
+        this.disposables = new CompositeDisposable(
+            this.chart.onDidClick(this.click.bind(this))
+        );
     }
 
     click({event, target}){
@@ -17,7 +32,7 @@ class QuickMeasure {
             event.preventDefault();
             event.stopPropagation();
 
-            target.addLayer(this.chart.plugins.get('measure'), event);
+            this.chart.select(target.add(new ChartDrawing({plugin: this.plugin, event, chart: this.chart, panel: target})));
         }
     }
 
@@ -25,12 +40,3 @@ class QuickMeasure {
         this.disposables.dispose();
     }
 }
-
-module.exports = {
-    name: 'quick-measure',
-    type: 'other',
-    settings: {},
-    title: 'Quick Measure',
-    description: 'Quickly select the measurement tool by shift-clicking on the chart.',
-    instance: params => new QuickMeasure(params)
-};

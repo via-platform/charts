@@ -32,8 +32,10 @@ module.exports = {
             const price_close = value.average;
             const price_high = index ? Math.max(value.price_high, price_open, price_close) : value.price_high;
             const price_low = index ? Math.min(value.price_low, price_open, price_close) : value.price_low;
+            const middle = (price_high + price_low) / 2;
+            const average = (price_open + price_close + price_high + price_low) / 4;
 
-            return last = {price_open, price_close, price_high, price_low};
+            return last = {price_open, price_close, price_high, price_low, average, middle};
         });
     },
     domain: series => {

@@ -3,6 +3,7 @@ module.exports = {
     title: 'Vertical Line',
     description: 'Draw a vertical line on the chart.',
     points: 1,
+    selectable: true,
     parameters: {
         fixed: 'y'
     },

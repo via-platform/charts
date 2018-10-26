@@ -1,6 +1,7 @@
 module.exports = {
     name: 'range',
     title: 'Range',
+    trackable: false,
     parameters: {
         fill: {
             title: 'Fill Color',

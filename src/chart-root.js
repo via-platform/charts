@@ -15,12 +15,17 @@ module.exports = class ChartRoot extends ChartLayer {
 
     constructor({chart, panel, state}){
         super({chart, panel});
+
+        this.destination = this.element.append('g').attr('class', 'destination');
+        this.flag = this.panel.axis.flag().classed('chart-plot-flag', true).classed('hide', true);
+        this.track = this.element.append('path').attr('class', 'track').attr('stroke-dasharray', 2).attr('stroke-width', '1px');
+        this.handles = this.element.append('g').attr('class', 'handles');
+
         this.initialize(state);
     }
 
     initialize(state = {}){
         this.parameters = {};
-        this.removable = false;
 
         //We need to store information about the user's parameters for each chart type.
         //This way, if they switch from line to area and back, their line preferences are retained.
@@ -54,7 +59,8 @@ module.exports = class ChartRoot extends ChartLayer {
         }
 
         this.type = type;
-        this.element.attr('class', `layer ${type.name}`).selectAll('*').remove();
+        this.element.attr('class', `layer ${type.name}`)
+        this.destination.selectAll('*').remove();
         this.chart.recalculate();
 
         this.emitter.emit('did-change-type', this.type);
@@ -97,11 +103,31 @@ module.exports = class ChartRoot extends ChartLayer {
             this.type.render({
                 chart: this.chart,
                 panel: this.panel,
-                element: this.element,
+                element: this.destination,
                 data,
                 selected: this.selected,
                 parameters: this.parameters[this.type.name]
             });
+
+            const last_value = (this.type.name === 'heikin-ashi') ? this.data.last() : this.chart.data.all().last();
+
+            if(last_value){
+                const last_color = (last_value.price_open <= last_value.price_close) ? '#0bd691' : '#ff3b30';
+
+                this.track.classed('hide', false)
+                    .attr('d', `M 0 ${Math.round(this.panel.scale(last_value.price_close)) - 0.5} h ${this.panel.width}`)
+                    .attr('stroke', last_color);
+
+                this.flag.classed('hide', false)
+                    .attr('transform', `translate(0, ${Math.round(this.panel.scale(last_value.price_close)) - 10})`)
+                    .attr('fill', last_color)
+                    .select('text')
+                        .attr('fill', '#FFFFFF')
+                        .text(via.fn.number.formatString(last_value.price_close.toFixed(this.decimals)));
+            }else{
+                this.track.classed('hide', true);
+                this.flag.classed('hide', true);
+            }
 
             if(this.selected){
                 const handle_points = data.filter(([x]) => (x.getTime() / this.chart.granularity) % 10 === 0);
@@ -114,12 +140,11 @@ module.exports = class ChartRoot extends ChartLayer {
                     formatted_data = handle_points.prop('middle');
                 }
 
-                const handles = this.element.selectAll('circle').data(formatted_data);
+                const handles = this.handles.selectAll('circle').data(formatted_data);
 
                 handles.enter()
                         .append('circle')
                     .merge(handles)
-                        .raise()
                         .attr('class', 'handle')
                         .attr('cx', ([x]) => this.chart.scale(x))
                         .attr('cy', ([x, y]) => this.panel.scale(y))
@@ -152,7 +177,7 @@ module.exports = class ChartRoot extends ChartLayer {
         //The reason for this is that we want to show OHLC for the main root but this.data will only contain
         //plot data for several types (e.g. line). Heikin-Ashi is special because it contains its own calculated
         //OHLC data points.
-        
+
         const data = (this.type.name === 'heikin-ashi') ? this.data : this.chart.data.all();
 
         if(this.chart.market){
@@ -179,5 +204,15 @@ module.exports = class ChartRoot extends ChartLayer {
 
     onDidChangeType(callback){
         return this.emitter.on('did-change-type', callback);
+    }
+
+    destroy(){
+        if(this.flag){
+            this.flag.remove();
+        }
+
+        if(this.track){
+            this.track.remove();
+        }
     }
 }

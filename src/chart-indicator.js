@@ -16,10 +16,6 @@ module.exports = class ChartIndicator extends ChartLayer {
         this.panel = panel ? panel : plugin.params.panel ? this.chart.panel() : this.chart.center();
         this.element.classed(plugin.name, true).classed('selectable', plugin.selectable);
 
-        //TODO There is one more thing that may force a recalculation - when the user changes a parameter
-        // this.disposables.add(this.chart.data.onDidUpdateData(this.recalculate.bind(this)));
-        // this.disposables.add(this.chart.onDidZoom(this.rescale.bind(this)));
-
         this.initialize(state);
     }
 
@@ -100,7 +96,7 @@ module.exports = class ChartIndicator extends ChartLayer {
     render(){
         //TODO If selected, render the actual points, flags, and ranges
         this.element.classed('selected', this.selected);
-        
+
         for(const plot of Object.values(this.components)){
             plot.render();
         }

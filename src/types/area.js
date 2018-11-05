@@ -42,7 +42,7 @@ module.exports = {
         return series.length ? [series.min(), series.max()] : [];
     },
     render: ({chart, panel, element, data, parameters}) => {
-        element.selectAll('path').remove();
+        element.selectAll('path.area, path.line').remove();
 
         if(data){
             const [start] = _.first(data);
@@ -53,12 +53,12 @@ module.exports = {
             fill.alpha = 0.25;
 
             element.append('path')
-                .classed('fill', true)
+                .classed('area', true)
                 .attr('d', data.length > 1 ? `M ${points} V ${bottom} H ${chart.scale(start)} Z` : '')
                 .attr('fill', fill.toRGBAString());
 
             element.append('path')
-                .classed('stroke', true)
+                .classed('line', true)
                 .attr('d', data.length > 1 ? `M ${points}` : '')
                 .attr('stroke', parameters.stroke)
                 .attr('stroke-width', parameters.width);

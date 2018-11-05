@@ -7,7 +7,6 @@ module.exports = class ChartLayer {
         this.panel = panel;
         this.params = {};
         this.selectable = true;
-        this.removable = true;
         this.disposables = new CompositeDisposable();
         this.emitter = new Emitter();
         this.element = this.panel.zoomable.append('g').classed('layer', true);
@@ -27,14 +26,6 @@ module.exports = class ChartLayer {
 
     select(){
         this.chart.select(this);
-    }
-
-    title(){
-        // return _.isFunction(this.plugin.title) ? this.plugin.title() : '';
-    }
-
-    value(candle){
-        return '';
     }
 
     recalculate(){}

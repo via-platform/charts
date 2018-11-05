@@ -64,7 +64,6 @@ module.exports = class VolumeProfile extends ChartLayer {
 
     initialize(state = {}){
         this.parameters = {};
-        this.removable = false;
         this.visible = state.visible;
 
         //First set the defaults for each chart type.

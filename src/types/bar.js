@@ -25,11 +25,12 @@ const Bar = {
             }
 
             const half = (width + 1) / 2;
-            const bars = element.selectAll('path').data(data);
+            const bars = element.selectAll('path.bar').data(data);
 
             bars.enter()
                 .append('path')
                 .merge(bars)
+                    .attr('class', 'bar')
                     .attr('d', ([x, candle]) => {
                         const start = Math.round(chart.scale(x));
                         const open = Math.round(panel.scale(candle.price_open));
@@ -55,7 +56,7 @@ const Bar = {
 
             bars.exit().remove();
         }else{
-            element.selectAll('rect').remove();
+            element.selectAll('path.bar').remove();
         }
     }
 };

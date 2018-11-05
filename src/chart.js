@@ -45,7 +45,7 @@ module.exports = class Chart {
         this.bandwidth = 10;
         this.granularity = state.granularity || via.config.get('charts.defaultChartGranularity');
         this.selected = null;
-        this.offset = 0;
+        this.offset = 1;
 
         this.basis = d3.scaleTime().domain([new Date(Date.now() - this.granularity * 144), new Date()]);
         this.scale = this.basis.copy();

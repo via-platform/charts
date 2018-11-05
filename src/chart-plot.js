@@ -1,5 +1,5 @@
 const _ = require('underscore-plus');
-const {etch} = require('via');
+const {etch, Color} = require('via');
 const {is_series, is_array} = require('via').VS;
 const $ = etch.dom;
 
@@ -40,6 +40,14 @@ module.exports = class ChartPlot {
                 this.parameters[identifier] = value;
             }
         }
+
+        if(this.plot.trackable){
+            this.flag = this.panel.axis.flag();
+            this.track = this.layer.element.append('path');
+
+            this.track.attr('class', 'track').attr('stroke-dasharray', 2).attr('stroke-width', '1px');
+            this.flag.classed('chart-plot-flag', true).classed('hide', true);
+        }
     }
 
     valid(parameter, value){
@@ -77,6 +85,26 @@ module.exports = class ChartPlot {
             });
 
             if(this.plot.trackable){
+                const last_value = this.data.last();
+
+                if(last_value){
+                    const color = Color.parse(this.parameters.color ? this.parameters.color : '#FFFFFF');
+
+                    this.track.classed('hide', false)
+                        .attr('d', `M 0 ${Math.round(this.panel.scale(last_value)) - 0.5} h ${this.panel.width}`)
+                        .attr('stroke', color.toRGBAString());
+
+                    this.flag.classed('hide', false)
+                        .attr('transform', `translate(0, ${Math.round(this.panel.scale(last_value)) - 10})`)
+                        .attr('fill', color.toRGBAString())
+                        .select('text')
+                            .attr('fill', color.contrast().toRGBAString())
+                            .text(via.fn.number.formatString(last_value.toFixed(this.panel.decimals)));
+                }else{
+                    this.track.classed('hide', true);
+                    this.flag.classed('hide', true);
+                }
+
                 if(this.layer.selected){
                     const handle_points = this.data.filter(([x]) => (x.getTime() / this.chart.granularity) % 10 === 0);
                     const handles = this.element.selectAll('circle').data(handle_points);
@@ -128,5 +156,13 @@ module.exports = class ChartPlot {
 
     destroy(){
         this.element.remove();
+
+        if(this.flag){
+            this.flag.remove();
+        }
+
+        if(this.track){
+            this.track.remove();
+        }
     }
 }

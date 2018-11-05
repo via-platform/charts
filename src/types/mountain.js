@@ -42,7 +42,7 @@ module.exports = {
         return series.length ? [series.min(), series.max()] : [];
     },
     render: ({chart, panel, element, data, parameters}) => {
-        element.selectAll('path').remove();
+        element.selectAll('path.line, path.mountain').remove();
         element.selectAll('linearGradient').remove();
 
         if(data){
@@ -71,12 +71,12 @@ module.exports = {
                     .attr('stop-color', d => d.color);
 
             element.append('path')
-                .classed('fill', true)
+                .attr('class', 'mountain')
                 .attr('d', data.length > 1 ? `M ${points} V ${bottom} H ${chart.scale(start)} Z` : '')
                 .attr('fill', `url(#${uuid})`);
 
             element.append('path')
-                .classed('stroke', true)
+                .attr('class', 'line')
                 .attr('d', data.length > 1 ? `M ${points}` : '')
                 .attr('stroke', parameters.stroke)
                 .attr('stroke-width', parameters.width);

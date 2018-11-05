@@ -84,7 +84,7 @@ module.exports = {
             body.exit().remove();
             wick.exit().remove();
         }else{
-            element.selectAll('path').remove();
+            element.selectAll('path.body, path.wick').remove();
         }
     }
 };

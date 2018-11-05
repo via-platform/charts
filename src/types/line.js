@@ -36,13 +36,13 @@ module.exports = {
         return series.length ? [series.min(), series.max()] : [];
     },
     render: ({chart, panel, element, data, parameters, selected}) => {
-        element.selectAll('path').remove();
+        element.selectAll('path.line').remove();
 
         if(data){
             const points = data.array().map(([x, y]) => `${chart.scale(x)} ${panel.scale(y)}`).join(' L ');
 
             element.append('path')
-                .classed('stroke', true)
+                .attr('class', 'line')
                 .attr('d', `M ${points}`)
                 .attr('stroke', parameters.stroke)
                 .attr('stroke-width', parameters.width);

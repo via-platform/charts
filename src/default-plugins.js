@@ -17,8 +17,8 @@ module.exports = {
         require('./plots/mountain'),
         require('./plots/line'),
         require('./plots/band'),
+        require('./plots/stacked-bar'),
         require('./plots/circle'),
-        require('./plots/column'),
         require('./plots/cross'),
         require('./plots/histogram'),
         require('./plots/horizontal-line'),
@@ -45,12 +45,16 @@ module.exports = {
     indicator: [
         require('./indicators/volume'),
         // require('./indicators/volume-notional'),
-        // require('./indicators/trades'),
+        require('./indicators/trade-volume-ratio'),
+        require('./indicators/trade-count-ratio'),
+        require('./indicators/trade-count'),
         require('./indicators/rsi'),
         // require('./indicators/macd'),
         require('./indicators/sma'),
+        require('./indicators/parabolic-sar'),
         // require('./indicators/ema'),
-        // require('./indicators/bollinger-bands'),
+        require('./indicators/bollinger-bands'),
+        require('./indicators/vwap')
         // require('./indicators/ichimoku-cloud')
     ],
     plugin: [

@@ -1,4 +1,4 @@
-const Line = {
+module.exports = {
     name: 'line',
     title: 'Line',
     trackable: true,
@@ -46,5 +46,3 @@ const Line = {
         }
     }
 };
-
-module.exports = Line;

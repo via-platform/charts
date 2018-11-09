@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'sar',
+    name: 'parabolic-sar',
     type: 'overlay',
     title: 'Parabolic SAR',
     abbreviation: 'SAR',
@@ -37,6 +37,6 @@ module.exports = {
         }
     },
     calculate: ({series, parameters, draw}) => {
-        draw('sar', );
+        draw('sar', sar(series, parameters.start, parameters.increment, parameters.max));
     }
 };

@@ -21,13 +21,9 @@ module.exports = class ChartAxis {
 
         this.basis = d3.axisBottom(this.chart.scale).tickSizeOuter(0).tickSizeInner(4).tickPadding(4);
         this.axis = this.svg.append('g').attr('class', 'x axis');
-
         this.zoomable.call(d3.zoom().on('zoom', this.zoom()));
-        // this.disposables.add(this.chart.onDidUpdateOffset(this.resize.bind(this)));
-        // this.disposables.add(this.chart.onDidResize(this.resize.bind(this)));
-        // this.disposables.add(this.chart.onDidZoom(this.zoomed.bind(this)));
 
-        this.resize({width: 0});
+        this.resize();
     }
 
     flag(){

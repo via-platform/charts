@@ -1,15 +1,15 @@
 const {permute} = require('via').VS;
 
 module.exports = {
-    name: 'volume',
-    title: 'Trading Volume',
-    description: 'A volume bar for each time period corresponding to the relative number of units traded.',
+    name: 'trade-count',
+    title: 'Number of Trades',
+    description: 'A bar for each time period corresponding to the number of individual trades.',
     panel: true,
-    decimals: chart => chart.market ? chart.market.precision.price : 0,
+    decimals: () => 0,
     components: {
-        volume: {
+        count: {
             type: 'stacked-bar',
-            title: 'Volume',
+            title: 'Trade Count',
             parameters: {}
         }
     },
@@ -24,6 +24,6 @@ module.exports = {
         }
     },
     calculate: ({series, parameters, draw}) => {
-        draw('volume', permute(series, ['volume_buy', 'volume_sell']), {fill: [parameters.up, parameters.down]});
+        draw('count', permute(series, ['buy_count', 'sell_count']), {fill: [parameters.up, parameters.down]});
     }
 }

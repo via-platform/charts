@@ -1,8 +1,6 @@
-const {d3} = require('via');
-
 module.exports = {
-    name: 'range',
-    title: 'Range',
+    name: 'horizontal-range',
+    title: 'Horizontal Range',
     trackable: false,
     parameters: {
         fill: {
@@ -20,14 +18,10 @@ module.exports = {
         element.select('path').remove();
 
         if(data){
-            const area = d3.area()
-                .x(([x]) => chart.scale(x))
-                .y0(([x, y]) => panel.scale(y[0]))
-                .y1(([x, y]) => panel.scale(y[1]));
+            const [start, end] = data;
 
             element.append('path')
-                .datum(data.array())
-                .attr('d', area)
+                .attr('d', `M 0 ${Math.round(panel.scale(start)) - 0.5} h ${panel.width} V ${Math.round(panel.scale(end)) - 0.5} h ${-1 * panel.width} Z`)
                 .attr('fill', parameters.fill);
         }
     }

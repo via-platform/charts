@@ -27,11 +27,6 @@ module.exports = class ChartPanelAxis {
 
         this.zoomable.call(d3.drag().on('drag', this.drag()));
         this.zoomable.on('dblclick', () => this.panel.lock());
-
-        // this.disposables.add(this.panel.onDidRescale(this.render.bind(this)));
-        // this.disposables.add(this.panel.onDidResize(this.resize.bind(this)));
-        // this.disposables.add(this.chart.onDidUpdateOffset(this.resize.bind(this)));
-        // this.disposables.add(this.chart.onDidDestroy(this.destroy.bind(this)));
     }
 
     flag(){
@@ -88,7 +83,7 @@ module.exports = class ChartPanelAxis {
     }
 
     render(){
-        this.axis.call(this.basis);
+        this.axis.call(this.basis.tickFormat(d3.format(`,.${this.panel.decimals}f`)));
         this.axis.selectAll('.tick').attr('transform', d => `translate(0, ${Math.round(this.panel.scale(d)) + 0.5})`);
     }
 

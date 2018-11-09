@@ -1,5 +1,5 @@
 const _ = require('underscore-plus');
-const {etch, Color} = require('via');
+const {etch, Color, d3} = require('via');
 const {is_series, is_array} = require('via').VS;
 const $ = etch.dom;
 
@@ -132,7 +132,17 @@ module.exports = class ChartPlot {
                 const range = this.data.range(start, end);
 
                 if(range.length){
-                    return [range.min(), range.max()];
+                    if(this.plot.name === 'stacked-bar'){
+                        //We're dealing with a stacked bar or area type series
+                        const totals = range.values().map(values => d3.sum(values));
+                        return [d3.min(totals), d3.max(totals)];
+                    }else if(this.plot.name === 'range'){
+                        const flattened = range.flatten();
+                        return [d3.min(flattened), d3.max(flattened)];
+                    }else{
+                        //This is a standard series
+                        return [range.min(), range.max()];
+                    }
                 }
             }else if(is_array(this.data)){
                 return [Math.min(...this.data), Math.max(...this.data)];

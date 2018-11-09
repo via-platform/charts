@@ -34,7 +34,7 @@ module.exports = {
             }
         },
         limit_range: {
-            type: 'range',
+            type: 'horizontal-range',
             title: 'Range',
             trackable: false,
             parameters: {

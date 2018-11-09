@@ -10,7 +10,6 @@ module.exports = {
                 {title: 'Line', value: 'line'},
                 {title: 'Area', value: 'area'},
                 {title: 'Histogram', value: 'histogram'},
-                {title: 'Column', value: 'column'},
                 {title: 'Cross', value: 'cross'},
                 {title: 'Circle', value: 'circle'},
                 {title: 'Step Line', value: 'step'},
@@ -49,16 +48,36 @@ module.exports = {
             width: configuration.parameters.width
         };
 
+        const options = {};
+
         if(['line', 'step'].includes(style)){
             parameters.style = 'solid';
         }
 
         if(['line', 'area', 'step'].includes(style)){
             parameters.stroke = configuration.parameters.color;
+
+            if(configuration.options.color){
+                options.stroke = configuration.options.color;
+            }
         }
 
-        if(['area', 'histogram', 'column', 'cross', 'circle'].includes(style)){
+        if(['area', 'histogram', 'cross', 'circle'].includes(style)){
             parameters.fill = configuration.parameters.color;
+
+            if(configuration.options.color){
+                options.fill = configuration.options.color;
+            }
+        }
+
+        if(['histogram'].includes(style)){
+            parameters.width = [1, 3, 5, 7][
+                [1, 1.5, 2, 2.5].indexOf(configuration.parameters.width)
+            ];
+        }
+
+        if(['step'].includes(style)){
+            parameters.width = configuration.parameters.width < 2 ? 1 : 2;
         }
 
         if(!configuration.element.classed(style)){
@@ -66,7 +85,7 @@ module.exports = {
         }
 
         if(configuration.data){
-            plot.render(Object.assign({}, configuration, {parameters}));
+            plot.render(Object.assign({}, configuration, {parameters, options}));
         }
     }
 };

@@ -12,8 +12,8 @@ module.exports = {
                 {title: 'High', value: 'price_high'},
                 {title: 'Low', value: 'price_low'},
                 {title: 'Close', value: 'price_close'},
-                {title: 'HL Midpoint', value: 'middle'},
-                {title: 'OHLC Average', value: 'average'}
+                {title: 'High-Low Average', value: 'hl_average'},
+                {title: 'OHLC Average', value: 'ohlc_average'}
             ],
             default: 'price_close'
         },

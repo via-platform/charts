@@ -1,3 +1,5 @@
+const {sar} = require('via').VS;
+
 module.exports = {
     name: 'parabolic-sar',
     type: 'overlay',
@@ -7,7 +9,7 @@ module.exports = {
     components: {
         sar: {
             type: 'plot',
-            title: 'SAR'
+            title: 'SAR',
             style: {
                 style: 'cross'
             }

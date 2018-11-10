@@ -57,16 +57,16 @@ module.exports = {
         if(['line', 'area', 'step'].includes(style)){
             parameters.stroke = configuration.parameters.color;
 
-            if(configuration.options.color){
-                options.stroke = configuration.options.color;
+            if(configuration.options.stroke){
+                options.stroke = configuration.options.stroke;
             }
         }
 
         if(['area', 'histogram', 'cross', 'circle'].includes(style)){
             parameters.fill = configuration.parameters.color;
 
-            if(configuration.options.color){
-                options.fill = configuration.options.color;
+            if(configuration.options.fill){
+                options.fill = configuration.options.fill;
             }
         }
 

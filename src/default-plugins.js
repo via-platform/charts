@@ -25,7 +25,8 @@ module.exports = {
         require('./plots/vertical-line'),
         require('./plots/plot'),
         require('./plots/step'),
-        require('./plots/range')
+        require('./plots/range'),
+        require('./plots/horizontal-range')
     ],
     drawing: [
         require('./drawings/horizontal-line'),
@@ -49,7 +50,13 @@ module.exports = {
         require('./indicators/trade-count-ratio'),
         require('./indicators/trade-count'),
         require('./indicators/rsi'),
+        require('./indicators/stochastic'),
         // require('./indicators/macd'),
+        require('./indicators/aroon'),
+        require('./indicators/alma'),
+        require('./indicators/awesome-oscillator'),
+        require('./indicators/average-true-range'),
+        require('./indicators/chaikin-money-flow'),
         require('./indicators/sma'),
         require('./indicators/parabolic-sar'),
         // require('./indicators/ema'),

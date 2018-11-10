@@ -5,6 +5,7 @@ module.exports = {
     title: 'Balance of Power',
     description: 'Measures the market strength of buyers against sellers.',
     decimals: () => 4,
+    panel: true,
     components: {
         balance: {
             type: 'plot',

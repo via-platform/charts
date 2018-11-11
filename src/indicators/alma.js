@@ -1,12 +1,13 @@
-const {sma, prop} = require('via').VS;
+const {alma, prop} = require('via').VS;
 
 module.exports = {
-    name: 'sma',
-    title: 'Simple Moving Average',
-    description: 'An n-period moving average.',
+    name: 'alma',
+    title: 'Arnaud Legoux Moving Average',
+    description: 'An n-period moving average using Gaussian weights.',
+    abbreviation: 'ALMA',
     decimals: chart => chart.market ? chart.market.precision.price : 0,
     components: {
-        sma: {
+        alma: {
             type: 'plot',
             parameters: {
                 color: '#FFF',
@@ -33,9 +34,21 @@ module.exports = {
             type: 'number',
             constraint: x => (x > 1 && x <= 200),
             default: 9
+        },
+        offset: {
+            title: 'Offset',
+            type: 'number',
+            constraint: x => (x > 1 && x <= 200),
+            default: 0.85
+        },
+        sigma: {
+            title: 'Sigma',
+            type: 'number',
+            constraint: x => (x > 1 && x <= 200),
+            default: 6
         }
     },
     calculate: ({series, parameters, draw}) => {
-        draw('sma', sma(prop(series, parameters.property), parameters.length));
+        draw('alma', alma(prop(series, parameters.property), parameters.length, parameters.offset, parameters.sigma));
     }
 }

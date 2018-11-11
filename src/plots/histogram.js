@@ -20,19 +20,19 @@ module.exports = {
             default: 3
         }
     },
-    render: ({chart, panel, element, data, parameters}) => {
+    render: ({chart, panel, element, data, parameters, options}) => {
         if(data){
             const half = (parameters.width + 1) / 2;
             const bars = element.selectAll('rect').data(data);
 
-            // bars.enter()
-            //     .append('rect')
-            //     .merge(bars)
-            //         .attr('x', ([x]) => Math.round(chart.scale(x)) - half)
-            //         .attr('y', ([x, y]) => Math.round(panel.scale(Math.max(0, y))))
-            //         .attr('width', () => parameters.width)
-            //         .attr('height', () => )
-            //         .attr('fill', parameters.fill);
+            bars.enter()
+                .append('rect')
+                .merge(bars)
+                    .attr('x', ([x]) => Math.round(chart.scale(x)) - half)
+                    .attr('y', ([x, y]) => Math.round(panel.scale(Math.max(0, y))))
+                    .attr('width', () => parameters.width)
+                    .attr('height', ([x, y]) => Math.abs(panel.scale(0) - panel.scale(y)))
+                    .attr('fill', options.fill ? (d, i) => options.fill(d, i, data) : parameters.fill);
 
             bars.exit().remove();
         }else{

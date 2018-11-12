@@ -21,7 +21,8 @@ module.exports = {
             title: 'Length',
             type: 'number',
             constraint: x => (x > 1 && x <= 200),
-            default: 21
+            default: 21,
+            legend: true
         }
     },
     calculate: ({series, parameters, draw}) => {

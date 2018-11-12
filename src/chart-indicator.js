@@ -103,20 +103,26 @@ module.exports = class ChartIndicator extends ChartLayer {
     }
 
     title(){
-        //TODO Use the abbreviation where available
-        //TODO Show the parameter values for this indicator (e.g. number of periods)
-        return this.plugin.title;
+        const title = this.plugin.abbreviation ? this.plugin.abbreviation : this.plugin.title;
+        const parameters = [];
+
+        for(const [parameter, value] of Object.entries(this.parameters)){
+            if(this.plugin.parameters[parameter].legend){
+                parameters.push(value);
+            }
+        }
+
+        return title + (parameters.length ? ` (${parameters.join(', ')})` : '');
     }
 
     value(band){
-        //TODO generate this etch object based on the plots for this indicator
         const values = [];
 
         for(const plot of Object.values(this.components)){
-            const value = plot.value(band);
+            const value = plot.value(band, this.plugin.decimals ? this.plugin.decimals(this.chart) : 0);
 
             if(value){
-                values.push(via.fn.number.formatString(value.toFixed(this.decimals)));
+                values.push(value);
             }
         }
 

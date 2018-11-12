@@ -21,7 +21,8 @@ module.exports = {
             title: 'Length',
             type: 'number',
             constraint: x => (x > 1 && x <= 100),
-            default: 14
+            default: 14,
+            legend: true
         },
         smoothing: {
             title: 'Smoothing',

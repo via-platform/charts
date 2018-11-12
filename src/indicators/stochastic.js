@@ -53,19 +53,22 @@ module.exports = {
             title: 'Length',
             type: 'number',
             constraint: x => (x > 1 && x <= 200),
-            default: 14
+            default: 14,
+            legend: true
         },
         k: {
             title: 'K Smoothing',
             type: 'number',
             constraint: x => (x >= 1 && x <= 200),
-            default: 3
+            default: 3,
+            legend: true
         },
         d: {
             title: 'D Smoothing',
             type: 'number',
             constraint: x => (x >= 1 && x <= 200),
-            default: 3
+            default: 3,
+            legend: true
         },
         upper_limit: {
             title: 'Upper Limit',

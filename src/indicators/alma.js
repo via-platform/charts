@@ -33,19 +33,22 @@ module.exports = {
             title: 'Length',
             type: 'number',
             constraint: x => (x > 1 && x <= 200),
-            default: 9
+            default: 9,
+            legend: true
         },
         offset: {
             title: 'Offset',
             type: 'number',
             constraint: x => (x > 1 && x <= 200),
-            default: 0.85
+            default: 0.85,
+            legend: true
         },
         sigma: {
             title: 'Sigma',
             type: 'number',
             constraint: x => (x > 1 && x <= 200),
-            default: 6
+            default: 6,
+            legend: true
         }
     },
     calculate: ({series, parameters, draw}) => {

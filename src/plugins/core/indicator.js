@@ -44,7 +44,7 @@ module.exports = class Indicator {
             placeholder: 'Search For an Indicator...',
             didConfirmSelection: option => option.group === 'special' ? option.action() : this.create(option.plugin),
             maxResultsPerCategory: 60,
-            items: indicators.concat(special)
+            items: special.concat(indicators)
         });
     }
 

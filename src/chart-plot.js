@@ -87,8 +87,28 @@ module.exports = class ChartPlot {
             if(this.plot.trackable){
                 const last_value = this.data.last();
 
-                if(last_value){
-                    const color = Color.parse(this.parameters.color ? this.parameters.color : '#FFFFFF');
+                //TODO This is deliberately set to false for now, until there is a way to manually specify
+                //whether or not you want to see a price line
+                if(last_value && false){
+                    let color = Color.parse('#FFFFFF');
+
+                    //Should probably think of a better way to do this
+                    //The issue is that the appropriate color can be specified in a number of
+                    //different ways, depending on the type of the chart plot
+
+                    if(this.options.fill){
+                        color = Color.parse(this.options.fill(last_value, this.data.length - 1, this.data));
+                    }else if(this.options.stroke){
+                        color = Color.parse(this.options.stroke(last_value, this.data.length - 1, this.data));
+                    }else if(this.options.color){
+                        color = Color.parse(this.options.color(last_value, this.data.length - 1, this.data));
+                    }else if(this.parameters.color){
+                        color = Color.parse(this.parameters.color);
+                    }else if(this.parameters.fill){
+                        color = Color.parse(this.parameters.fill);
+                    }else if(this.parameters.stroke){
+                        color = Color.parse(this.parameters.stroke);
+                    }
 
                     this.track.classed('hide', false)
                         .attr('d', `M 0 ${Math.round(this.panel.scale(last_value)) - 0.5} h ${this.panel.width}`)
@@ -154,11 +174,32 @@ module.exports = class ChartPlot {
         return [];
     }
 
-    value(band){
+    value(band, precision = 0){
         if(this.plot.trackable){
-            for(const [key, value] of this.data){
+            for(const datum of this.data){
+                const [key, value] = datum;
+
                 if(key.getTime() === band.getTime()){
-                    return value;
+                    //Should probably think of a better way to do this
+                    //The issue is that the appropriate color can be specified in a number of
+                    //different ways, depending on the type of the chart plot
+                    let color = Color.parse('#FFFFFF');
+
+                    if(this.options.fill){
+                        color = Color.parse(this.options.fill(value, this.data.indexOf(datum), this.data));
+                    }else if(this.options.stroke){
+                        color = Color.parse(this.options.stroke(value, this.data.indexOf(datum), this.data));
+                    }else if(this.options.color){
+                        color = Color.parse(this.options.color(value, this.data.indexOf(datum), this.data));
+                    }else if(this.parameters.color){
+                        color = Color.parse(this.parameters.color);
+                    }else if(this.parameters.fill){
+                        color = Color.parse(this.parameters.fill);
+                    }else if(this.parameters.stroke){
+                        color = Color.parse(this.parameters.stroke);
+                    }
+
+                    return $.span({style: `color: ${color.toRGBAString()};`}, via.fn.number.formatString(value.toFixed(precision)));
                 }
             }
         }

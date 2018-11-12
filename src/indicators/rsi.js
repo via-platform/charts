@@ -47,7 +47,8 @@ module.exports = {
             title: 'Length',
             type: 'number',
             constraint: x => x => 0 && x <= 100,
-            default: 14
+            default: 14,
+            legend: true
         },
         upper_limit: {
             title: 'Upper Limit',

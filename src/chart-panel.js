@@ -92,6 +92,7 @@ module.exports = class ChartPanel {
         layer.destroy();
         this.layers.splice(this.layers.indexOf(layer), 1);
         this.emitter.emit('did-remove-layer', layer);
+        this.chart.rescale();
 
         if(this.layers.length || this.root){
             return;
@@ -264,11 +265,12 @@ module.exports = class ChartPanel {
         this.values.destroy();
 
         for(const layer of this.layers){
-            this.remove(layer);
+            layer.destroy();
         }
 
         this.element.parentElement.removeChild(this.element);
         this.disposables.dispose();
+        this.chart.rescale();
         this.emitter.emit('did-destroy');
     }
 

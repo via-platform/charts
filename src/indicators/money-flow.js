@@ -1,4 +1,4 @@
-const {subtract, divide, multiply, prop} = require('via').VS;
+const {map, sum, nz, divide} = require('via').VS;
 
 module.exports = {
     name: 'money-flow',
@@ -13,18 +13,67 @@ module.exports = {
                 color: '#0bd691',
                 style: 'line'
             }
+        },
+        upper_limit: {
+            type: 'horizontal-line',
+            title: 'Upper Limit',
+            trackable: false,
+            parameters: {
+                stroke: 'rgba(69, 148, 235, 0.5)',
+                style: 'dashed'
+            }
+        },
+        lower_limit: {
+            type: 'horizontal-line',
+            title: 'Lower Limit',
+            trackable: false,
+            parameters: {
+                stroke: 'rgba(69, 148, 235, 0.5)',
+                style: 'dashed'
+            }
+        },
+        limit_range: {
+            type: 'horizontal-range',
+            title: 'Range',
+            trackable: false,
+            parameters: {
+                fill: 'rgba(69, 148, 235, 0.1)'
+            }
         }
     },
-    parameters: {},
+    parameters: {
+        length: {
+            title: 'Length',
+            type: 'number',
+            constraint: x => (x > 1 && x <= 100),
+            default: 14,
+            legend: true
+        },
+        upper_limit: {
+            title: 'Upper Limit',
+            type: 'integer',
+            legend: false,
+            constraint: x => x => 0 && x <= 100,
+            default: 80
+        },
+        lower_limit: {
+            title: 'Lower Limit',
+            type: 'integer',
+            legend: false,
+            constraint: x => x => 0 && x <= 100,
+            default: 20
+        }
+    },
     calculate: ({series, parameters, draw}) => {
-        const mf = multiply(prop(series, 'hlc_average'), prop(series, 'volume_traded'));
+        const positive_money_flow = map(series, (value, index) => index > 0 && value.hlc_average > series.get(index - 1).hlc_average ? value.hlc_average * value.volume_traded : 0);
+        const negative_money_flow = map(series, (value, index) => index > 0 && value.hlc_average < series.get(index - 1).hlc_average ? value.hlc_average * value.volume_traded : 0);
 
-        //For each item in the sequence
-            //For the previous 14 items
-                //If item > previous
-                    //Add to total
+        const positive = sum(positive_money_flow, parameters.length);
+        const negative = sum(negative_money_flow, parameters.length);
 
-
-        draw('mf', map(divide(positive, negative), value => 100 - 100 / (1 + value)));
+        draw('limit_range', [parameters.lower_limit, parameters.upper_limit]);
+        draw('upper_limit', parameters.upper_limit);
+        draw('lower_limit', parameters.lower_limit);
+        draw('mf', map(nz(divide(positive, negative), 100), value => 100 - 100 / (1 + value)));
     }
 }

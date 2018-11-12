@@ -61,13 +61,15 @@ module.exports = {
             title: 'Length',
             type: 'number',
             constraint: x => (x > 1 && x <= 200),
-            default: 20
+            default: 20,
+            legend: true
         },
         deviations: {
             title: 'Standard Deviation',
             type: 'integer',
             constraint: x => (x > 1 && x <= 5),
-            default: 2
+            default: 2,
+            legend: true
         }
     },
     calculate: ({series, parameters, draw}) => {

@@ -2,10 +2,9 @@ const {sar} = require('via').VS;
 
 module.exports = {
     name: 'parabolic-sar',
-    type: 'overlay',
     title: 'Parabolic SAR',
     abbreviation: 'SAR',
-    description: 'An n-period moving average.',
+    description: 'Used to identify points of potential stops and reverses.',
     components: {
         sar: {
             type: 'plot',

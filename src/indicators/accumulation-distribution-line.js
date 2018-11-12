@@ -1,4 +1,4 @@
-const {subtract, divide, multiply, prop} = require('via').VS;
+const {adl} = require('via').VS;
 
 module.exports = {
     name: 'accumulation-distribution-line',
@@ -18,18 +18,6 @@ module.exports = {
     },
     parameters: {},
     calculate: ({series, parameters, draw}) => {
-        const high = prop(series, 'price_high');
-        const low = prop(series, 'price_low');
-        const high = prop(series, 'price_close');
-
-        draw('adl',
-            multiply(
-                divide(
-                    subtract(subtract(close, low), subtract(high, close)),
-                    subtract(high, low)
-                ),
-                prop(series, 'volume_traded')
-            )
-        );
+        draw('adl', adl(series));
     }
-}
+};

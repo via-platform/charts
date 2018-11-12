@@ -4,6 +4,7 @@ module.exports = {
     name: 'sma',
     title: 'Simple Moving Average',
     description: 'An n-period moving average.',
+    abbreviation: 'SMA',
     decimals: chart => chart.market ? chart.market.precision.price : 0,
     components: {
         sma: {
@@ -32,7 +33,8 @@ module.exports = {
             title: 'Length',
             type: 'number',
             constraint: x => (x > 1 && x <= 200),
-            default: 9
+            default: 9,
+            legend: true
         }
     },
     calculate: ({series, parameters, draw}) => {

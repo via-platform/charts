@@ -1,4 +1,4 @@
-const {d3} = require('via');
+const d3 = require('d3');
 
 module.exports = {
     name: 'stacked-bar',

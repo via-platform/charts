@@ -1,4 +1,5 @@
-const {Disposable, CompositeDisposable, Emitter, d3} = require('via');
+const {Disposable, CompositeDisposable, Emitter} = require('event-kit');
+const d3 = require('d3');
 const AXIS_HEIGHT = 22;
 const FLAG_HEIGHT = AXIS_HEIGHT - 2;
 const X_FLAG_WIDTH = 114;

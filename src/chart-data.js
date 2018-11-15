@@ -1,4 +1,5 @@
-const {Disposable, CompositeDisposable, Emitter, Series} = require('via');
+const {Disposable, CompositeDisposable, Emitter} = require('event-kit');
+const {Series} = require('via-script');
 const _ = require('underscore-plus');
 
 module.exports = class ChartData {

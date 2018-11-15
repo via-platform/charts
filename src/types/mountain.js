@@ -1,4 +1,5 @@
-const {UUID, Color} = require('via');
+const UUID = require('uuid/v1');
+const Color = require('../color');
 const {prop} = require('via-script');
 const _ = require('underscore-plus');
 

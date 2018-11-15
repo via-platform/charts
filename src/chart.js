@@ -1,4 +1,5 @@
-const {Disposable, CompositeDisposable, Emitter, d3} = require('via');
+const {Disposable, CompositeDisposable, Emitter} = require('event-kit');
+const d3 = require('d3');
 const ChartData = require('./chart-data');
 const granularities = require('./chart-granularities');
 const ChartPanels = require('./chart-panels');
@@ -20,7 +21,6 @@ module.exports = class Chart {
             uri: this.getURI(),
             granularity: this.granularity,
             transform: this.transform,
-            group: this.group ? this.group.color : ''
             // panels: this.panels.serialize()
         };
     }
@@ -43,7 +43,7 @@ module.exports = class Chart {
 
         this.padding = 0.2;
         this.bandwidth = 10;
-        this.granularity = state.granularity || via.config.get('charts.defaultChartGranularity');
+        this.granularity = state.granularity || 60000;
         this.selected = null;
         this.offset = 1;
 
@@ -79,48 +79,12 @@ module.exports = class Chart {
             }
         }));
 
-        this.disposables.add(via.commands.add(this.element, {
-            'charts:zoom-in': () => this.zoom(2),
-            'charts:zoom-out': () => this.zoom(0.5),
-            'core:move-left': () => this.translate(100),
-            'core:move-right': () => this.translate(-100),
-            'charts:lock-scale': this.lock.bind(this),
-            'core:delete': () => {
-                this.cancel();
-
-                if(this.selected){
-                    this.selected.remove();
-                }
-            },
-            'core:backspace': () => {
-                this.cancel();
-
-                if(this.selected){
-                    this.selected.remove();
-                }
-            },
-            'core:cancel': () => {
-                this.cancel();
-                this.unselect();
-            }
-        }));
-
         this.initialize(state);
     }
 
     async initialize(state){
-        await via.markets.initialize();
-
-        this.changeGroup(state.group ? via.workspace.groups.get(state.group) : null);
-
-        const [method, id] = this.uri.slice(base.length + 1).split('/');
-
-        if(method === 'market'){
-            const market = via.markets.uri(id);
-            this.changeMarket(market);
-        }else if(method === 'public'){
-            //TODO fetch state from server
-        }
+        //TODO This used to be where we initialized the chart based on a market
+        //Now we have no such thing to work with
 
         if(state.transform){
             //TODO, the chart doesn't draw immediately when the transform is applied. No clue why.
@@ -306,10 +270,6 @@ module.exports = class Chart {
     }
 
     destroy(){
-        if(this.groupDisposables){
-            this.groupDisposables.dispose();
-        }
-
         this.data.destroy();
         this.panels.destroy();
         this.tools.destroy();
@@ -356,37 +316,6 @@ module.exports = class Chart {
         this.market = market;
         this.emitter.emit('did-change-market', market);
         this.emitter.emit('did-change-title');
-
-        if(this.group){
-            this.group.market = market;
-        }
-    }
-
-    changeGroup(group){
-        if(this.group === group){
-            return;
-        }
-
-        this.group = group;
-
-        if(this.groupDisposables){
-            this.groupDisposables.dispose();
-            this.groupDisposables = null;
-        }
-
-        if(this.group){
-            this.groupDisposables = new CompositeDisposable(
-                this.group.onDidChangeMarket(this.changeMarket.bind(this))
-            );
-
-            if(this.group.market){
-                this.changeMarket(this.group.market);
-            }else{
-                this.group.market = this.market;
-            }
-        }
-
-        this.emitter.emit('did-change-group', this.group);
     }
 
     changeGranularity(granularity){
@@ -395,11 +324,9 @@ module.exports = class Chart {
         this.emitter.emit('will-change-granularity', granularity);
         this.granularity = granularity;
 
-        if(via.config.get('charts.resetZoomOnGranularityChange')){
-            this.basis.domain([new Date(Date.now() - (this.granularity || 3e5) * 144), new Date()]);
-            this.transform = d3.zoomIdentity;
-            this.zoomed();
-        }
+        this.basis.domain([new Date(Date.now() - (this.granularity || 3e5) * 144), new Date()]);
+        this.transform = d3.zoomIdentity;
+        this.zoomed();
 
         this.setNextBandTimeout(false);
 
@@ -421,10 +348,6 @@ module.exports = class Chart {
 
     onDidUpdateOffset(callback){
         return this.emitter.on('did-update-offset', callback);
-    }
-
-    onDidChangeGroup(callback){
-        return this.emitter.on('did-change-group', callback);
     }
 
     onWillChangeGranularity(callback){

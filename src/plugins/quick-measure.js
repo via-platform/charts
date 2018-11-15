@@ -1,4 +1,4 @@
-const {CompositeDisposable, Disposable} = require('via');
+const {Disposable, CompositeDisposable} = require('event-kit');
 const ChartDrawing = require('../chart-drawing');
 const _ = require('underscore-plus');
 

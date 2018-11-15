@@ -1,5 +1,7 @@
 const _ = require('underscore-plus');
-const {etch, Color, d3} = require('via');
+const Color = require('./color');
+const etch = require('etch');
+const d3 = require('d3');
 const {is_series, is_array} = require('via-script');
 const $ = etch.dom;
 

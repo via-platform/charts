@@ -1,6 +1,8 @@
 //This file contains the base functionality for the root plot.
 
-const {CompositeDisposable, Disposable, d3, etch} = require('via');
+const {Disposable, CompositeDisposable} = require('event-kit');
+const etch = require('etch');
+const d3 = require('d3');
 const _ = require('underscore-plus');
 const ChartLayer = require('./chart-layer');
 const $ = etch.dom;
@@ -47,7 +49,7 @@ module.exports = class ChartRoot extends ChartLayer {
             }
         }
 
-        const type = state.type ? state.type : via.config.get('charts.defaultChartType');
+        const type = state.type ? state.type : 'candle';
         const plugin = this.chart.manager.types.find(plugin => plugin.name === type);
 
         this.change(plugin);
@@ -55,7 +57,7 @@ module.exports = class ChartRoot extends ChartLayer {
 
     change(type){
         if(this.type === type){
-            return void via.console.log(`Did not change chart type. You are already looking at a ${type.title.toLowerCase()} chart.`);
+            return void console.log(`Did not change chart type. You are already looking at a ${type.title.toLowerCase()} chart.`);
         }
 
         this.type = type;
@@ -199,7 +201,7 @@ module.exports = class ChartRoot extends ChartLayer {
     }
 
     remove(){
-        via.console.warn('You cannot remove this layer.');
+        console.warn('You cannot remove this layer.');
     }
 
     onDidChangeType(callback){

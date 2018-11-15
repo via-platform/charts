@@ -1,4 +1,5 @@
-const {Disposable, CompositeDisposable, Emitter, d3} = require('via');
+const {Disposable, CompositeDisposable, Emitter} = require('event-kit');
+const d3 = require('d3');
 const DEFAULT_TICKS = 10;
 
 //TODO Allow this to be customizable

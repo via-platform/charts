@@ -1,4 +1,6 @@
-const {Disposable, etch, d3} = require('via');
+const {Disposable} = require('event-kit');
+const etch = require('etch');
+const d3 = require('d3');
 const _ = require('underscore-plus');
 const $ = etch.dom;
 

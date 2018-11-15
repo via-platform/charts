@@ -1,7 +1,8 @@
-const {CompositeDisposable, Disposable, Emitter} = require('via');
+const {Disposable, CompositeDisposable, Emitter} = require('event-kit');
 const Chart = require('./chart');
 const base = 'via://charts';
 const _ = require('underscore-plus');
+const CSS = require('../styles/chart.less');
 
 const DefaultPlugins = require('./default-plugins');
 
@@ -23,23 +24,6 @@ class ChartPackage {
         this.types = [];
         this.omnibar = null;
 
-        this.disposables.add(via.commands.add('via-workspace, .symbol-explorer .market, .watchlist .market', 'charts:create-chart', this.create.bind(this)));
-
-        this.disposables.add(via.workspace.addOpener((uri, options) => {
-            if(uri === base || uri.startsWith(base + '/')){
-                const chart = new Chart({manager: this, omnibar: this.omnibar}, {uri});
-
-                for(const plugin of this.plugins){
-                    plugin.instance({chart, manager: this});
-                }
-
-                this.charts.push(chart);
-                this.emitter.emit('did-create-chart', chart);
-
-                return chart;
-            }
-        }, InterfaceConfiguration));
-
         for(const [type, plugins] of Object.entries(DefaultPlugins)){
             for(const plugin of plugins){
                 this[type](plugin);
@@ -60,16 +44,6 @@ class ChartPackage {
         return chart;
     }
 
-    create(e){
-        e.stopPropagation();
-
-        if(e.currentTarget.classList.contains('market')){
-            via.workspace.open(`${base}/market/${e.currentTarget.market.uri()}`, {});
-        }else{
-            via.workspace.open(base);
-        }
-    }
-
     deactivate(){
         for(const plugin of this.plugins.values()){
             this.deactivatePlugin(plugin);
@@ -80,26 +54,9 @@ class ChartPackage {
         this.active = false;
     }
 
-    consumeActionBar(actionBar){
-        this.omnibar = actionBar.omnibar;
-
-        for(const chart of this.charts){
-            chart.consumeActionBar(actionBar);
-        }
-    }
-
     getCharts(){
         return this.charts.slice();
     }
-
-    provideCharts(){
-        return this;
-    }
-
-
-
-
-
 
     plugin(plugin){
         this.plugins.push(plugin);
@@ -131,13 +88,6 @@ class ChartPackage {
         this.types.push(plugin);
         return new Disposable(() => _.remove(this.types, plugin));
     }
-
-
-
-
-
-
-
 
     observeCharts(callback){
         for(const chart of this.getCharts()){

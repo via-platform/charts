@@ -1,4 +1,4 @@
-const {Color} = require('via');
+const Color = require('../color');
 const {prop} = require('via-script');
 const _ = require('underscore-plus');
 

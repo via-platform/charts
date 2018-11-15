@@ -1,4 +1,5 @@
-const {Disposable, CompositeDisposable, Emitter, d3} = require('via');
+const {Disposable, CompositeDisposable, Emitter} = require('event-kit');
+const d3 = require('d3');
 const _ = require('underscore-plus');
 const ChartLayer = require('./chart-layer');
 const ChartPanelAxis = require('./chart-panel-axis');
@@ -64,10 +65,6 @@ module.exports = class ChartPanel {
         this.disposables.add(this.chart.onDidDestroy(this.destroy.bind(this)));
         // this.disposables.add(this.chart.data.onDidUpdateData(this.rescale.bind(this)));
         // this.disposables.add(this.chart.onDidUpdateOffset(this.resize.bind(this)));
-
-        this.disposables.add(via.commands.add(this.element, {
-            'charts:remove-panel': () => this.panels.remove(this)
-        }));
 
         if(state && state.layers){
             this.layers = state.layers.map(layer => ChartLayer.deserialize({chart: this.chart, panel: this, state: layer}));

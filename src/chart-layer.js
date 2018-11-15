@@ -1,4 +1,4 @@
-const {Disposable, CompositeDisposable, Emitter} = require('via');
+const {Disposable, CompositeDisposable, Emitter} = require('event-kit');
 const _ = require('underscore-plus');
 
 module.exports = class ChartLayer {
@@ -46,14 +46,6 @@ module.exports = class ChartLayer {
         }
 
         this.panel.remove(this);
-    }
-
-    async customize(){
-        const modal = await via.modal.form({height: 200}, {});
-
-        modal.on('did-change-value', data => {
-            console.log(data);
-        });
     }
 
     destroy(){

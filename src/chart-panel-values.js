@@ -1,4 +1,4 @@
-const {Disposable, CompositeDisposable, Emitter} = require('via');
+const {Disposable, CompositeDisposable, Emitter} = require('event-kit');
 const _ = require('underscore-plus');
 const etch = require('etch');
 const $ = etch.dom;
@@ -73,12 +73,6 @@ class ChartPanelValue {
         this.disposables = new CompositeDisposable();
 
         etch.initialize(this);
-
-        this.disposables.add(via.commands.add(this.element, {
-            'charts:remove-layer': () => this.layer.remove(),
-            'charts:select-layer': () => this.layer.selectable ? this.layer.select() : null,
-            'charts:customize-layer': () => this.layer.customize(),
-        }));
     }
 
     render(){

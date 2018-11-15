@@ -1,4 +1,5 @@
-const {Disposable, CompositeDisposable, Emitter, d3} = require('via');
+const {Disposable, CompositeDisposable, Emitter} = require('event-kit');
+const d3 = require('d3');
 const ChartPanel = require('./chart-panel');
 
 module.exports = class ChartPanels {
@@ -48,7 +49,7 @@ module.exports = class ChartPanels {
 
     remove(panel){
         if(panel.root){
-            return void via.console.warn('You cannot remove the center panel.');
+            return void console.warn('You cannot remove the center panel.');
         }
 
         this.panels.splice(this.panels.indexOf(panel), 1);

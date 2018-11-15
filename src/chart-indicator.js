@@ -2,7 +2,9 @@
 //functionality shared by all layers. When a new ChartIndicator is created, it is initialized
 //with a set of ChartPlots and parameters that are defined by the plugin configuration.
 
-const {CompositeDisposable, Disposable, d3, etch} = require('via');
+const {Disposable, CompositeDisposable} = require('event-kit');
+const d3 = require('d3');
+const etch = require('etch');
 const _ = require('underscore-plus');
 const ChartLayer = require('./chart-layer');
 const ChartPlot = require('./chart-plot');

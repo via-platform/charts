@@ -1,4 +1,4 @@
-const {adl} = require('via').VS;
+const {adl} = require('via-script');
 
 module.exports = {
     name: 'accumulation-distribution-line',

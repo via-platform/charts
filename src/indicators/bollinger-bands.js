@@ -1,4 +1,4 @@
-const {sma, map, merge, multiply, add, subtract, prop, deviation} = require('via').VS;
+const {sma, map, merge, multiply, add, subtract, prop, deviation} = require('via-script');
 
 module.exports = {
     name: 'bollinger-bands',

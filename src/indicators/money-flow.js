@@ -1,4 +1,4 @@
-const {map, sum, nz, divide} = require('via').VS;
+const {map, sum, nz, divide} = require('via-script');
 
 module.exports = {
     name: 'money-flow',

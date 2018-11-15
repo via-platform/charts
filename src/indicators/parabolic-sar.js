@@ -1,4 +1,4 @@
-const {sar} = require('via').VS;
+const {sar} = require('via-script');
 
 module.exports = {
     name: 'parabolic-sar',

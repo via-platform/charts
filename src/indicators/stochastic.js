@@ -1,4 +1,4 @@
-const {stochastic, sma} = require('via').VS;
+const {stochastic, sma} = require('via-script');
 
 module.exports = {
     name: 'stochastic',

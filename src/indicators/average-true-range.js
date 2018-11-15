@@ -1,4 +1,4 @@
-const {rma, wma, ema, sma, tr} = require('via').VS;
+const {rma, wma, ema, sma, tr} = require('via-script');
 
 module.exports = {
     name: 'average-true-range',

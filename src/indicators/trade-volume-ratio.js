@@ -1,4 +1,4 @@
-const {divide, prop} = require('via').VS;
+const {divide, prop} = require('via-script');
 
 module.exports = {
     name: 'trade-volume-ratio',

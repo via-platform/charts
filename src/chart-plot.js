@@ -1,6 +1,6 @@
 const _ = require('underscore-plus');
 const {etch, Color, d3} = require('via');
-const {is_series, is_array} = require('via').VS;
+const {is_series, is_array} = require('via-script');
 const $ = etch.dom;
 
 module.exports = class ChartPlot {

@@ -1,4 +1,4 @@
-const {rsi, map} = require('via').VS;
+const {rsi, map} = require('via-script');
 
 module.exports = {
     name: 'rsi',

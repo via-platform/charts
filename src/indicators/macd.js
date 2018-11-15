@@ -1,4 +1,4 @@
-const {prop, ema, subtract} = require('via').VS;
+const {prop, ema, subtract} = require('via-script');
 
 module.exports = {
     name: 'macd',

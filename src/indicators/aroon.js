@@ -1,4 +1,4 @@
-const {map, highest_bars, lowest_bars} = require('via').VS;
+const {map, highest_bars, lowest_bars} = require('via-script');
 
 module.exports = {
     name: 'aroon',

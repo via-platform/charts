@@ -1,4 +1,4 @@
-const {vwap} = require('via').VS;
+const {vwap} = require('via-script');
 
 module.exports = {
     name: 'vwap',

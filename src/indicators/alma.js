@@ -1,4 +1,4 @@
-const {alma, prop} = require('via').VS;
+const {alma, prop} = require('via-script');
 
 module.exports = {
     name: 'alma',

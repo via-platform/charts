@@ -1,4 +1,4 @@
-const {permute} = require('via').VS;
+const {permute} = require('via-script');
 
 module.exports = {
     name: 'volume',

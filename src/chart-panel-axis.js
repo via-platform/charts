@@ -33,13 +33,13 @@ module.exports = class ChartPanelAxis {
         const flag = this.svg.append('g').attr('class', 'flag');
 
         flag.append('rect')
-            .attr('x', 1)
+            // .attr('x', 1)
             .attr('y', 0)
-            .attr('width', this.chart.offset - 1)
+            // .attr('width', this.chart.offset - 1)
             .attr('height', FLAG_HEIGHT);
 
         flag.append('text')
-            .attr('x', this.chart.offset / 2)
+            // .attr('x', this.chart.offset / 2)
             .attr('y', FLAG_HEIGHT / 2 + 1)
             .attr('alignment-baseline', 'middle')
             .attr('text-anchor', 'middle');
@@ -76,8 +76,8 @@ module.exports = class ChartPanelAxis {
         this.zoomable.attr('height', this.panel.height);
         this.basis.ticks(Math.floor(this.panel.height / TICK_SPACING));
 
-        this.svg.selectAll('g.flag rect').attr('width', this.chart.offset);
-        this.svg.selectAll('g.flag text').attr('x', this.chart.offset / 2);
+        // this.svg.selectAll('g.flag rect').attr('width', this.chart.offset);
+        // this.svg.selectAll('g.flag text').attr('x', this.chart.offset / 2);
         this.svg.attr('width', this.chart.offset);
         this.zoomable.attr('width', this.chart.offset);
     }

@@ -31,7 +31,7 @@ module.exports = {
             default: 'solid'
         }
     },
-    render: ({chart, panel, element, data, parameters}) => {
+    render: ({chart, panel, element, data, parameters, options}) => {
         element.select('path').remove();
 
         if(data){
@@ -40,7 +40,7 @@ module.exports = {
             element.append('path')
                 .classed('stroke', true)
                 .attr('d', `M ${points}`)
-                .attr('stroke', parameters.stroke)
+                .attr('stroke', options.stroke ? options.stroke() : parameters.stroke)
                 .attr('stroke-width', parameters.width)
                 .attr('stroke-dasharray', parameters.style === 'solid' ? '' : (parameters.style === 'dashed' ? '5' : '2'));
         }

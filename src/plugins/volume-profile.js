@@ -181,7 +181,7 @@ module.exports = class VolumeProfile extends ChartLayer {
     }
 
     coerce(value, profile_increment){
-        return Math.floor(value / profile_increment) * profile_increment;
+        return Math.floor(value * (1 / profile_increment)) * profile_increment;
     }
 
     remove(){

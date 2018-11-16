@@ -17,6 +17,7 @@ module.exports = class ChartPlot {
 
     initialize(state = {}){
         this.parameters = {};
+        this.options = {};
 
         //First we initialize the plot defaults
         for(const [identifier, value] of Object.entries(this.plot.parameters)){
@@ -90,6 +91,7 @@ module.exports = class ChartPlot {
                 //TODO This is deliberately set to false for now, until there is a way to manually specify
                 //whether or not you want to see a price line
                 if(last_value && false){
+                    const value_string = via.fn.number.formatString(last_value.toFixed(this.panel.decimals));
                     let color = Color.parse('#FFFFFF');
 
                     //Should probably think of a better way to do this
@@ -118,8 +120,12 @@ module.exports = class ChartPlot {
                         .attr('transform', `translate(0, ${Math.round(this.panel.scale(last_value)) - 10})`)
                         .attr('fill', color.toRGBAString())
                         .select('text')
+                            .attr('x', value_string.length * 3 + 6)
                             .attr('fill', color.contrast().toRGBAString())
-                            .text(via.fn.number.formatString(last_value.toFixed(this.panel.decimals)));
+                            .text(value_string);
+
+                    this.flag.select('rect')
+                        .attr('width', value_string.length * 6 + 12);
                 }else{
                     this.track.classed('hide', true);
                     this.flag.classed('hide', true);

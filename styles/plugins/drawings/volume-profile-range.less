@@ -1,0 +1,31 @@
+@import "variables";
+
+.chart
+{
+    .panel .layer.volume-profile-range
+    {
+        rect
+        {
+            fill: fade(#9b59b6, 5%);
+        }
+
+        rect.volume-bar
+        {
+            fill: fade(#9b59b6, 50%);
+            pointer-events: none;
+        }
+
+        text
+        {
+            fill: #FFF;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        path
+        {
+            stroke-width: 1;
+            stroke: #9b59b6;
+        }
+    }
+}

@@ -1,4 +1,4 @@
-const {subtract, divide, prop, multiply, sum} = require('via').VS;
+const {multiply, divide, prop, mfm, sum} = require('via').VS;
 
 module.exports = {
     name: 'chaikin-money-flow',
@@ -26,20 +26,8 @@ module.exports = {
         }
     },
     calculate: ({series, parameters, draw}) => {
-        const high = prop(series, 'price_high');
-        const low = prop(series, 'price_low');
-        const close = prop(series, 'price_close');
         const volume = prop(series, 'volume_traded');
-
-        const mfm = divide(
-            subtract(
-                subtract(close, low),
-                subtract(high, close)
-            ),
-            subtract(high, low)
-        );
-
-        const mfv = multiply(mfm, volume);
+        const mfv = multiply(mfm(series), volume);
 
         draw('cmf', divide(sum(mfv, parameters.length), sum(volume, parameters.length)));
     }

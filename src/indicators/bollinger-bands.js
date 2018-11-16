@@ -4,6 +4,7 @@ module.exports = {
     name: 'bollinger-bands',
     title: 'Bollinger Bands',
     description: 'The n-period moving average and two bands, one standard deviation above and below the moving average.',
+    decimals: chart => chart.market ? chart.market.precision.price : 0,
     components: {
         midline: {
             type: 'line',

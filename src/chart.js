@@ -47,7 +47,7 @@ module.exports = class Chart {
         this.selected = null;
         this.offset = 1;
 
-        this.basis = d3.scaleTime().domain([new Date(Date.now() - this.granularity * 144), new Date()]);
+        this.basis = d3.scaleTime().domain([new Date(Date.now() - this.granularity * 144), new Date(Date.now() + this.granularity / 2)]);
         this.scale = this.basis.copy();
 
         this.element = document.createElement('div');
@@ -396,7 +396,7 @@ module.exports = class Chart {
         this.granularity = granularity;
 
         if(via.config.get('charts.resetZoomOnGranularityChange')){
-            this.basis.domain([new Date(Date.now() - (this.granularity || 3e5) * 144), new Date()]);
+            this.basis.domain([new Date(Date.now() - this.granularity * 144), new Date(Date.now() + this.granularity / 2)]);
             this.transform = d3.zoomIdentity;
             this.zoomed();
         }

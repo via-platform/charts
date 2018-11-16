@@ -245,7 +245,7 @@ module.exports = class ChartPanel {
         const [low, high] = this.scale.domain();
 
         //The number of significant digits is now based on the scale, not the layer domains
-        return high.toFixed(this.decimals).length * 6 + 12;
+        return via.fn.number.formatString(high.toFixed(this.decimals)).length * 6 + 12;
     }
 
     render(){

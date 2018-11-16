@@ -73,13 +73,20 @@ module.exports = class Crosshair {
         const position = Math.min(Math.max(Math.floor(this.chart.scale(candle)) - (X_FLAG_WIDTH / 2), 0), this.chart.width - this.chart.offset - X_FLAG_WIDTH);
         this.flag.attr('transform', `translate(${position}, 0)`).select('text').text(moment(candle).format('YYYY-MM-DD HH:mm:ss'));
 
+
         //Figure out which panel was the target and move the y hair and flag on that panel
         const panel = this.panels.get(target);
 
         if(panel){
-            const value = target.scale.invert(event.offsetY); //TODO properly format this number
-            panel.flag.attr('transform', `translate(0, ${event.offsetY - Math.ceil(FLAG_HEIGHT / 2)})`).select('text').text(value.toFixed(target.decimals));
+            const value = via.fn.number.formatString(target.scale.invert(event.offsetY).toFixed(target.decimals));
+
+            panel.flag.attr('transform', `translate(0, ${event.offsetY - Math.ceil(FLAG_HEIGHT / 2)})`)
+                .select('text')
+                    .attr('x', value.length * 3 + 6)
+                    .text(value);
+
             panel.crosshairs.y.attr('transform', `translate(0, ${event.offsetY - 0.5})`);
+            panel.flag.select('rect').attr('width', value.length * 6 + 12);
         }
 
         //Move the x hairs on all panels

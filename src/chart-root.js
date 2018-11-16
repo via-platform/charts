@@ -18,6 +18,7 @@ module.exports = class ChartRoot extends ChartLayer {
 
         this.destination = this.element.append('g').attr('class', 'destination');
         this.flag = this.panel.axis.flag().classed('chart-plot-flag', true).classed('hide', true);
+        this.timer = this.panel.axis.flag().classed('chart-plot-timer', true).classed('hide', true);
         this.track = this.element.append('path').attr('class', 'track').attr('stroke-dasharray', 2).attr('stroke-width', '1px');
         this.handles = this.element.append('g').attr('class', 'handles');
 
@@ -92,7 +93,6 @@ module.exports = class ChartRoot extends ChartLayer {
     }
 
     render(){
-        //TODO If selected, render the actual points, flags, and ranges
         const [start, end] = this.chart.scale.domain();
 
         this.element.classed('selected', this.selected);
@@ -113,6 +113,7 @@ module.exports = class ChartRoot extends ChartLayer {
 
             if(last_value){
                 const last_color = (last_value.price_open <= last_value.price_close) ? '#0bd691' : '#ff3b30';
+                const value_string = via.fn.number.formatString(last_value.price_close.toFixed(this.decimals));
 
                 this.track.classed('hide', false)
                     .attr('d', `M 0 ${Math.round(this.panel.scale(last_value.price_close)) - 0.5} h ${this.panel.width}`)
@@ -123,10 +124,29 @@ module.exports = class ChartRoot extends ChartLayer {
                     .attr('fill', last_color)
                     .select('text')
                         .attr('fill', '#FFFFFF')
-                        .text(via.fn.number.formatString(last_value.price_close.toFixed(this.decimals)));
+                        .attr('x', value_string.length * 3 + 6)
+                        .text(value_string);
+
+                this.flag.select('rect')
+                    .attr('width', value_string.length * 6 + 12);
+
+                // const time_string = '14:40';
+                //
+                // this.timer.classed('hide', false)
+                //     .attr('transform', `translate(0, ${Math.round(this.panel.scale(last_value.price_close)) + 10})`)
+                //     .attr('fill', last_color)
+                //     .select('text')
+                //         .attr('fill', '#FFFFFF')
+                //         .attr('x', time_string.length * 3 + 6 + (value_string.length - time_string.length) * 6)
+                //         .text(time_string);
+                //
+                // this.timer.select('rect')
+                //     .attr('x', (value_string.length - time_string.length) * 6)
+                //     .attr('width', time_string.length * 6 + 12);
             }else{
                 this.track.classed('hide', true);
                 this.flag.classed('hide', true);
+                this.timer.classed('hide', true);
             }
 
             if(this.selected){
@@ -209,6 +229,10 @@ module.exports = class ChartRoot extends ChartLayer {
     destroy(){
         if(this.flag){
             this.flag.remove();
+        }
+
+        if(this.timer){
+            this.timer.remove();
         }
 
         if(this.track){

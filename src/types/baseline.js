@@ -1,4 +1,5 @@
-const {Color, VS, UUID, d3} = require('via');
+const {Color, UUID, d3} = require('via');
+const {prop} = require('via-script');
 const _ = require('underscore-plus');
 
 module.exports = {
@@ -41,7 +42,7 @@ module.exports = {
         }
     },
     calculate: ({series, parameters}) => {
-        return VS.prop(series, parameters.property);
+        return prop(series, parameters.property);
     },
     domain: series => {
         return series.length ? [series.min(), series.max()] : [];

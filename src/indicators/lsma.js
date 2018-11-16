@@ -1,4 +1,4 @@
-const {linreg, prop} = require('via').VS;
+const {linreg, prop} = require('via-script');
 
 module.exports = {
     name: 'lsma',

@@ -1,4 +1,4 @@
-const {ema, subtract, multiply, prop} = require('via').VS;
+const {ema, subtract, multiply, prop} = require('via-script');
 
 module.exports = {
     name: 'double-ema',

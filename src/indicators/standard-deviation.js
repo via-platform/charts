@@ -1,4 +1,4 @@
-const {deviation, prop} = require('via').VS;
+const {deviation, prop} = require('via-script');
 
 module.exports = {
     name: 'standard-deviation',

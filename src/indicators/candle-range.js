@@ -1,4 +1,4 @@
-const {prop, subtract} = require('via').VS;
+const {prop, subtract} = require('via-script');
 
 module.exports = {
     name: 'candle-range',

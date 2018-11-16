@@ -1,4 +1,4 @@
-const {map} = require('via').VS;
+const {map} = require('via-script');
 
 module.exports = {
     name: 'price-volume-trend',

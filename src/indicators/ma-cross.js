@@ -1,4 +1,4 @@
-const {sma, prop, trim, iff, cross} = require('via').VS;
+const {sma, prop, trim, iff, cross} = require('via-script');
 
 module.exports = {
     name: 'ma-cross',

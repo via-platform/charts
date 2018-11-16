@@ -1,4 +1,4 @@
-const {sma, divide, multiply, prop, deviation} = require('via').VS;
+const {sma, divide, multiply, prop, deviation} = require('via-script');
 
 module.exports = {
     name: 'bollinger-bandwidth',

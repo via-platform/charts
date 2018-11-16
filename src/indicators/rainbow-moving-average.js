@@ -1,5 +1,5 @@
 const {d3} = require('via');
-const {sma, wma, ema, rma, prop} = require('via').VS;
+const {sma, wma, ema, rma, prop} = require('via-script');
 
 module.exports = {
     name: 'rainbow-moving-average',

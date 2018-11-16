@@ -1,4 +1,4 @@
-const {ema, prop, add, subtract, multiply} = require('via').VS;
+const {ema, prop, add, subtract, multiply} = require('via-script');
 
 module.exports = {
     name: 'tema',

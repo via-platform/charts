@@ -1,4 +1,4 @@
-const {prop, subtract, sma, wma, ema, rma} = require('via').VS;
+const {prop, subtract, sma, wma, ema, rma} = require('via-script');
 
 module.exports = {
     name: 'average-candle-range',

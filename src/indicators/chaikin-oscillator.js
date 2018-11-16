@@ -1,4 +1,4 @@
-const {subtract, adl, ema} = require('via').VS;
+const {subtract, adl, ema} = require('via-script');
 
 module.exports = {
     name: 'chaikin-oscillator',

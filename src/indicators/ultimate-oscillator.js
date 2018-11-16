@@ -1,4 +1,4 @@
-const {subtract, map, tr, prop, divide, sum} = require('via').VS;
+const {subtract, map, tr, prop, divide, sum} = require('via-script');
 
 module.exports = {
     name: 'ultimate-oscillator',

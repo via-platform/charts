@@ -1,4 +1,4 @@
-const {multiply, divide, prop, mfm, sum} = require('via').VS;
+const {subtract, divide, prop, multiply, sum} = require('via-script');
 
 module.exports = {
     name: 'chaikin-money-flow',

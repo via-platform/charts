@@ -1,6 +1,6 @@
 //This file contains the base functionality for the root plot.
 
-const {CompositeDisposable, Disposable, d3, VS, etch} = require('via');
+const {CompositeDisposable, Disposable, d3, etch} = require('via');
 const _ = require('underscore-plus');
 const ChartLayer = require('./chart-layer');
 const $ = etch.dom;

@@ -1,4 +1,4 @@
-const {prop} = require('via').VS;
+const {prop} = require('via-script');
 
 module.exports = {
     name: 'volume-notional',

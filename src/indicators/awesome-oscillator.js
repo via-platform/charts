@@ -1,4 +1,4 @@
-const {subtract, sma, prop} = require('via').VS;
+const {subtract, sma, prop} = require('via-script');
 
 module.exports = {
     name: 'awesome-oscillator',

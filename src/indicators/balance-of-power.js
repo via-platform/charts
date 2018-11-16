@@ -1,4 +1,4 @@
-const {subtract, divide, prop} = require('via').VS;
+const {subtract, divide, prop} = require('via-script');
 
 module.exports = {
     name: 'balance-of-power',

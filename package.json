@@ -16,7 +16,8 @@
     "etch": "^0.12.5",
     "moment": "^2.20.1",
     "moment-duration-format": "^2.2.2",
-    "underscore-plus": "^1.6.6"
+    "underscore-plus": "^1.6.6",
+    "via-script": "^0.1.0"
   },
   "engines": {
     "via": "^0.9.1-alpha"

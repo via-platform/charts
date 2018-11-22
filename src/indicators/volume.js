@@ -15,10 +15,12 @@ module.exports = {
     },
     parameters: {
         up: {
+            title: 'Buy Color',
             type: 'color',
             default: '#0bd691'
         },
         down: {
+            title: 'Sell Color',
             type: 'color',
             default: '#ff3b30'
         }

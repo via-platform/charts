@@ -8,7 +8,7 @@ module.exports = {
     components: {
         midline: {
             type: 'line',
-            title: 'Bollinger Value',
+            title: 'Bollinger Midline',
             parameters: {
                 stroke: '#4594eb',
                 style: 'dashed',
@@ -40,7 +40,8 @@ module.exports = {
             title: 'Range',
             trackable: false,
             parameters: {
-                fill: 'rgba(69, 148, 235, 0.1)'
+                fill: '#4594eb',
+                opacity: 10
             }
         }
     },
@@ -61,14 +62,18 @@ module.exports = {
         length: {
             title: 'Length',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 200,
+            step: 1,
             default: 20,
             legend: true
         },
         deviations: {
-            title: 'Standard Deviation',
-            type: 'integer',
-            constraint: x => (x > 1 && x <= 5),
+            title: 'Standard Deviations',
+            type: 'number',
+            min: 2,
+            max: 5,
+            step: 1,
             default: 2,
             legend: true
         }

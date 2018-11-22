@@ -8,6 +8,7 @@ module.exports = {
     panel: 'true',
     components: {
         k: {
+            title: 'K',
             type: 'plot',
             parameters: {
                 color: '#4594eb',
@@ -15,6 +16,7 @@ module.exports = {
             }
         },
         d: {
+            title: 'D',
             type: 'plot',
             parameters: {
                 color: '#f39c12',
@@ -26,7 +28,8 @@ module.exports = {
             title: 'Upper Limit',
             trackable: false,
             parameters: {
-                stroke: 'rgba(69, 148, 235, 0.5)',
+                fill: '#4594eb',
+                opacity: 50,
                 style: 'dashed'
             }
         },
@@ -35,7 +38,8 @@ module.exports = {
             title: 'Lower Limit',
             trackable: false,
             parameters: {
-                stroke: 'rgba(69, 148, 235, 0.5)',
+                fill: '#4594eb',
+                opacity: 50,
                 style: 'dashed'
             }
         },
@@ -44,7 +48,8 @@ module.exports = {
             title: 'Range',
             trackable: false,
             parameters: {
-                fill: 'rgba(69, 148, 235, 0.1)'
+                fill: '#4594eb',
+                opacity: 10
             }
         }
     },
@@ -52,21 +57,27 @@ module.exports = {
         length: {
             title: 'Length',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 200,
+            step: 1,
             default: 14,
             legend: true
         },
         k: {
             title: 'K Smoothing',
             type: 'number',
-            constraint: x => (x >= 1 && x <= 200),
+            min: 2,
+            max: 200,
+            step: 1,
             default: 3,
             legend: true
         },
         d: {
             title: 'D Smoothing',
             type: 'number',
-            constraint: x => (x >= 1 && x <= 200),
+            min: 2,
+            max: 200,
+            step: 1,
             default: 3,
             legend: true
         },
@@ -74,14 +85,18 @@ module.exports = {
             title: 'Upper Limit',
             type: 'integer',
             legend: false,
-            constraint: x => x => 0 && x <= 100,
+            min: 0,
+            max: 100,
+            step: 1,
             default: 80
         },
         lower_limit: {
             title: 'Lower Limit',
             type: 'integer',
             legend: false,
-            constraint: x => x => 0 && x <= 100,
+            min: 0,
+            max: 100,
+            step: 1,
             default: 20
         }
     },

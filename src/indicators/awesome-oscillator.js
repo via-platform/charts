@@ -9,9 +9,10 @@ module.exports = {
     panel: true,
     components: {
         ao: {
+            title: 'Awesome Oscillator',
             type: 'plot',
             parameters: {
-                color: '#CCC',
+                color: '#CCCCCC',
                 style: 'histogram'
             }
         }

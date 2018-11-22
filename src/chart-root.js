@@ -106,7 +106,8 @@ module.exports = class ChartRoot extends ChartLayer {
                 element: this.destination,
                 data,
                 selected: this.selected,
-                parameters: this.parameters[this.type.name]
+                parameters: this.parameters[this.type.name],
+                layer: this
             });
 
             const last_value = (this.type.name === 'heikin-ashi') ? this.data.last() : this.chart.data.all().last();
@@ -150,6 +151,7 @@ module.exports = class ChartRoot extends ChartLayer {
             }
 
             if(this.selected){
+                return;
                 const handle_points = data.filter(([x]) => (x.getTime() / this.chart.granularity) % 10 === 0);
 
                 let formatted_data = null;
@@ -224,6 +226,48 @@ module.exports = class ChartRoot extends ChartLayer {
 
     onDidChangeType(callback){
         return this.emitter.on('did-change-type', callback);
+    }
+
+    customize(){
+        const parameters = this.parameters[this.type.name];
+        const defaults = this.type.parameters;
+
+        const fields = [
+            {
+                name: 'show-last-value-line',
+                title: 'Show Last Value Line',
+                type: 'boolean',
+                default: true
+            },
+            {
+                name: 'show-last-value-flag',
+                title: 'Show Last Value Flag',
+                type: 'boolean',
+                default: true
+            },
+            {
+                title: this.type.title,
+                type: 'group',
+                fields: Object.entries(defaults).map(([name, value]) => Object.assign({name}, value))
+            }
+        ];
+
+        const values = {
+            ...parameters,
+            'show-last-value-line': true,
+            'show-last-value-flag': true
+        };
+
+        //Each layer is made up of the chart type parameters plus some
+        //default chart parameters that make up every chart
+
+        via.modal.configuration({title: `Configure ${this.title()}`, confirmText: 'Done'}, fields, values)
+        .then(modal => {
+            modal.on('did-change-value', ({field, value}) => {
+                this.parameters[this.type.name][field] = value;
+                this.render();
+            });
+        });
     }
 
     destroy(){

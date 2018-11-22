@@ -10,6 +10,14 @@ module.exports = {
             type: 'color',
             default: '#0000FF'
         },
+        opacity: {
+            title: 'Fill Opacity',
+            type: 'number',
+            min: 1,
+            max: 100,
+            step: 1,
+            default: 10
+        },
         visible: {
             title: 'Visible',
             type: 'boolean',
@@ -28,7 +36,8 @@ module.exports = {
             element.append('path')
                 .datum(data.array())
                 .attr('d', area)
-                .attr('fill', parameters.fill);
+                .attr('fill', parameters.fill)
+                .attr('fill-opacity', parameters.opacity / 100);
         }
     }
 };

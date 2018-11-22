@@ -15,10 +15,12 @@ module.exports = {
     },
     parameters: {
         up: {
+            title: 'Positive Color',
             type: 'color',
             default: '#0bd691'
         },
         down: {
+            title: 'Negative Color',
             type: 'color',
             default: '#ff3b30'
         }

@@ -8,6 +8,7 @@ module.exports = {
     decimals: chart => chart.market ? chart.market.precision.price : 0,
     components: {
         fast: {
+            title: 'Fast Line',
             type: 'plot',
             parameters: {
                 color: '#3498db',
@@ -15,6 +16,7 @@ module.exports = {
             }
         },
         slow: {
+            title: 'Slow Line',
             type: 'plot',
             parameters: {
                 color: '#f39c12',
@@ -22,6 +24,7 @@ module.exports = {
             }
         },
         cross: {
+            title: 'Cross',
             type: 'plot',
             parameters: {
                 color: '#ecf0f1',
@@ -47,14 +50,18 @@ module.exports = {
         fast: {
             title: 'Fast Length',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 200,
+            step: 1,
             default: 9,
             legend: true
         },
         slow: {
             title: 'Slow Length',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 200,
+            step: 1,
             default: 21,
             legend: true
         }

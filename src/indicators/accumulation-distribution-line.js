@@ -9,6 +9,7 @@ module.exports = {
     panel: true,
     components: {
         adl: {
+            title: 'ADL',
             type: 'plot',
             parameters: {
                 color: '#eb2f06',

@@ -8,9 +8,10 @@ module.exports = {
     decimals: chart => chart.market ? chart.market.precision.price : 0,
     components: {
         alma: {
+            title: 'ALMA',
             type: 'plot',
             parameters: {
-                color: '#FFF',
+                color: '#FFFFFF',
                 style: 'line'
             }
         }
@@ -32,21 +33,27 @@ module.exports = {
         length: {
             title: 'Length',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 200,
+            step: 1,
             default: 9,
             legend: true
         },
         offset: {
             title: 'Offset',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 0.1,
+            max: 200,
+            step: 0.01,
             default: 0.85,
             legend: true
         },
         sigma: {
             title: 'Sigma',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 200,
+            step: 1,
             default: 6,
             legend: true
         }

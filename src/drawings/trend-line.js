@@ -1,7 +1,7 @@
 module.exports = {
-    name: 'arbitrary-line',
-    title: 'Line',
-    description: 'Draw an arbitrary line on the chart.',
+    name: 'trend-line',
+    title: 'Trend Line',
+    description: 'Draw a trend line on the chart.',
     points: 2,
     selectable: true,
     parameters: {},

@@ -9,8 +9,8 @@ module.exports = {
     decimals: () => 4,
     components: {
         bandwidth: {
-            type: 'plot',
             title: 'Bollinger Value',
+            type: 'plot',
             parameters: {
                 style: 'line',
                 color: '#16a085'
@@ -34,14 +34,18 @@ module.exports = {
         length: {
             title: 'Length',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 200,
+            step: 1,
             default: 20,
             legend: true
         },
         deviations: {
-            title: 'Standard Deviation',
+            title: 'Standard Deviations',
             type: 'integer',
-            constraint: x => (x > 1 && x <= 5),
+            min: 2,
+            max: 5,
+            step: 1,
             default: 2,
             legend: true
         }

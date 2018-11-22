@@ -11,7 +11,7 @@ module.exports = {
             type: 'plot',
             title: 'Ratio',
             parameters: {
-                color: '#FFF',
+                color: '#FFFFFF',
                 style: 'circle'
             }
         },
@@ -20,7 +20,7 @@ module.exports = {
             title: 'Baseline',
             trackable: false,
             parameters: {
-                stroke: '#FFF',
+                stroke: '#FFFFFF',
                 style: 'dashed'
             }
         }

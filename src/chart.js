@@ -19,7 +19,6 @@ module.exports = class Chart {
             deserializer: 'Chart',
             uri: this.getURI(),
             granularity: this.granularity,
-            transform: this.transform,
             group: this.group ? this.group.color : ''
             // panels: this.panels.serialize()
         };
@@ -47,7 +46,7 @@ module.exports = class Chart {
         this.selected = null;
         this.offset = 1;
 
-        this.basis = d3.scaleTime().domain([new Date(Date.now() - this.granularity * 144), new Date(Date.now() + this.granularity / 2)]);
+        this.basis = d3.scaleTime().domain([new Date(Date.now() - this.granularity * 143), new Date(Date.now() + this.granularity)]);
         this.scale = this.basis.copy();
 
         this.element = document.createElement('div');
@@ -120,14 +119,6 @@ module.exports = class Chart {
             this.changeMarket(market);
         }else if(method === 'public'){
             //TODO fetch state from server
-        }
-
-        if(state.transform){
-            //TODO, the chart doesn't draw immediately when the transform is applied. No clue why.
-            // console.log(this.transform);
-            // this.transform = this.transform.scale(state.transform.k).translate(state.transform.x, state.transform.y);
-            // this.zoomed();
-            // console.log(this.transform);
         }
 
         this.initialized = true;
@@ -396,7 +387,7 @@ module.exports = class Chart {
         this.granularity = granularity;
 
         if(via.config.get('charts.resetZoomOnGranularityChange')){
-            this.basis.domain([new Date(Date.now() - this.granularity * 144), new Date(Date.now() + this.granularity / 2)]);
+            this.basis.domain([new Date(Date.now() - this.granularity * 143), new Date(Date.now() + this.granularity)]);
             this.transform = d3.zoomIdentity;
             this.zoomed();
         }

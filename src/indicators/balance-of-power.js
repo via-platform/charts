@@ -8,6 +8,7 @@ module.exports = {
     panel: true,
     components: {
         balance: {
+            title: 'Balance of Power',
             type: 'plot',
             parameters: {
                 color: '#eb2f06',

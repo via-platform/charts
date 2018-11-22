@@ -65,7 +65,7 @@ module.exports = class ChartIndicator extends ChartLayer {
         for(const plot of Object.values(this.components)){
             const [low, high] = plot.domain;
 
-            if(_.isNumber(low)){
+            if(_.isNumber(low) && !_.isNaN(low)){
                 min.push(low);
                 max.push(high);
             }
@@ -127,5 +127,47 @@ module.exports = class ChartIndicator extends ChartLayer {
         }
 
         return values.length ? $.div({}, values) : '';
+    }
+
+    customize(){
+        //Each layer is made up of parameters, plus one or more plugins' parameters
+        //The main indicator's parameters will make up the root options
+        //After that, there will be one or more groups, one for each plot
+
+        const fields = Object.entries(this.plugin.parameters).map(([name, value]) => Object.assign({name}, value));
+        const values = Object.assign({}, this.parameters);
+
+        for(const [name, {component, plot, parameters}] of Object.entries(this.components)){
+            const group = {
+                title: component.title,
+                type: 'group',
+                fields: Object.entries(plot.parameters).map(([key, value]) => Object.assign({name: `${name}.${key}`}, value))
+            };
+
+            fields.push(group);
+
+            for(const [key, value] of Object.entries(parameters)){
+                values[`${name}.${key}`] = value;
+            }
+        }
+
+        via.modal.configuration({title: `Configure ${this.title()}`, confirmText: 'Done'}, fields, values)
+        .then(modal => {
+            modal.on('did-change-value', ({field, value}) => {
+                if(field.indexOf('.') === -1){
+                    //We've updated a main parameter
+                    this.parameters[field] = value;
+                    this.chart.recalculate();
+                }else{
+                    //We've updated a parameter for one of our components
+                    const [component, parameter] = field.split('.');
+
+                    this.components[component].parameters[parameter] = value;
+
+                    //We only need to render the single plot, not the whole indicator
+                    this.components[component].render();
+                }
+            });
+        });
     }
 }

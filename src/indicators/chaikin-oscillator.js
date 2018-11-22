@@ -8,6 +8,7 @@ module.exports = {
     panel: true,
     components: {
         oscillator: {
+            title: 'Chaikin Oscillator',
             type: 'plot',
             parameters: {
                 color: '#eb2f06',
@@ -15,11 +16,11 @@ module.exports = {
             }
         },
         baseline: {
-            type: 'horizontal-line',
             title: 'Baseline',
+            type: 'horizontal-line',
             trackable: false,
             parameters: {
-                stroke: '#AAA',
+                stroke: '#AAAAAA',
                 style: 'dashed'
             }
         },
@@ -28,14 +29,18 @@ module.exports = {
         fast: {
             title: 'Fast Length',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 100,
+            step: 1,
             default: 3,
             legend: true
         },
         slow: {
             title: 'Slow Length',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 100,
+            step: 1,
             default: 10,
             legend: true
         }

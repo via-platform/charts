@@ -74,6 +74,8 @@ module.exports = class ChartPlot {
         if(this.plot){
             const [start, end] = this.chart.scale.domain();
 
+            this.element.classed('hide', !this.parameters.visible);
+
             this.plot.render({
                 chart: this.chart,
                 panel: this.panel,
@@ -85,12 +87,11 @@ module.exports = class ChartPlot {
                 parameters: this.parameters
             });
 
-            if(this.plot.trackable){
+            if(this.plot.trackable && this.parameters.track && this.parameters.visible){
+                const last_entry = this.data[this.data.length - 1];
                 const last_value = this.data.last();
 
-                //TODO This is deliberately set to false for now, until there is a way to manually specify
-                //whether or not you want to see a price line
-                if(last_value && false){
+                if(!_.isUndefined(last_value)){
                     const value_string = via.fn.number.formatString(last_value.toFixed(this.panel.decimals));
                     let color = Color.parse('#FFFFFF');
 
@@ -99,11 +100,11 @@ module.exports = class ChartPlot {
                     //different ways, depending on the type of the chart plot
 
                     if(this.options.fill){
-                        color = Color.parse(this.options.fill(last_value, this.data.length - 1, this.data));
+                        color = Color.parse(this.options.fill(last_entry, this.data.length - 1, this.data));
                     }else if(this.options.stroke){
-                        color = Color.parse(this.options.stroke(last_value, this.data.length - 1, this.data));
+                        color = Color.parse(this.options.stroke(last_entry, this.data.length - 1, this.data));
                     }else if(this.options.color){
-                        color = Color.parse(this.options.color(last_value, this.data.length - 1, this.data));
+                        color = Color.parse(this.options.color(last_entry, this.data.length - 1, this.data));
                     }else if(this.parameters.color){
                         color = Color.parse(this.parameters.color);
                     }else if(this.parameters.fill){
@@ -126,26 +127,27 @@ module.exports = class ChartPlot {
 
                     this.flag.select('rect')
                         .attr('width', value_string.length * 6 + 12);
-                }else{
-                    this.track.classed('hide', true);
-                    this.flag.classed('hide', true);
                 }
+            }else if(this.plot.trackable){
+                this.track.classed('hide', true);
+                this.flag.classed('hide', true);
+            }
 
-                if(this.layer.selected){
-                    const handle_points = this.data.filter(([x]) => (x.getTime() / this.chart.granularity) % 10 === 0);
-                    const handles = this.element.selectAll('circle').data(handle_points);
+            if(this.layer.selected && this.parameters.visible){
+                return;
+                const handle_points = this.data.filter(([x]) => (x.getTime() / this.chart.granularity) % 10 === 0);
+                const handles = this.element.selectAll('circle').data(handle_points);
 
-                    handles.enter()
-                            .append('circle')
-                        .merge(handles)
-                            .raise()
-                            .attr('class', 'handle')
-                            .attr('cx', ([x]) => this.chart.scale(x))
-                            .attr('cy', ([x, y]) => this.panel.scale(y))
-                            .attr('r', 5);
+                handles.enter()
+                        .append('circle')
+                    .merge(handles)
+                        .raise()
+                        .attr('class', 'handle')
+                        .attr('cx', ([x]) => this.chart.scale(x))
+                        .attr('cy', ([x, y]) => this.panel.scale(y))
+                        .attr('r', 5);
 
-                    handles.exit().remove();
-                }
+                handles.exit().remove();
             }
         }
     }
@@ -192,11 +194,11 @@ module.exports = class ChartPlot {
                     let color = Color.parse('#FFFFFF');
 
                     if(this.options.fill){
-                        color = Color.parse(this.options.fill(value, this.data.indexOf(datum), this.data));
+                        color = Color.parse(this.options.fill(datum, this.data.indexOf(datum), this.data));
                     }else if(this.options.stroke){
-                        color = Color.parse(this.options.stroke(value, this.data.indexOf(datum), this.data));
+                        color = Color.parse(this.options.stroke(datum, this.data.indexOf(datum), this.data));
                     }else if(this.options.color){
-                        color = Color.parse(this.options.color(value, this.data.indexOf(datum), this.data));
+                        color = Color.parse(this.options.color(datum, this.data.indexOf(datum), this.data));
                     }else if(this.parameters.color){
                         color = Color.parse(this.parameters.color);
                     }else if(this.parameters.fill){

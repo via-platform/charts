@@ -22,7 +22,7 @@ module.exports = {
         stroke: {
             title: 'Stroke Color',
             type: 'color',
-            default: '#FFF'
+            default: '#FFFFFF'
         },
         fill: {
             title: 'Fill Color',

@@ -11,7 +11,7 @@ module.exports = {
             type: 'plot',
             title: 'Ratio',
             parameters: {
-                color: '#FFF',
+                color: '#FFFFFF',
                 style: 'circle'
             }
         },
@@ -20,17 +20,19 @@ module.exports = {
             title: 'Baseline',
             trackable: false,
             parameters: {
-                stroke: '#FFF',
+                stroke: '#FFFFFF',
                 style: 'dashed'
             }
         }
     },
     parameters: {
         up: {
+            title: 'Positive Ratio Color',
             type: 'color',
             default: '#0bd691'
         },
         down: {
+            title: 'Negative Ratio Color',
             type: 'color',
             default: '#ff3b30'
         }

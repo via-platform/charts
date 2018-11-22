@@ -8,6 +8,7 @@ module.exports = {
     panel: true,
     components: {
         up: {
+            title: 'Aroon Up',
             type: 'plot',
             parameters: {
                 color: '#f39c12',
@@ -15,6 +16,7 @@ module.exports = {
             }
         },
         down: {
+            title: 'Aroon Down',
             type: 'plot',
             parameters: {
                 color: '#4594eb',
@@ -26,7 +28,9 @@ module.exports = {
         length: {
             title: 'Length',
             type: 'number',
-            constraint: x => (x > 1 && x <= 100),
+            min: 2,
+            max: 100,
+            step: 1,
             default: 14,
             legend: true
         }

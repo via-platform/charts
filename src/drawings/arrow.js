@@ -1,8 +1,8 @@
 module.exports = {
-    name: 'horizontal-line',
-    title: 'Horizontal Line',
-    description: 'Draw a horizontal line on the chart.',
-    points: 1,
+    name: 'arrow',
+    title: 'Arrow',
+    description: 'Draw an arrow line on the chart.',
+    points: 2,
     selectable: true,
     parameters: {
         stroke: {
@@ -14,7 +14,7 @@ module.exports = {
             title: 'Stroke Width',
             type: 'number',
             enum: [1, 1.5, 2, 2.5],
-            default: 1
+            default: 1.5
         },
         style: {
             title: 'Stroke Style',
@@ -24,16 +24,16 @@ module.exports = {
         }
     },
     render: ({chart, panel, element, points}) => {
-        const [point] = points;
+        const [start, end] = points;
+
+        const sx = chart.scale(start.x);
+        const ex = chart.scale(end.x);
+        const sy = panel.scale(start.y);
+        const ey = panel.scale(end.y);
 
         element.selectAll('path').remove();
 
         element.append('path')
-            .attr('d', `M 0 ${Math.floor(panel.scale(point.y)) - 0.5} h ${panel.width}`)
-            .attr('stroke', '#FFFFFF')
-            .attr('stroke-dasharray', 2)
-            .attr('stroke-width', 1);
-
-        element.append('path').attr('d', `M 0 ${Math.floor(panel.scale(point.y)) - 3} v 7 h ${panel.width} v -7 Z`);
+            .attr('d', `M ${sx} ${sy} L ${ex} ${ey}`);
     }
 };

@@ -18,15 +18,30 @@ module.exports = {
     name: 'cluster',
     title: 'Cluster',
     parameters: {
+        low: {
+            title: 'Low Volume Color',
+            type: 'color',
+            default: '#002248'
+        },
+        high: {
+            title: 'High Volume Color',
+            type: 'color',
+            default: '#288eff'
+        },
         positive: {
-            title: 'Positive Color',
+            title: 'Positive Bar Color',
             type: 'color',
             default: '#0bd691'
         },
         negative: {
-            title: 'Negative Color',
+            title: 'Negative Bar Color',
             type: 'color',
             default: '#ff3b30'
+        },
+        text: {
+            title: 'Text Color',
+            type: 'color',
+            default: '#FFFFFF'
         }
     },
     domain: series => {
@@ -39,7 +54,7 @@ module.exports = {
         if(data){
             let profile_increment = data.prop('profile_increment').max();
             const [high, low] = panel.scale.domain();
-            const default_color_scale = d3.scaleLinear().range(['#002248', '#288eff']);
+            const default_color_scale = d3.scaleLinear().range([parameters.low, parameters.high]);
             const original_candles = new Map();
 
             for(const [k, v] of data){
@@ -136,7 +151,7 @@ module.exports = {
             price_level_entries.append('path');
 
             price_level_entries.append('text')
-                .attr('fill', '#FFF')
+                .attr('fill', parameters.text)
                 .attr('alignment-baseline', 'middle')
                 .attr('text-anchor', 'middle');
 

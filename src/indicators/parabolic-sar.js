@@ -18,22 +18,25 @@ module.exports = {
         start: {
             title: 'Start',
             type: 'number',
-            constraint: value => (value >= 0 && value <= 1),
-            increment: 0.01,
+            min: 0,
+            max: 1,
+            step: 0.01,
             default: 0.02
         },
         increment: {
             title: 'Increment',
             type: 'number',
-            constraint: value => (value >= 0 && value <= 1),
-            increment: 0.01,
+            min: 0,
+            max: 1,
+            step: 0.01,
             default: 0.02
         },
         max: {
             title: 'Max Value',
             type: 'number',
-            constraint: value => (value > 0 && value <= 10),
-            increment: 0.1,
+            min: 1,
+            max: 10,
+            step: 0.1,
             default: 0.2
         }
     },

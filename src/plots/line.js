@@ -8,16 +8,6 @@ module.exports = {
             type: 'color',
             default: '#0000FF'
         },
-        visible: {
-            title: 'Visible',
-            type: 'boolean',
-            default: true
-        },
-        track: {
-            title: 'Track Value',
-            type: 'boolean',
-            default: false
-        },
         width: {
             title: 'Stroke Width',
             type: 'number',
@@ -29,6 +19,24 @@ module.exports = {
             type: 'string',
             enum: ['solid', 'dashed', 'dotted'],
             default: 'solid'
+        },
+        opacity: {
+            title: 'Opacity',
+            type: 'number',
+            min: 0,
+            max: 100,
+            step: 1,
+            default: 100
+        },
+        visible: {
+            title: 'Visible',
+            type: 'boolean',
+            default: true
+        },
+        track: {
+            title: 'Track Value',
+            type: 'boolean',
+            default: false
         }
     },
     render: ({chart, panel, element, data, parameters, options}) => {
@@ -40,6 +48,7 @@ module.exports = {
             element.append('path')
                 .classed('stroke', true)
                 .attr('d', `M ${points}`)
+                .attr('opacity', parameters.opacity / 100)
                 .attr('stroke', options.stroke ? options.stroke() : parameters.stroke)
                 .attr('stroke-width', parameters.width)
                 .attr('stroke-dasharray', parameters.style === 'solid' ? '' : (parameters.style === 'dashed' ? '5' : '2'));

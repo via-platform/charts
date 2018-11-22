@@ -29,6 +29,7 @@ module.exports = {
     drawing: [
         require('./drawings/horizontal-line'),
         require('./drawings/vertical-line'),
+        require('./drawings/cross-line'),
         require('./drawings/measure'),
         require('./drawings/volume-profile-range'),
         require('./drawings/date-range'),
@@ -38,8 +39,10 @@ module.exports = {
         require('./drawings/rectangle'),
         require('./drawings/triangle'),
         require('./drawings/parallelogram'),
-        require('./drawings/arbitrary-line'),
+        require('./drawings/trend-line'),
+        require('./drawings/info-line'),
         require('./drawings/polyline'),
+        require('./drawings/trend-angle'),
         require('./drawings/fibonacci-retracement')
     ],
     indicator: [
@@ -88,6 +91,7 @@ module.exports = {
         require('./plugins/core/granularity'),
         require('./plugins/core/draw'),
         require('./plugins/crosshair'),
+        require('./plugins/screenshot'),
         require('./plugins/bid-ask'),
         // require('./plugins/local-high-low'),
         require('./plugins/volume-profile'),

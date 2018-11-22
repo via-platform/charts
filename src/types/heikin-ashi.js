@@ -11,17 +11,7 @@ module.exports = {
         down: {
             title: 'Down Candle Color',
             type: 'color',
-            default: 'rgb(255, 59, 48)'
-        },
-        actual: {
-            title: 'Show Last Price',
-            type: 'boolean',
-            default: false
-        },
-        stroke: {
-            title: 'Stroke Color',
-            type: 'color',
-            default: 'rgba(0, 0, 0, 0)'
+            default: '#ff3b30'
         }
     },
     calculate: ({series}) => {

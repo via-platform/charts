@@ -8,8 +8,8 @@ module.exports = {
     decimals: chart => chart.market ? chart.market.precision.price : 0,
     components: {
         average: {
-            type: 'plot',
             title: 'Average Candle Range',
+            type: 'plot',
             parameters: {
                 style: 'line',
                 color: '#95a5a6'
@@ -31,7 +31,9 @@ module.exports = {
         length: {
             title: 'Length',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 200,
+            step: 1,
             default: 9,
             legend: true
         }

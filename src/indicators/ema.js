@@ -8,6 +8,7 @@ module.exports = {
     decimals: chart => chart.market ? chart.market.precision.price : 0,
     components: {
         ema: {
+            title: 'EMA',
             type: 'plot',
             parameters: {
                 color: '#f1c40f',
@@ -32,7 +33,9 @@ module.exports = {
         length: {
             title: 'Length',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 200,
+            step: 1,
             default: 9,
             legend: true
         }

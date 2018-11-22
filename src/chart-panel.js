@@ -195,7 +195,7 @@ module.exports = class ChartPanel {
             for(const layer of this.layers){
                 const [low, high] = layer.domain;
 
-                if(_.isNumber(low)){
+                if(_.isNumber(low) && !_.isNaN(low)){
                     min.push(low);
                     max.push(high);
                 }

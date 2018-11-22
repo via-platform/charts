@@ -20,7 +20,8 @@ module.exports = {
             title: 'Upper Limit',
             trackable: false,
             parameters: {
-                stroke: 'rgba(69, 148, 235, 0.5)',
+                fill: '#4594eb',
+                opacity: 50,
                 style: 'dashed'
             }
         },
@@ -29,7 +30,8 @@ module.exports = {
             title: 'Lower Limit',
             trackable: false,
             parameters: {
-                stroke: 'rgba(69, 148, 235, 0.5)',
+                fill: '#4594eb',
+                opacity: 50,
                 style: 'dashed'
             }
         },
@@ -38,7 +40,8 @@ module.exports = {
             title: 'Range',
             trackable: false,
             parameters: {
-                fill: 'rgba(69, 148, 235, 0.1)'
+                fill: '#4594eb',
+                opacity: 10
             }
         }
     },
@@ -46,20 +49,26 @@ module.exports = {
         length: {
             title: 'Length',
             type: 'number',
-            constraint: x => x => 0 && x <= 100,
+            min: 2,
+            max: 100,
+            step: 1,
             default: 14,
             legend: true
         },
         upper_limit: {
             title: 'Upper Limit',
             type: 'integer',
-            constraint: x => x => 0 && x <= 100,
+            min: 0,
+            max: 100,
+            step: 1,
             default: 70
         },
         lower_limit: {
             title: 'Lower Limit',
             type: 'integer',
-            constraint: x => x => 0 && x <= 100,
+            min: 0,
+            max: 100,
+            step: 1,
             default: 30
         }
     },

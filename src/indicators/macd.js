@@ -8,6 +8,7 @@ module.exports = {
     panel: 'true',
     components: {
         macd: {
+            title: 'MACD',
             type: 'plot',
             parameters: {
                 color: '#4594eb',
@@ -15,6 +16,7 @@ module.exports = {
             }
         },
         signal: {
+            title: 'Signal Line',
             type: 'plot',
             parameters: {
                 color: '#f39c12',
@@ -22,6 +24,7 @@ module.exports = {
             }
         },
         histogram: {
+            title: 'Histogram',
             type: 'plot',
             parameters: {
                 style: 'histogram'
@@ -45,37 +48,47 @@ module.exports = {
         fast: {
             title: 'Fast Length',
             type: 'number',
-            constraint: x => (x >= 1 && x <= 200),
+            min: 2,
+            max: 200,
+            step: 1,
             default: 12,
             legend: true
         },
         slow: {
             title: 'Slow length',
             type: 'number',
-            constraint: x => (x >= 1 && x <= 200),
+            min: 2,
+            max: 200,
+            step: 1,
             default: 26,
             legend: true
         },
         smoothing: {
             title: 'Signal Smoothing',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 200,
+            step: 1,
             default: 9,
             legend: true
         },
         positive_up: {
+            title: 'Increasing Positive',
             type: 'color',
             default: '#0bd691'
         },
         positive_down: {
+            title: 'Decreasing Positive',
             type: 'color',
             default: '#a8dfcc'
         },
         negative_up: {
+            title: 'Increasing Negative',
             type: 'color',
             default: '#ff8a83'
         },
         negative_down: {
+            title: 'Decreasing Negative',
             type: 'color',
             default: '#ff3b30'
         }

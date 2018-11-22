@@ -9,6 +9,7 @@ module.exports = {
     panel: true,
     components: {
         uo: {
+            title: 'Ultimate Oscillator',
             type: 'plot',
             parameters: {
                 color: '#f1c40f',
@@ -20,21 +21,27 @@ module.exports = {
         fast: {
             title: 'Fast Length',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 100,
+            step: 1,
             default: 7,
             legend: true
         },
         medium: {
             title: 'Medium Length',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 100,
+            step: 1,
             default: 14,
             legend: true
         },
         slow: {
             title: 'Slow Length',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 100,
+            step: 1,
             default: 28,
             legend: true
         }

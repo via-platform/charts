@@ -12,7 +12,7 @@ module.exports = {
             type: 'plot',
             title: 'Price Volume Trend',
             parameters: {
-                color: '#FFF',
+                color: '#FFFFFF',
                 style: 'line'
             }
         }

@@ -8,11 +8,11 @@ module.exports = {
     decimals: chart => chart.market ? chart.market.precision.price : 0,
     components: {
         range: {
-            type: 'plot',
             title: 'Candle Range',
+            type: 'plot',
             parameters: {
                 style: 'histogram',
-                color: '#AAA'
+                color: '#AAAAAA'
             }
         }
     },

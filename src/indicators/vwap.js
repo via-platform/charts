@@ -7,6 +7,7 @@ module.exports = {
     decimals: chart => chart.market ? chart.market.precision.price : 0,
     components: {
         vwap: {
+            title: 'VWAP',
             type: 'plot',
             parameters: {
                 color: '#8e44ad',

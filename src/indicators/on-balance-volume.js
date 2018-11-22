@@ -12,7 +12,7 @@ module.exports = {
             type: 'plot',
             title: 'On Balance Volume',
             parameters: {
-                color: '#FFF',
+                color: '#FFFFFF',
                 style: 'line'
             }
         }

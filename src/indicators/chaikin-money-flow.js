@@ -9,6 +9,7 @@ module.exports = {
     panel: true,
     components: {
         cmf: {
+            title: 'Chaikin Money Flow',
             type: 'plot',
             parameters: {
                 color: '#eb2f06',
@@ -20,7 +21,9 @@ module.exports = {
         length: {
             title: 'Length',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 100,
+            step: 1,
             default: 21,
             legend: true
         }

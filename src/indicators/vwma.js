@@ -8,9 +8,10 @@ module.exports = {
     decimals: chart => chart.market ? chart.market.precision.price : 0,
     components: {
         vwma: {
+            title: 'VWMA',
             type: 'plot',
             parameters: {
-                color: '#FFF',
+                color: '#FFFFFF',
                 style: 'line'
             }
         }
@@ -32,7 +33,9 @@ module.exports = {
         length: {
             title: 'Length',
             type: 'number',
-            constraint: x => (x > 1 && x <= 200),
+            min: 2,
+            max: 100,
+            step: 1,
             default: 20,
             legend: true
         }

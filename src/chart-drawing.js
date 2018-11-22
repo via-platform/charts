@@ -120,8 +120,8 @@ module.exports = class ChartDrawing extends ChartLayer {
                 .merge(handles)
                     .raise()
                     .attr('class', 'handle')
-                    .attr('cx', ({x}) => this.chart.scale(x))
-                    .attr('cy', ({y}) => this.panel.scale(y))
+                    .attr('cx', ({x}) => Math.round(this.chart.scale(x)))
+                    .attr('cy', ({y}) => Math.round(this.panel.scale(y)))
                     .attr('r', 6);
 
             handles.exit().remove();

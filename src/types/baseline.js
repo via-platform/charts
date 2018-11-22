@@ -22,7 +22,10 @@ module.exports = {
         baseline: {
             title: 'Baseline',
             type: 'number',
-            default: 50
+            default: 50,
+            min: 0,
+            max: 100,
+            step: 0.1
         },
         positive: {
             title: 'Positive Color',
@@ -47,12 +50,12 @@ module.exports = {
     domain: series => {
         return series.length ? [series.min(), series.max()] : [];
     },
-    render: ({chart, panel, element, data, parameters}) => {
+    render: ({chart, panel, element, data, parameters, layer}) => {
         element.datum(data).selectAll('*').remove();
 
         if(data){
             const [low, high] = panel.scale.domain();
-            const baseline = low + ((high - low) * parameters.baseline / 100);
+            const baseline = low + ((high - low) * (100 - parameters.baseline) / 100);
             const clip_below = UUID();
             const clip_above = UUID();
             const positive = Color.parse(parameters.positive);
@@ -67,11 +70,16 @@ module.exports = {
                 .y1(([x, y]) => panel.scale(y))
                 .y0(panel.scale(baseline));
 
+            const dragged = function(){
+                parameters.baseline = Math.max(0, Math.min(100, Math.round((panel.height - d3.event.y) / panel.height * 1000) / 10));
+                layer.render();
+            };
+
             element.append('clipPath')
                 .attr('id', clip_below)
                 .append('rect')
                 .attr('width', panel.width)
-                .attr('height', panel.height * parameters.baseline / 100)
+                .attr('height', panel.height * (100 - parameters.baseline) / 100)
                 .attr('x', 0)
                 .attr('y', 0);
 
@@ -79,9 +87,9 @@ module.exports = {
                 .attr('id', clip_above)
                 .append('rect')
                 .attr('width', panel.width)
-                .attr('height', panel.height * (100 - parameters.baseline) / 100)
+                .attr('height', panel.height * parameters.baseline / 100)
                 .attr('x', 0)
-                .attr('y', panel.height * parameters.baseline / 100);
+                .attr('y', panel.height * (100 - parameters.baseline) / 100);
 
             positive.alpha = 0.2;
             negative.alpha = 0.2;
@@ -114,6 +122,11 @@ module.exports = {
                 .attr('d', line)
                 .attr('stroke', parameters.negative)
                 .attr('stroke-width', parameters.width);
+
+            element.append('path')
+                .classed('baseline-hitbox', true)
+                .attr('d', data.length > 1 ? `M 0 ${panel.scale(baseline) - 3} h ${panel.width} v 7 h ${-panel.width} Z` : '')
+                .call(d3.drag().on('drag', dragged));
         }
     }
 };

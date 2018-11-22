@@ -86,11 +86,11 @@ class ChartPanelValue {
         //For they moment, they just can't be removed the normal way
         const title = this.layer.title();
         const value = this.layer.value(this.candle);
-        const options = {classList: 'panel-value'};
 
-        if(this.layer.selectable){
-            options.onClick = () => this.layer.select();
-        }
+        const options = {
+            classList: 'panel-value',
+            onClick: e => e.detail === 2 ? this.layer.customize() : this.layer.select()
+        };
 
         return title ? $.div(options, $.div({classList: 'title'}, title), value) : $.div({});
     }

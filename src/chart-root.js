@@ -265,7 +265,7 @@ module.exports = class ChartRoot extends ChartLayer {
         .then(modal => {
             modal.on('did-change-value', ({field, value}) => {
                 this.parameters[this.type.name][field] = value;
-                this.render();
+                this.chart.recalculate();
             });
         });
     }

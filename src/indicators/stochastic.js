@@ -28,7 +28,7 @@ module.exports = {
             title: 'Upper Limit',
             trackable: false,
             parameters: {
-                fill: '#4594eb',
+                stroke: '#4594eb',
                 opacity: 50,
                 style: 'dashed'
             }
@@ -38,7 +38,7 @@ module.exports = {
             title: 'Lower Limit',
             trackable: false,
             parameters: {
-                fill: '#4594eb',
+                stroke: '#4594eb',
                 opacity: 50,
                 style: 'dashed'
             }

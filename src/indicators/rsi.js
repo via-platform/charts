@@ -20,7 +20,7 @@ module.exports = {
             title: 'Upper Limit',
             trackable: false,
             parameters: {
-                fill: '#4594eb',
+                stroke: '#4594eb',
                 opacity: 50,
                 style: 'dashed'
             }
@@ -30,7 +30,7 @@ module.exports = {
             title: 'Lower Limit',
             trackable: false,
             parameters: {
-                fill: '#4594eb',
+                stroke: '#4594eb',
                 opacity: 50,
                 style: 'dashed'
             }
@@ -57,7 +57,7 @@ module.exports = {
         },
         upper_limit: {
             title: 'Upper Limit',
-            type: 'integer',
+            type: 'number',
             min: 0,
             max: 100,
             step: 1,
@@ -65,7 +65,7 @@ module.exports = {
         },
         lower_limit: {
             title: 'Lower Limit',
-            type: 'integer',
+            type: 'number',
             min: 0,
             max: 100,
             step: 1,

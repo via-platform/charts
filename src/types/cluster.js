@@ -151,7 +151,6 @@ module.exports = {
             price_level_entries.append('path');
 
             price_level_entries.append('text')
-                .attr('fill', parameters.text)
                 .attr('alignment-baseline', 'middle')
                 .attr('text-anchor', 'middle');
 
@@ -167,6 +166,7 @@ module.exports = {
             all_price_levels.select('text')
                 .attr('x', cell_width / 2)
                 .attr('y', ([price]) => Math.ceil(panel.scale(price * profile_increment + profile_increment / 2)) + 0.5)
+                .attr('fill', parameters.text)
                 .text(([price, volume]) => {
                     return cell_width > 40 ? via.fn.number.formatAmount(volume.total, chart.market) : '';
                 });
